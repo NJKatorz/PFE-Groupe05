@@ -1,0 +1,5 @@
+### Read questions
+GET http://localhost:8080/questions
+
+### Read questions by template
+GET http://localhost:8080/questions?template=ALL
