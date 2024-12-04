@@ -1,41 +1,22 @@
 <template>
-  <div class="footer">
-    <div class="footer-container">
-      <div class="footer-content">
-        <p class="footer-text">ESG & ODD Évaluation © 2023 Shifting Pact. Tous droits réservés.</p>
-      </div>
+  <footer class="footer">
+    <div class="footer-content">
+      <p>&copy; 2024 Shifting Pact. Tous droits réservés.</p>
     </div>
-  </div>
+  </footer>
 </template>
 
 <script>
 export default {
-  name: 'Footer',
+  name: 'Footer'
 };
 </script>
 
 <style scoped>
 .footer {
-  background: linear-gradient(to right, #002E37, #40867A);
-  height: 72px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.footer-container {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-}
-
-.footer-content {
+  background-color: #004C53;
+  padding: 20px 0;
   text-align: center;
-}
-
-.footer-text {
-  font-size: 14px;
   color: white;
-  margin: 0;
 }
 </style>

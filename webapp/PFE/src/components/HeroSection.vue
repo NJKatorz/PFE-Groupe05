@@ -1,12 +1,12 @@
 <template>
-  <div class="hero-section">
+  <section class="hero-section">
     <div class="content-container">
       <h1 class="headline">Évaluez votre impact ESG & ODD</h1>
       <p class="subheading">
         Découvrez comment votre entreprise contribue au développement durable et à la responsabilité sociale grâce à notre plateforme d'évaluation innovante.
       </p>
     </div>
-  </div>
+  </section>
 </template>
 
 <script>
@@ -16,51 +16,45 @@ export default {
 </script>
 
 <style scoped>
+/* Styles spécifiques pour la section Hero */
 .hero-section {
   position: relative;
   height: 335px;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-family: 'Inter', sans-serif;
   text-align: center;
-  color: #002E37;
-  overflow: hidden;
+  background-image: url('../assets/Accueil.jpg');
+  background-size: cover;
+  background-position: center;
 }
 
 .hero-section::before {
   content: "";
-  background-image: url('@/assets/Accueil.jpg');
-  background-size: cover;
-  background-position: center;
-  opacity: 0.5; /* Set background image opacity */
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0; /* Place the overlay behind the text */
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.5);
 }
 
 .content-container {
-  width: 1090px;
-  height: 168px;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  position: relative; /* Ensure text is above the background */
-  z-index: 2; /* Place text above the background image */
+  position: relative;
+  max-width: 1090px;
+  padding: 0 20px;
+  z-index: 1;
 }
 
 .headline {
   font-size: 40px;
   font-weight: 800;
-  line-height: 48.41px;
+  line-height: 1.2;
+  margin-bottom: 20px;
 }
 
 .subheading {
   font-size: 24px;
-  font-weight: 400;
-  line-height: 29.05px;
+  line-height: 1.4;
 }
 </style>
