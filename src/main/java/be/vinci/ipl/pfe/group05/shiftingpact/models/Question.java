@@ -1,17 +1,15 @@
 package be.vinci.ipl.pfe.group05.shiftingpact.models;
 
 import com.mongodb.lang.NonNull;
-import com.mongodb.lang.Nullable;
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Document(collection= "questions")
 @Getter
@@ -19,10 +17,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Question {
-  @Id
-  private int id;
-  @NonNull
-  private int companyID;
+  private ObjectId id;
+
+  @Field("question_id")
+  private int questionId;
+//  @NonNull
+ // @Field("company_id")
+ // private int companyID;
   @NonNull
   private String question;
   private List<String> choice;
@@ -34,6 +35,4 @@ public class Question {
   private String template;
   @NonNull
   private String type; //radio, check box, champ libre
-
-
 }
