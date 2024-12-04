@@ -1,23 +1,31 @@
 <template>
   <div class="questionnaire-section">
     <div class="title-container">
-      <div class="title">Nos Questionnaires</div>
+      <h1 class="title">Nos questionnaires</h1>
     </div>
 
-    <div class="questionnaire-column">
+    <div class="questionnaire-container">
       <div class="questionnaire-card">
-        <div class="headline">Questionnaire ESG</div>
-        <div class="subheading">
-          Mesurez vos performances environnementales, sociales et de gouvernance pour identifier les domaines d'amélioration et valoriser vos actions responsables.
+        <div class="card-content">
+          <div class="icon-title">
+            <span class="icon">🍃</span>
+            <h2 class="headline">Questionnaire ESG</h2>
+          </div>
+          <p class="subheading">
+            Mesurez vos performances environnementales, sociales et de gouvernance pour identifier les domaines d'amélioration et valoriser vos actions responsables.
+          </p>
         </div>
       </div>
-    </div>
 
-    <div class="questionnaire-column">
       <div class="questionnaire-card">
-        <div class="headline">Questionnaire ODD</div>
-        <div class="subheading">
-          Alignez vos activités avec les ODD de l'ONU et contribuez à un avenir plus durable tout en renforçant votre impact positif sur la société.
+        <div class="card-content">
+          <div class="icon-title">
+            <span class="icon">🌐</span>
+            <h2 class="headline">Questionnaire ODD</h2>
+          </div>
+          <p class="subheading">
+            Alignez vos activités avec les ODD de l'ONU et contribuez à un avenir plus durable tout en renforçant votre impact positif sur la société.
+          </p>
         </div>
       </div>
     </div>
@@ -27,63 +35,91 @@
 <script>
 export default {
   name: 'QuestionnaireSection',
-};
+}
 </script>
 
 <style scoped>
 .questionnaire-section {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 16px;
   text-align: center;
 }
 
 .title-container {
-  width: 100%;
-  margin-bottom: 20px;
+  margin-bottom: 32px;
 }
 
 .title {
   font-family: 'Lalezar', sans-serif;
-  font-weight: 400; /* Regular weight */
-  font-size: 48px;  /* Font size */
-  line-height: 75.22px; /* Line height */
+  font-weight: 400;
+  font-size: 48px;
+  line-height: 75px;
   color: #004C53;
 }
 
-.questionnaire-column {
-  flex: 0 0 auto;
-  width: 586.23px;
-  height: 272px;
-  padding: 10px;
-  box-sizing: border-box;
-  text-align: center;
+.questionnaire-container {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  max-width: 1200px;
+  width: 100%;
 }
 
 .questionnaire-card {
-  padding: 20px;
-  border: 1px solid #ddd;
+  background-color: #FFFFFF;
   border-radius: 21px;
-  background-color: #fff;
-  height: 100%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  width: 586px;
+  height: 272px;
   display: flex;
-  flex-direction: column;
+  align-items: center;
+}
+
+.card-content {
+  padding: 32px;
+}
+
+.icon-title {
+  display: flex;
+  align-items: center;
   justify-content: center;
+  margin-bottom: 16px;
+}
+
+.icon {
+  font-size: 36px;
+  margin-right: 12px;
 }
 
 .headline {
   font-family: 'Inter', sans-serif;
-  font-weight: 700; /* Bold */
-  font-size: 36px;  /* Font size */
-  line-height: 43.57px; /* Line height */
-  margin-bottom: 10px; /* Spacing between headline and subheading */
+  font-weight: 700;
+  font-size: 36px;
+  line-height: 44px;
+  color: #000000;
 }
 
 .subheading {
   font-family: 'Inter', sans-serif;
-  font-weight: 400; /* Regular weight */
-  font-size: 26px;  /* Font size */
-  line-height: 31.47px; /* Line height */
-  color: #555;
+  font-weight: 400;
+  font-size: 26px;
+  line-height: 31px;
+  color: #555555;
+}
+
+@media (max-width: 1200px) {
+  .questionnaire-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .questionnaire-card {
+    width: 100%;
+    max-width: 586px;
+    height: auto;
+  }
 }
 </style>
+
