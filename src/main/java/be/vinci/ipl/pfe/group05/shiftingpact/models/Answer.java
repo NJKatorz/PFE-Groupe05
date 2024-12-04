@@ -2,7 +2,6 @@ package be.vinci.ipl.pfe.group05.shiftingpact.models;
 
 import com.mongodb.lang.NonNull;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

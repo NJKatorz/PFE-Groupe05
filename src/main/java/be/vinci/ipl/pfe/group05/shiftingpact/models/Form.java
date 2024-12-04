@@ -9,10 +9,11 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-@Getter
-@Setter
+
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 @Document(collection= "forms")
 public class Form {
   @Id
