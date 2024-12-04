@@ -20,7 +20,7 @@ public class FormsService {
   @Autowired
   QuestionsService questionsService;
 
-  public Form createOne(int companyId){
+  public Form createOne(Integer companyId){
     Form form = new Form();
     form.setCompanyId(companyId);
     Company company = companiesService.getOneById(companyId);
@@ -28,7 +28,8 @@ public class FormsService {
     List<Question> questionList = new ArrayList<>();
 
     for (String temp : companyTemplatesTemplate){
-      questionList.addAll(questionsService.getAllByTemplate(temp));
+      List<Question> list = questionsService.getAllByTemplate(temp);
+      questionList.addAll(list);
     }
 
     form.setQuestionList(questionList);

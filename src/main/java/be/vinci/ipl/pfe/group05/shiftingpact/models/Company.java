@@ -17,8 +17,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Company {
-  @Id
-  private int id;
+  private int companyId;
   @NonNull
   private String name;
   @NonNull

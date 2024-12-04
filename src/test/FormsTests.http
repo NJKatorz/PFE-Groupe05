@@ -1,8 +1,4 @@
 ### Create a form
 POST http://localhost:8080/forms/1
-Content-Type: application/json
 
-{
-  "companyId" : 1
-}
 

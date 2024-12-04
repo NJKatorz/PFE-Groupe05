@@ -20,8 +20,7 @@ public class Form {
 
   @NonNull
   @Field("company_id")
-  private int companyId;
-
+  private Integer companyId;
 
   @NonNull
   private int total;

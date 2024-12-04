@@ -11,6 +11,6 @@ public class CompaniesService {
   CompaniesRepository repository;
 
   public Company getOneById(int id){
-    return repository.findById(id).orElse(null);
+    return repository.findByCompanyId(id).orElse(null);
   }
 }
