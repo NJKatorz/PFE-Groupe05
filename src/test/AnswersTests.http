@@ -1,0 +1,13 @@
+### Create reponse
+POST http://localhost:8080/answers
+Content-Type: application/json
+
+{
+  "questionId": 1,
+  "formId": 1,
+  "response": "Non",
+  "responseInTwoYears": "Oui",
+  "comments": "Additional comments"
+}
+
+
