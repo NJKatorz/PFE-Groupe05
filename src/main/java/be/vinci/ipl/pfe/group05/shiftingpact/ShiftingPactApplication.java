@@ -15,18 +15,4 @@ public class ShiftingPactApplication {
     SpringApplication.run(ShiftingPactApplication.class, args);
   }
 
-  @Bean
-  CommandLineRunner runner(QuestionnaireRepository repository) {
-    return args -> {
-      Questionnaire questionnaire = new Questionnaire(
-          1,
-          Questionnaire.Statut.A_COMPLETER,
-          "Challenge 1",
-          "Template 1",
-          new ArrayList<>()
-      );
-      repository.insert(questionnaire);
-    };
-  }
-
 }
