@@ -1,6 +1,5 @@
 package be.vinci.ipl.pfe.group05.shiftingpact.models;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,32 +10,32 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-@Document(collection= "companies")
+@Document(collection= "users")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Company {
+public class User {
   @Id
   private int id;
-  @NonNull
-  private String name;
-  @NonNull
-  @Field("company_number")
-  private String companyNumber;
-  @NonNull
-  @Field("legal_form")
-  private String legalForm;
-  @NonNull
-  private String address;
-  @NonNull
-  @Field("nace_code")
-  private String naceCode;
-  @NonNull
-  @Field("registration_date")
-  private LocalDateTime registrationDate;
+
+  @Field("company_id")
+  private int companyId;
 
   @NonNull
-  private List<String> templates;
+  private String email;
 
+  @NonNull
+  @Field("last_name")
+  private String lastName;
+
+  @NonNull
+  @Field("first_name")
+  private String firstName;
+
+  private String fonction;
+
+  @NonNull
+  @Field("is_admin")
+  private boolean isAdmin;
 }
