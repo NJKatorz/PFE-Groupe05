@@ -1,46 +1,37 @@
 package be.vinci.ipl.pfe.group05.shiftingpact.models;
 
-import com.mongodb.lang.NonNull;
 import java.time.LocalDateTime;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-
-@Document(collection= "forms")
+@Document(collection= "companies")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Form {
+public class Company {
   @Id
   private int id;
   @NonNull
-  @Field("company_id")
-  private int companyID;
+  private String name;
   @NonNull
-  private int total;
+  @Field("company_number")
+  private String companyNumber;
   @NonNull
-  private int completed;
+  @Field("legal_form")
+  private String legalForm;
   @NonNull
-  @Field("created_at")
-  private LocalDateTime createdAt;
+  private String address;
   @NonNull
-  @Field("send_at")
-  private LocalDateTime sendAt;
+  @Field("nace_code")
+  private String naceCode;
   @NonNull
-  private String template;
-  @NonNull
-  @Field("question_list")
-  private List<Question> questionList;
-
-
-  }
-
-
-
+  @Field("registration_date")
+  private LocalDateTime registrationDate;
+}
