@@ -22,8 +22,6 @@ public class CompaniesService {
   }
 
   public Company login(String login, String password) {
-    String hash = BCrypt.hashpw(password, BCrypt.gensalt());
-    System.out.println(hash);
       Company company =  repository.findByLogin(login).orElse(null);
       if (company == null) {
         return null;
