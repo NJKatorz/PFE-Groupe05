@@ -81,10 +81,7 @@
   
   const startQuestionnaire = () => {
     if (selectedQuestionnaire.value) {
-      router.push({
-        name: 'QuestionByModule',
-        params: { type: selectedQuestionnaire.value }
-      });
+      router.push('/questionnaire/ESG');
     }
   };
   </script>
