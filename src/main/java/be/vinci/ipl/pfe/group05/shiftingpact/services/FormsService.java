@@ -63,13 +63,13 @@ public class FormsService {
 }
 
   public Form submit(int formId) {
-    Form form = repository.findById(formId).orElse(null);
+    Form form = repository.findByFormId(formId).orElse(null);
     if (form == null) {
-      return null;
+      throw new IllegalArgumentException("Formulaire introuvable");
     }
     form.setSendAt(LocalDateTime.now());
     if (form.getCompleted() != form.getTotal()) {
-      return null;
+      throw new IllegalArgumentException("Le formulaire n'est pas complet");
     }
     form.setCompleted(form.getTotal());
     return repository.save(form);
