@@ -11,7 +11,12 @@ public class AnswersService {
   @Autowired
   AnswersRepository repository;
 
-  public Answer createOne(Answer answer){
+ /* public Answer createOne(Answer answer){
     return repository.save(answer);
   }
+  public Answer updateOne(Integer formId, Integer questionId, Answer Answer){
+
+  } */
+
+
 }
