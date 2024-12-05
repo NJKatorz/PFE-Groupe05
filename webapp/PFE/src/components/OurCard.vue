@@ -11,6 +11,8 @@
 </template>
 
 <script setup>
+
+
 defineProps({
   title: {
     type: String,
@@ -21,6 +23,8 @@ defineProps({
     default: ''
   }
 });
+
+
 </script>
 
 <style scoped>
@@ -33,7 +37,7 @@ defineProps({
 }
 
 .card-header {
-  background: linear-gradient(to bottom, #004851 0%, #004851 100%);
+  background: linear-gradient(to right, #002E37, #40867A);
   color: white;
   padding: 1.5rem;
   text-align: center;
