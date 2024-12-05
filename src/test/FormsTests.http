@@ -5,3 +5,180 @@ POST http://localhost:8080/forms/1
 GET http://localhost:8080/forms
 
 
+### Save the form
+POST http://localhost:8080/forms/2/saveAnswers
+Content-Type: application/json
+
+[
+  {
+    "questionId": 1,
+    "response": "Non"
+  },
+  {
+    "questionId": 2,
+    "response": "test"
+  },
+  {
+    "questionId": 7,
+    "response": "Non"
+  },
+  {
+    "questionId": 8,
+    "response": "test"
+  },
+  {
+    "questionId": 9,
+    "response": "test"
+  },
+  {
+    "questionId": 10,
+    "response": "test"
+  },
+  {
+    "questionId": 11,
+    "response": "Nous n'avons pas réalisé de rapport d'empreinte carbone."
+  },
+  {
+    "questionId": 12,
+    "response": "Aucune de ces réponses."
+  },
+  {
+    "questionId": 14,
+    "response": "Je ne sais pas"
+  },
+  {
+    "questionId": 17,
+    "response": "Aucune de ces réponses."
+  },
+  {
+    "questionId": 22,
+    "response": "Aucune de ces réponses."
+  },
+  {
+    "questionId": 60,
+    "response": "Aucune de ces réponses."
+  },
+  {
+    "questionId": 61,
+    "response": "Non"
+  },
+  {
+    "questionId": 62,
+    "response": "Aucune des réponses ci-dessus."
+  },
+  {
+    "questionId": 63,
+    "response": "Pas de philantropie"
+  },
+  {
+    "questionId": 64,
+    "response": "Notre organisation est dirigée par ses fondateur·trices ou propriétaires uniquement."
+  },
+  {
+    "questionId": 65,
+    "response": "Aucune de ces réponses."
+  },
+  {
+    "questionId": 66,
+    "response": "test"
+  },
+  {
+    "questionId": 67,
+    "response": "test"
+  },
+  {
+    "questionId": 68,
+    "response": "0%"
+  },
+  {
+    "questionId": 69,
+    "response": "Non"
+  },
+  {
+    "questionId": 70,
+    "response": "test"
+  },
+  {
+    "questionId": 71,
+    "response": "Nous ne procédons à aucun contrôle ou audit de nos fournisseurs."
+  },
+  {
+    "questionId": 72,
+    "response": "Aucune de ces réponses."
+  },
+  {
+    "questionId": 73,
+    "response": "Aucune de ces réponses."
+  },
+  {
+    "questionId": 74,
+    "response": "Aucune de ces réponses."
+  },
+  {
+    "questionId": 75,
+    "response": "Nous n'avons pas de mission écrite et formelle."
+  },
+  {
+    "questionId": 76,
+    "response": "Aucune de ces réponses."
+  },
+  {
+    "questionId": 77,
+    "response": "Aucune de ces réponses."
+  },
+  {
+    "questionId": 78,
+    "response": "Aucune de ces réponses."
+  },
+  {
+    "questionId": 79,
+    "response": "Aucune de ces réponses."
+  },
+  {
+    "questionId": 80,
+    "response": "Aucune de ces réponses."
+  },
+  {
+    "questionId": 81,
+    "response": "Nous n'avons pas de rapport d'impact."
+  },
+  {
+    "questionId": 82,
+    "response": "Aucune des réponses ci-dessus."
+  },
+  {
+    "questionId": 83,
+    "response": "Aucune des réponses ci-dessus."
+  },
+  {
+    "questionId": 84,
+    "response": "Non"
+  },
+  {
+    "questionId": 85,
+    "response": "Non"
+  },
+  {
+    "questionId": 86,
+    "response": "Aucune de ces réponses."
+  },
+  {
+    "questionId": 87,
+    "response": "Nous avons mis en place quelques mesures de base mais nous ne disposons pas d'une politique de protection de la vie privée formelle."
+  },
+  {
+    "questionId": 88,
+    "response": "Je ne sais pas"
+  },
+  {
+    "questionId": 89,
+    "response": "0%"
+  },
+  {
+    "questionId": 90,
+    "response": "Non"
+  }
+]
+
+###Submit the form
+POST http://localhost:8080/forms/2/submit
