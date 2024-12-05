@@ -44,9 +44,9 @@ public class FormsService {
   }
 
   public Form saveAnswers(int formId, List<Answer> answers) {
-  Form form = repository.findById(formId).orElse(null);
+  Form form = repository.findByFormId(formId).orElse(null);
   if (form == null) {
-    return null;
+    throw new IllegalArgumentException("Formulaire introuvable");
   }
 
   List<Answer> existingAnswers = form.getAnswersList();
