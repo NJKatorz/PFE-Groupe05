@@ -39,4 +39,8 @@ public class FormsService {
     form.setCreatedAt(LocalDateTime.now());
     return repository.save(form);
   }
+
+  public Iterable<Form> getAllForms() {
+    return repository.findAll();
+  }
 }

@@ -1,4 +1,7 @@
 ### Create a form
 POST http://localhost:8080/forms/1
 
+### Get all forms
+GET http://localhost:8080/forms
+
 

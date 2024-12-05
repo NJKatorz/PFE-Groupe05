@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import NewQuestionnaire from '../views/NewQuestionnaire.vue'
+// import NewQuestionnaire from '../views/NewQuestionnaire.vue'
 import Homepage from "@/views/Homepage.vue";
 
 const router = createRouter({
