@@ -61,19 +61,15 @@
 
       <!-- Navigation Buttons -->
       <div class="navigation-buttons">
-        <button 
-          class="btn btn-previous"
-          :disabled="!selectedQuestionnaire"
-          @click="startQuestionnaire"
-        >
+        <button class="btn btn-previous" @click="$router.back()">
           <i class="fas fa-arrow-left"></i>
-          Précédent
+           Précédent
         </button>
         <button class="btn btn-save">
           <i class="fas fa-save"></i>
           Sauvegarder
         </button>
-        <button class="btn btn-next">
+        <button class="btn btn-next" @click="handleSubmit">
           Suivant
           <i class="fas fa-arrow-right"></i>
         </button>
@@ -87,6 +83,7 @@
 <script setup>
 import { ref } from 'vue';
 import OurCard from '../components/OurCard.vue';
+import { useRouter } from 'vue-router'
 
 // eslint-disable-next-line no-unused-vars
 const props = defineProps({
@@ -95,6 +92,13 @@ const props = defineProps({
     required: true
   }
 });
+
+ const router = useRouter()
+
+ const handleSubmit = () => {
+      router.push('/validation')
+  }
+ 
 
 // Questions data
 const questions = ref([
