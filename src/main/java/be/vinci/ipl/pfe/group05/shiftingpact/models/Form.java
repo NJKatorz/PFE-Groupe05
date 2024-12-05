@@ -18,7 +18,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class Form {
   @Id
   private ObjectId id;
-
+  private int formId;
   @NonNull
   @Field("form_id")
   private Integer formId;
