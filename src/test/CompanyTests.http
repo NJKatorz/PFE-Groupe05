@@ -11,14 +11,14 @@ Content-Type: application/json
   client.global.set("tecToken", response.body.token);
 %}
 
-### Create a company
-POST http://localhost:8080/companies/validate/1
+### Validate a company
+POST http://localhost:8080/companies/3/validate
 Content-Type: application/json
 
 {
-  "companyId": 1,
-  "name": "Tech Inovators Inc.",
-  "companyNumber": "1234560989878",
+  "companyId": 3,
+  "name": "Blue Horizon Ventures",
+  "companyNumber": "45432345678",
   "legalForm": "SARL",
   "address": "L'adresse de la company",
   "naceCode": "1234",
