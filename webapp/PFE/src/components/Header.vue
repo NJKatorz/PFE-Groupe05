@@ -8,7 +8,7 @@
 
 <script>
 export default {
-  name: 'Header'
+  name: 'HeaderPart'
 };
 </script>
 
@@ -16,7 +16,7 @@ export default {
 /* Styles spécifiques pour le header */
 .header {
   background: linear-gradient(to right, #002E37, #40867A);
-  height: 125px;
+  height: 100px;
   position: relative;
 }
 
@@ -27,7 +27,7 @@ export default {
 }
 
 .logo {
-  width: 242px;
-  height: 97.87px;
+  width: 180px;
+  height: 70px;
 }
 </style>
