@@ -1,89 +1,9 @@
-<template>
-  <div class="questionnaire-container">
-    <OurCard :title="'QUESTIONNAIRE ' + type">
-      <!-- Progress Bar -->
-      <div class="progress-bar">
-        <div class="progress-fill" :style="{ width: progress + '%' }"></div>
-      </div>
-
-      <!-- Module Header -->
-      <div class="module-header">
-        <div class="module-icon">
-          <img src="../assets/moduleImage.png" alt="Santé et bien être" />
-          <span class="module-number">3</span>
-        </div>
-        <div class="module-info">
-          <h2 class="module-title">MODULE 3</h2>
-          <p class="module-subtitle">SANTÉ ET BIEN ÊTRE</p>
-        </div>
-      </div>
-
-      <!-- Questions -->
-      <div class="questions-container">
-        <div 
-          v-for="(question, index) in questions" 
-          :key="index" 
-          class="question"
-        >
-          <h3>{{ question.text }}</h3>
-          <div class="options">
-            <!-- Wrapper element now holds the v-if -->
-            <template v-if="question.type === 'radio'">
-              <div
-                v-for="option in question.options"
-                :key="option"
-                class="radio-option"
-                @click="selectOption(index, option)"
-              >
-                <div class="radio-circle">
-                  <div class="radio-inner" v-if="selectedAnswers[index] === option"></div>
-                </div>
-                <span>{{ option }}</span>
-              </div>
-            </template>
-
-            <template v-else-if="question.type === 'checkbox'">
-              <div
-                v-for="option in question.options"
-                :key="option"
-                class="checkbox-option"
-                @click="toggleCheckbox(index, option)"
-              >
-                <div class="checkbox">
-                  <div class="checkbox-inner" v-if="selectedAnswers[index]?.includes(option)"></div>
-                </div>
-                <span>{{ option }}</span>
-              </div>
-            </template>
-          </div>
-        </div>
-      </div>
-
-      <!-- Navigation Buttons -->
-      <div class="navigation-buttons">
-        <button class="btn btn-previous" @click="$router.back()">
-          <i class="fas fa-arrow-left"></i>
-           Précédent
-        </button>
-        <button class="btn btn-save">
-          <i class="fas fa-save"></i>
-          Sauvegarder
-        </button>
-        <button class="btn btn-next" @click="handleSubmit">
-          Suivant
-          <i class="fas fa-arrow-right"></i>
-        </button>
-      </div>
-    </OurCard>
-  </div>
-</template>
-
-
-  
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import OurCard from '../components/OurCard.vue';
-import { useRouter } from 'vue-router'
+import { useRouter } from 'vue-router';
+import api from '../services/api'; // Chemin vers ton fichier `api.js`
+
 
 // eslint-disable-next-line no-unused-vars
 const props = defineProps({
@@ -93,33 +13,21 @@ const props = defineProps({
   }
 });
 
- const router = useRouter()
+const router = useRouter();
 
- const handleSubmit = () => {
-      router.push('/validation')
-  }
- 
+const handleSubmit = () => {
+  router.push('/validation');
+};
 
 // Questions data
-const questions = ref([
-  {
-    text: 'Quel est le niveau de votre politique ESG?',
-    type: 'radio',
-    options: ['Débutant', 'Intermédiaire', 'Avancé']
-  },
-  {
-    text: 'Sélectionnez les certifications que vous possédez',
-    type: 'checkbox',
-    options: ['ISO 14001', 'ISO 26000', 'B Corp', 'Label RSE']
-  }
-]);
+const questions = ref([]); // Initialement vide
 
-const selectedAnswers = ref(questions.value.map(question => 
-  question.type === 'checkbox' ? [] : ''
-));
+// Sélection des réponses
+const selectedAnswers = ref([]);
 
 // Progress calculation
 const progress = ref(0);
+
 const updateProgress = () => {
   const totalQuestions = questions.value.length;
   const answered = selectedAnswers.value.filter(answer =>
@@ -144,12 +52,126 @@ const toggleCheckbox = (index, option) => {
   }
   updateProgress();
 };
+
+// Charger les questions depuis une API
+onMounted(async () => {
+  try {
+    const response = await api.get('/questions'); // Utilisation de l'instance personnalisée
+    questions.value = response.data; // Remplacer les données statiques par celles récupérées
+    // Initialiser `selectedAnswers` avec des valeurs par défaut
+    selectedAnswers.value = questions.value.map(question =>
+      question.type === 'checkbox' ? [] : ''
+    );
+  } catch (error) {
+    console.error('Erreur lors de la récupération des questions:', error);
+  }
+});
 </script>
+
+<template>
+  <div class="questionnaire-container">
+    <OurCard :title="'QUESTIONNAIRE ' + type">
+      <!-- Progress Bar -->
+      <div class="progress-bar">
+        <div class="progress-fill" :style="{ width: progress + '%' }"></div>
+      </div>
+
+      <!-- Module Header -->
+      <div class="module-header">
+        <div class="module-icon">
+          <img src="../assets/moduleImage.png" alt="Santé et bien être" />
+          <span class="module-number">3</span>
+        </div>
+        <div class="module-info">
+          <h2 class="module-title">MODULE 3</h2>
+          <p class="module-subtitle">SANTÉ ET BIEN ÊTRE</p>
+        </div>
+      </div>
+
+      <!-- Questions -->
+      <div class="questions-container">
+    <div
+      v-for="(question, index) in questions"
+      :key="index"
+      class="question"
+    >
+      <h3>{{ question.question }}</h3>
+      <div class="options">
+        <!-- Si le type est "radio" -->
+        <template v-if="question.type === 'radio'">
+          <div
+            v-for="(option, optionIndex) in question.choice"
+            :key="optionIndex"
+            class="radio-option"
+            @click="selectOption(index, option)"
+          >
+            <div class="radio-circle">
+              <div
+                class="radio-inner"
+                v-if="selectedAnswers[index] === option"
+              ></div>
+            </div>
+            <span>{{ option }}</span>
+          </div>
+        </template>
+
+        <!-- Si le type est "checkbox" -->
+        <template v-else-if="question.type === 'checkbox'">
+          <div
+            v-for="(option, optionIndex) in question.choice"
+            :key="optionIndex"
+            class="checkbox-option"
+            @click="toggleCheckbox(index, option)"
+          >
+            <div class="checkbox">
+              <div
+                class="checkbox-inner"
+                v-if="selectedAnswers[index]?.includes(option)"
+              ></div>
+            </div>
+            <span>{{ option }}</span>
+          </div>
+        </template>
+
+        <!-- Pour d'autres types -->
+        <template v-else>
+          <input
+            v-if="question.type === 'champ libre'"
+            type="text"
+            class="text-input"
+            @input="handleTextInput(index, $event.target.value)"
+            :value="selectedAnswers[index]"
+          />
+        </template>
+      </div>
+    </div>
+  </div>
+
+      <!-- Navigation Buttons -->
+      <div class="navigation-buttons">
+        <button class="btn btn-previous" @click="$router.back()">
+          <i class="fas fa-arrow-left"></i>
+          Précédent
+        </button>
+        <button class="btn btn-save">
+          <i class="fas fa-save"></i>
+          Sauvegarder
+        </button>
+        <button class="btn btn-next" @click="handleSubmit">
+          Suivant
+          <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </OurCard>
+  </div>
+</template>
+
+
 
   
   <style scoped>
   .questionnaire-container {
-    max-width: 800px;
+    max-width: 1000px;
     margin: 0 auto;
     padding: 1rem;
   }
@@ -244,51 +266,45 @@ const toggleCheckbox = (index, option) => {
   }
   
   .radio-option, .checkbox-option {
-    display: flex;
-    align-items: center;
-    padding: 1rem;
-    border: 2px solid #E2E8F0;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-  
-  .radio-option:hover, .checkbox-option:hover {
-    border-color: #2F8886;
-    background-color: #F7FAFC;
-  }
-  
-  .radio-circle, .checkbox {
-    width: 24px;
-    height: 24px;
-    border: 2px solid #2F8886;
-    margin-right: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .radio-circle {
-    border-radius: 50%;
-  }
-  
-  .checkbox {
-    border-radius: 4px;
-  }
-  
-  .radio-inner {
-    width: 12px;
-    height: 12px;
-    background-color: #2F8886;
-    border-radius: 50%;
-  }
-  
-  .checkbox-inner {
-    width: 12px;
-    height: 12px;
-    background-color: #2F8886;
-    border-radius: 2px;
-  }
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border: 2px solid #E2E8F0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 60px; /* Fixe une hauteur minimale */
+}
+
+.radio-option:hover, .checkbox-option:hover {
+  border-color: #2F8886;
+  background-color: #F7FAFC;
+}
+
+.radio-circle, .checkbox {
+  flex-shrink: 0; /* Empêche la réduction de taille des cercles/carrés */
+  width: 24px;
+  height: 24px;
+  border: 2px solid #2F8886;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.radio-circle {
+  border-radius: 50%;
+}
+
+.checkbox {
+  border-radius: 4px;
+}
+
+.radio-inner, .checkbox-inner {
+  width: 12px;
+  height: 12px;
+  background-color: #2F8886;
+}
   
   .checkbox-option {
     justify-content: space-between;
@@ -335,6 +351,22 @@ const toggleCheckbox = (index, option) => {
     background-color: #004851;
     color: white;
   }
+
+  .text-input {
+  width: 95%;
+  padding: 1rem;
+  border: 2px solid #E2E8F0;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.text-input:focus {
+  outline: none;
+  border-color: #2F8886;
+  background-color: #F7FAFC;
+}
+
   
   @media (max-width: 640px) {
     .navigation-buttons {
