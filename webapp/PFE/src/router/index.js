@@ -30,6 +30,11 @@ const router = createRouter({
       name: 'EndQuestionnaire',
       component: () => import('@/views/EndQuestionnaire.vue')
     },
+    {
+      path: '/AllClientForms',
+      name: 'AllClientForms',
+      component: () => import('@/views/AllClientForms.vue')
+    }
   ],
 })
 
