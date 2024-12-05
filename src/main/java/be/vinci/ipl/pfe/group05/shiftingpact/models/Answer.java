@@ -19,8 +19,6 @@ public class Answer {
   private ObjectId id;
   @NonNull
   private int questionId;
-  @NonNull
-  private int formId;
   private String response;
   private String responseInTwoYears;
   private String comments;
