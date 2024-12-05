@@ -1,165 +1,206 @@
+
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import OurCard from '../components/OurCard.vue';
-import { useRouter } from 'vue-router';
-import api from '../services/api'; // Chemin vers ton fichier `api.js`
+import api from '../services/api';
 
 
-// eslint-disable-next-line no-unused-vars
-const props = defineProps({
-  type: {
-    type: String,
-    required: true
-  }
-});
-
-const router = useRouter();
-
-const handleSubmit = () => {
-  router.push('/validation');
-};
-
-// Questions data
-const questions = ref([]); // Initialement vide
-
-// Sélection des réponses
-const selectedAnswers = ref([]);
-
-// Progress calculation
+const questionsByCategory = ref({});
+const categories = ref([]);
+const currentCategoryIndex = ref(0);
+const selectedAnswers = ref({});
 const progress = ref(0);
 
-const updateProgress = () => {
-  const totalQuestions = questions.value.length;
-  const answered = selectedAnswers.value.filter(answer =>
-    Array.isArray(answer) ? answer.length > 0 : answer !== ''
-  ).length;
-  progress.value = (answered / totalQuestions) * 100;
-};
+// Données de la catégorie actuelle
+const currentCategory = computed(() => categories.value[currentCategoryIndex.value]);
+const currentQuestions = computed(() => questionsByCategory.value[currentCategory.value] || []);
 
-// Handlers for answers
-const selectOption = (index, option) => {
-  selectedAnswers.value[index] = option;
-  updateProgress();
-};
-
-const toggleCheckbox = (index, option) => {
-  const currentAnswers = selectedAnswers.value[index];
-  const answerIndex = currentAnswers.indexOf(option);
-  if (answerIndex === -1) {
-    currentAnswers.push(option);
-  } else {
-    currentAnswers.splice(answerIndex, 1);
-  }
-  updateProgress();
-};
-
-// Charger les questions depuis une API
+// Charger les questions depuis l'API
 onMounted(async () => {
   try {
-    const response = await api.get('/questions'); // Utilisation de l'instance personnalisée
-    questions.value = response.data; // Remplacer les données statiques par celles récupérées
-    // Initialiser `selectedAnswers` avec des valeurs par défaut
-    selectedAnswers.value = questions.value.map(question =>
-      question.type === 'checkbox' ? [] : ''
+    const response = await api.get('/questions');
+    const questions = response.data;
+
+    // Regrouper par catégorie
+    questionsByCategory.value = questions.reduce((acc, question) => {
+      const category = question.category;
+      if (!acc[category]) acc[category] = [];
+      acc[category].push(question);
+      return acc;
+    }, {});
+
+    categories.value = Object.keys(questionsByCategory.value);
+
+    // Initialiser les réponses par catégorie
+    selectedAnswers.value = Object.fromEntries(
+      categories.value.map((category) => [
+        category,
+        questionsByCategory.value[category].reduce((answers, question) => {
+          answers[question.questionId] = question.type === 'checkbox' ? [] : '';
+          return answers;
+        }, {}),
+      ])
     );
+
+    updateProgress();
   } catch (error) {
     console.error('Erreur lors de la récupération des questions:', error);
   }
 });
+
+// Mettre à jour le progrès
+const updateProgress = () => {
+  const category = currentCategory.value;
+  const totalQuestions = currentQuestions.value.length;
+  const answered = Object.values(selectedAnswers.value[category] || {}).filter((answer) =>
+    Array.isArray(answer) ? answer.length > 0 : answer !== ''
+  ).length;
+  progress.value = totalQuestions > 0 ? (answered / totalQuestions) * 100 : 0;
+};
+
+// Gestion des réponses
+const selectOption = (questionId, option) => {
+  const category = currentCategory.value;
+  selectedAnswers.value[category][questionId] = option;
+  updateProgress();
+};
+
+const toggleCheckbox = (questionId, option) => {
+  const category = currentCategory.value;
+  const answers = selectedAnswers.value[category][questionId];
+  const index = answers.indexOf(option);
+  if (index === -1) {
+    answers.push(option);
+  } else {
+    answers.splice(index, 1);
+  }
+  selectedAnswers.value[category][questionId] = answers;
+  updateProgress();
+};
+
+const handleTextInput = (questionId, value) => {
+  const category = currentCategory.value;
+  selectedAnswers.value[category][questionId] = value;
+  updateProgress();
+};
+
+const scrollToTop = () => {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth', // Ajoute un défilement fluide
+  });
+};
+
+// Navigation entre les catégories
+const goToNextCategory = () => {
+  if (currentCategoryIndex.value < categories.value.length - 1) {
+    currentCategoryIndex.value++;
+    scrollToTop(); 
+    updateProgress();
+  }
+};
+
+const goToPreviousCategory = () => {
+  if (currentCategoryIndex.value > 0) {
+    currentCategoryIndex.value--;
+    scrollToTop(); 
+    updateProgress();
+  }
+};
+
 </script>
+
 
 <template>
   <div class="questionnaire-container">
-    <OurCard :title="'QUESTIONNAIRE ' + type">
+    <OurCard :title="'QUESTIONNAIRE ESG '">
       <!-- Progress Bar -->
       <div class="progress-bar">
         <div class="progress-fill" :style="{ width: progress + '%' }"></div>
       </div>
 
-      <!-- Module Header -->
-      <div class="module-header">
-        <div class="module-icon">
-          <img src="../assets/moduleImage.png" alt="Santé et bien être" />
-          <span class="module-number">3</span>
-        </div>
+      <!-- Titre de la catégorie -->
+      <div class="module-header" >
         <div class="module-info">
-          <h2 class="module-title">MODULE 3</h2>
-          <p class="module-subtitle">SANTÉ ET BIEN ÊTRE</p>
+          <div class="module-title">
+            <p>{{ categories[currentCategoryIndex] }}</p>
+          </div>
         </div>
       </div>
 
       <!-- Questions -->
       <div class="questions-container">
-    <div
-      v-for="(question, index) in questions"
-      :key="index"
-      class="question"
-    >
-      <h3>{{ question.question }}</h3>
-      <div class="options">
-        <!-- Si le type est "radio" -->
-        <template v-if="question.type === 'radio'">
-          <div
-            v-for="(option, optionIndex) in question.choice"
-            :key="optionIndex"
-            class="radio-option"
-            @click="selectOption(index, option)"
-          >
-            <div class="radio-circle">
+        <div
+          v-for="(question) in currentQuestions"
+          :key="question.questionId"
+          class="question"
+        >
+          <h3>{{ question.question }}</h3>
+          <div class="options">
+            <!-- Si le type est "radio" -->
+            <template v-if="question.type === 'radio'">
               <div
-                class="radio-inner"
-                v-if="selectedAnswers[index] === option"
-              ></div>
-            </div>
-            <span>{{ option }}</span>
-          </div>
-        </template>
+                v-for="option in question.choice"
+                :key="option"
+                class="radio-option"
+                @click="selectOption(question.questionId, option)"
+              >
+                <div class="radio-circle">
+                  <div
+                    class="radio-inner"
+                    v-if="selectedAnswers[categories[currentCategoryIndex]][question.questionId] === option"
+                  ></div>
+                </div>
+                <span>{{ option }}</span>
+              </div>
+            </template>
 
-        <!-- Si le type est "checkbox" -->
-        <template v-else-if="question.type === 'checkbox'">
-          <div
-            v-for="(option, optionIndex) in question.choice"
-            :key="optionIndex"
-            class="checkbox-option"
-            @click="toggleCheckbox(index, option)"
-          >
-            <div class="checkbox">
+            <!-- Si le type est "checkbox" -->
+            <template v-else-if="question.type === 'checkbox'">
               <div
-                class="checkbox-inner"
-                v-if="selectedAnswers[index]?.includes(option)"
-              ></div>
-            </div>
-            <span>{{ option }}</span>
-          </div>
-        </template>
+                v-for="option in question.choice"
+                :key="option"
+                class="checkbox-option"
+                @click="toggleCheckbox(question.questionId, option)"
+              >
+                <div class="checkbox">
+                  <div
+                    class="checkbox-inner"
+                    v-if="selectedAnswers[categories[currentCategoryIndex]][question.questionId]?.includes(option)"
+                  ></div>
+                </div>
+                <span>{{ option }}</span>
+              </div>
+            </template>
 
-        <!-- Pour d'autres types -->
-        <template v-else>
-          <input
-            v-if="question.type === 'champ libre'"
-            type="text"
-            class="text-input"
-            @input="handleTextInput(index, $event.target.value)"
-            :value="selectedAnswers[index]"
-          />
-        </template>
+            <!-- Pour le texte libre -->
+            <template v-else-if="question.type === 'champ libre'">
+              <input
+                type="text"
+                class="text-input"
+                @input="handleTextInput(question.questionId, $event.target.value)"
+                :value="selectedAnswers[categories[currentCategoryIndex]][question.questionId]"
+              />
+            </template>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
 
       <!-- Navigation Buttons -->
       <div class="navigation-buttons">
-        <button class="btn btn-previous" @click="$router.back()">
-          <i class="fas fa-arrow-left"></i>
+        <button
+          class="btn btn-previous"
+          @click="goToPreviousCategory"
+          :disabled="currentCategoryIndex === 0"
+        >
           Précédent
         </button>
-        <button class="btn btn-save">
-          <i class="fas fa-save"></i>
-          Sauvegarder
-        </button>
-        <button class="btn btn-next" @click="handleSubmit">
+        <button
+          class="btn btn-next"
+          @click="goToNextCategory"
+          :disabled="currentCategoryIndex === categories.length - 1"
+        >
           Suivant
-          <i class="fas fa-arrow-right"></i>
         </button>
       </div>
     </OurCard>
@@ -293,7 +334,7 @@ onMounted(async () => {
 }
 
 .radio-circle {
-  border-radius: 50%;
+  border-radius: 100%;
 }
 
 .checkbox {
@@ -304,6 +345,11 @@ onMounted(async () => {
   width: 12px;
   height: 12px;
   background-color: #2F8886;
+}
+
+.radio-inner {
+
+  border-radius: 50%; /* Assure que l'intérieur reste rond */
 }
   
   .checkbox-option {
