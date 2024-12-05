@@ -1,0 +1,26 @@
+### Login a company
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "login": "tec234",
+  "password": "-w8*2g^gljwr"
+}
+
+
+### Create a company
+POST http://localhost:8080/companies/validate/1
+Content-Type: application/json
+
+{
+  "companyId": 1,
+  "name": "Tech Inovators Inc.",
+  "companyNumber": "1234560989878",
+  "legalForm": "SARL",
+  "address": "L'adresse de la company",
+  "naceCode": "1234",
+  "templates": ["ALL"],
+  "scores": [],
+  "isValidated": false,
+  "contactEmail": "ouarrad.dania@gmail.com"
+}

@@ -24,6 +24,9 @@ public class FormsService {
     Form form = new Form();
     form.setCompanyId(companyId);
     Company company = companiesService.getOneById(companyId);
+    if (company == null){
+      return null;
+    }
     List<String> companyTemplatesTemplate = company.getTemplates();
     List<Question> questionList = new ArrayList<>();
 
