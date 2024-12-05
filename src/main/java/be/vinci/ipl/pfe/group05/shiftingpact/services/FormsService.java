@@ -1,5 +1,6 @@
 package be.vinci.ipl.pfe.group05.shiftingpact.services;
 
+import be.vinci.ipl.pfe.group05.shiftingpact.models.Answer;
 import be.vinci.ipl.pfe.group05.shiftingpact.models.Company;
 import be.vinci.ipl.pfe.group05.shiftingpact.models.Form;
 import be.vinci.ipl.pfe.group05.shiftingpact.models.Question;
@@ -42,12 +43,34 @@ public class FormsService {
     return repository.save(form);
   }
 
+  public Form saveAnswers(int formId, List<Answer> answers) {
+  Form form = repository.findById(formId).orElse(null);
+  if (form == null) {
+    return null;
+  }
+
+  List<Answer> existingAnswers = form.getAnswersList();
+  for (Answer newAnswer : answers) {
+    if (newAnswer.getResponse() != null && !newAnswer.getResponse().isEmpty()) {
+      existingAnswers.removeIf(existingAnswer -> existingAnswer.getQuestionId() == newAnswer.getQuestionId() || existingAnswer.getResponse()==null || existingAnswer.getResponse().isEmpty());
+      existingAnswers.add(newAnswer);
+    }
+  }
+
+  form.setAnswersList(existingAnswers);
+  form.setCompleted(existingAnswers.size());
+  return repository.save(form);
+}
+
   public Form submit(int formId) {
     Form form = repository.findById(formId).orElse(null);
     if (form == null) {
       return null;
     }
     form.setSendAt(LocalDateTime.now());
+    if (form.getCompleted() != form.getTotal()) {
+      return null;
+    }
     form.setCompleted(form.getTotal());
     return repository.save(form);
   }
