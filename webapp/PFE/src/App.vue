@@ -1,41 +1,34 @@
+<script setup>
+import { RouterView } from 'vue-router';
+import Header from '@/components/Header.vue';
+import Footer from '@/components/Footer.vue';
+</script>
+
 <template>
-  <div class="app">
-    <!-- Header -->
+  <div class="app-container">
     <Header />
-
-    <!-- Hero Section -->
-    <HeroSection />
-
-    <!-- Questionnaire Section -->
-    <QuestionnaireSection />
-
-    <!-- Why Choose Section -->
-    <WhyChooseSection />
-
-    <!-- Footer -->
+    <main>
+      <RouterView />
+    </main>
     <Footer />
   </div>
 </template>
 
-<script>
-import Header from './components/Header.vue';
-import HeroSection from './components/HeroSection.vue';
-import QuestionnaireSection from './components/QuestionnaireSection.vue';
-import WhyChooseSection from './components/WhyChooseSection.vue';
-import Footer from './components/Footer.vue';
+<style>
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
 
-export default {
-  name: 'App',
-  components: {
-    Header,
-    HeroSection,
-    QuestionnaireSection,
-    WhyChooseSection,
-    Footer
-  }
-};
-</script>
+main{
+  flex: 1;
+}
 
-<style scoped>
-/* Global Styles */
+header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 10;
+}
 </style>

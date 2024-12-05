@@ -4,16 +4,15 @@
 
     <div class="features-container">
       <div class="feature-card" v-for="(feature, index) in features" :key="index">
-        <!--<div class="feature-icon" v-html="feature.icon"></div>-->
         <h3 class="feature-title">{{ feature.title }}</h3>
         <p class="feature-text">{{ feature.description }}</p>
       </div>
     </div>
 
-    <button class="cta-button">
+    <router-link to="/new-questionnaire" class="cta-button">
       Commencer l'expérience
       <span class="arrow">→</span>
-    </button>
+    </router-link>
   </section>
 </template>
 
@@ -24,17 +23,14 @@ export default {
     return {
       features: [
         {
-          //icon: ``,
           title: "Fiabilité",
           description: "Évaluations basées sur des normes internationales reconnues pour des résultats précis et pertinents."
         },
         {
-          //icon: ``,
           title: "Personnalisation",
           description: "Questionnaires adaptés à votre secteur d'activité et à la taille de votre entreprise."
         },
         {
-          //icon: ``,
           title: "Analyse détaillée",
           description: "Obtenez des rapports détaillés et des recommandations concrètes pour améliorer vos performances."
         }
@@ -46,9 +42,8 @@ export default {
 
 <style scoped>
 .why-choose-section {
-  padding: 60px 20px;
+  padding: 30px 0;
   text-align: center;
-  background-color: #fff;
 }
 
 .section-title {
@@ -85,23 +80,6 @@ export default {
   transform: translateY(-5px);
 }
 
-.feature-icon {
-  margin-bottom: 1.5rem;
-  padding: 1rem;
-  background: rgba(0, 209, 178, 0.1);
-  border-radius: 50%;
-  width: 64px;
-  height: 64px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.feature-icon svg {
-  width: 32px;
-  height: 32px;
-}
-
 .feature-title {
   color: #004D56;
   font-size: 1.5rem;
@@ -128,6 +106,7 @@ export default {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  text-decoration: none;
 }
 
 .cta-button:hover {

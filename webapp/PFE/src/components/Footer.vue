@@ -14,8 +14,8 @@ export default {
 
 <style scoped>
 .footer {
-  background-color: #004C53;
-  padding: 20px 0;
+  background: linear-gradient(to right, #002E37, #40867A);
+  padding: 1px 0;
   text-align: center;
   color: white;
 }

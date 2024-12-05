@@ -43,7 +43,7 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 48px 16px;
+  padding: 25px 16px;
   text-align: center;
 }
 
