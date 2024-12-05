@@ -1,7 +1,7 @@
 <template>
   <div class="questionnaire-section">
     <div class="title-container">
-      <h1 class="title">Nos questionnaires</h1>
+      <h1 class="section-title">Nos questionnaires</h1>
     </div>
 
     <div class="questionnaire-container">
@@ -59,6 +59,15 @@ export default {
   color: #004C53;
 }
 
+.section-title {
+  color: #004D56;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 3rem;
+  position: relative;
+  display: inline-block;
+}
+
 .questionnaire-container {
   display: flex;
   justify-content: center;
@@ -75,6 +84,7 @@ export default {
   height: 272px;
   display: flex;
   align-items: center;
+  padding-bottom: 3%;
 }
 
 .card-content {
@@ -86,6 +96,7 @@ export default {
   align-items: center;
   justify-content: center;
   margin-bottom: 16px;
+  padding-top: 4%;
 }
 
 .icon {
@@ -107,6 +118,7 @@ export default {
   font-size: 26px;
   line-height: 31px;
   color: #555555;
+  
 }
 
 @media (max-width: 1200px) {
