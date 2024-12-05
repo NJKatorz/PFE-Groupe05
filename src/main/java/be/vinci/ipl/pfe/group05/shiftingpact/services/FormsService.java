@@ -32,7 +32,7 @@ public class FormsService {
       questionList.addAll(list);
     }
 
-    form.setFormId((int) repository.count());
+    form.setFormId((int) repository.count()+1);
     form.setQuestionList(questionList);
     form.setAnswersList(new ArrayList<>());
     form.setTotal(questionList.size());
