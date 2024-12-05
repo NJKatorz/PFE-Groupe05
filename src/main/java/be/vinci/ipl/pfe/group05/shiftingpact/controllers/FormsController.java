@@ -28,6 +28,11 @@ public class FormsController {
     return service.getAllForms();
   }
 
+  @GetMapping("/forms/{formId}")
+  public Form getOneById(@PathVariable int formId) {
+    return service.getOneFormById(formId);
+  }
+
   @PostMapping("/forms/{formId}/saveAnswers")
   public Form saveAnswers(@PathVariable int formId, @RequestBody List<Answer> answers) {
     if(answers == null || answers.isEmpty()) {
