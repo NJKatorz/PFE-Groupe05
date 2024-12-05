@@ -7,6 +7,7 @@ import be.vinci.ipl.pfe.group05.shiftingpact.repositories.FormsRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +38,16 @@ public class FormsService {
     form.setTotal(questionList.size());
     form.setCompleted(0);
     form.setCreatedAt(LocalDateTime.now());
+    return repository.save(form);
+  }
+
+  public Form submit(int formId) {
+    Form form = repository.findById(formId).orElse(null);
+    if (form == null) {
+      return null;
+    }
+    form.setSendAt(LocalDateTime.now());
+    form.setCompleted(form.getTotal());
     return repository.save(form);
   }
 }
