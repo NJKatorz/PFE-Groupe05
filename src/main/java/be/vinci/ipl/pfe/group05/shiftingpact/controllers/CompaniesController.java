@@ -13,7 +13,7 @@ public class CompaniesController {
 
   @Autowired
   CompaniesService service;
-  @PostMapping("/companies/validate/{id}")
+  @PostMapping("/companies/{id}/validate")
   public ResponseEntity<Void> validate(@PathVariable int id) {
     boolean created = service.validateOne(id);
     if(!created)
