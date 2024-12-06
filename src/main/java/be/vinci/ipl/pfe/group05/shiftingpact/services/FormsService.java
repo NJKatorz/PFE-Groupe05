@@ -68,13 +68,15 @@ public class FormsService {
   public Form saveAnswers(int formId, List<Answer> answers) {
   Form form = repository.findByFormId(formId).orElse(null);
   if (form == null) {
-    throw new IllegalArgumentException("Formulaire introuvable");
+      throw new IllegalArgumentException("Formulaire introuvable");
+    }
+  if(form.getSendAt()!=null){
+    throw new IllegalArgumentException("Le formulaire a déjà été envoyé");
   }
-
   List<Answer> existingAnswers = form.getAnswersList();
   for (Answer newAnswer : answers) {
     if (newAnswer.getResponse() != null && !newAnswer.getResponse().isEmpty()) {
-      existingAnswers.removeIf(existingAnswer -> existingAnswer.getQuestionId() == newAnswer.getQuestionId() || existingAnswer.getResponse()==null || existingAnswer.getResponse().isEmpty());
+      existingAnswers.removeIf(existingAnswer -> existingAnswer.getQuestionId() == newAnswer.getQuestionId());
       existingAnswers.add(newAnswer);
     }
   }
@@ -89,10 +91,13 @@ public class FormsService {
     if (form == null) {
       throw new IllegalArgumentException("Formulaire introuvable");
     }
-    form.setSendAt(LocalDateTime.now());
     if (form.getCompleted() != form.getTotal()) {
       throw new IllegalArgumentException("Le formulaire n'est pas complet");
     }
+    if(form.getSendAt()!=null){
+      throw new IllegalArgumentException("Le formulaire a déjà été envoyé");
+    }
+    form.setSendAt(LocalDateTime.now());
     form.setCompleted(form.getTotal());
     return repository.save(form);
   }
