@@ -69,10 +69,13 @@ public class FormsService {
     if (form == null) {
       throw new IllegalArgumentException("Formulaire introuvable");
     }
-    form.setSendAt(LocalDateTime.now());
     if (form.getCompleted() != form.getTotal()) {
       throw new IllegalArgumentException("Le formulaire n'est pas complet");
     }
+    if(form.getSendAt()!=null){
+      throw new IllegalArgumentException("Le formulaire a déjà été envoyé");
+    }
+    form.setSendAt(LocalDateTime.now());
     form.setCompleted(form.getTotal());
     return repository.save(form);
   }
