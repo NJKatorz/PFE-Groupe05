@@ -15,36 +15,43 @@ const progress = ref(0);
 const currentCategory = computed(() => categories.value[currentCategoryIndex.value]);
 const currentQuestions = computed(() => questionsByCategory.value[currentCategory.value] || []);
 
-// Charger les questions depuis l'API
 onMounted(async () => {
   try {
-    const response = await api.get('/questions');
-    const questions = response.data;
+    // Récupérer les données via l'API
+    const response = await api.post('/forms/1');
+    const formData = response.data;
 
-    // Regrouper par catégorie
+    if (!formData  || !formData.questionList) {
+      console.error('Aucune question trouvée dans la réponse de l’API.');
+      return;
+    }
+
+    const questions = formData.questionList;
+
+    // Regrouper les questions par catégorie
     questionsByCategory.value = questions.reduce((acc, question) => {
-      const category = question.category;
+      const category = question.category || 'Non catégorisé'; // Gérer les catégories manquantes
       if (!acc[category]) acc[category] = [];
       acc[category].push(question);
       return acc;
     }, {});
 
+    // Extraire les catégories
     categories.value = Object.keys(questionsByCategory.value);
 
     // Initialiser les réponses par catégorie
-    selectedAnswers.value = Object.fromEntries(
-      categories.value.map((category) => [
-        category,
-        questionsByCategory.value[category].reduce((answers, question) => {
-          answers[question.questionId] = question.type === 'checkbox' ? [] : '';
-          return answers;
-        }, {}),
-      ])
-    );
+    selectedAnswers.value = categories.value.reduce((acc, category) => {
+      acc[category] = questionsByCategory.value[category].reduce((answers, question) => {
+        answers[question.questionId] = question.type === 'checkbox' ? [] : '';
+        return answers;
+      }, {});
+      return acc;
+    }, {});
 
-    updateProgress();
+    console.log('Questions regroupées par catégorie :', questionsByCategory.value);
+    console.log('Réponses initialisées :', selectedAnswers.value);
   } catch (error) {
-    console.error('Erreur lors de la récupération des questions:', error);
+    console.error('Erreur lors du chargement des données :', error);
   }
 });
 
