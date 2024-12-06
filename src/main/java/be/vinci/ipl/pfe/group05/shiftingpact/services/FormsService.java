@@ -28,7 +28,7 @@ public class FormsService {
 
   private static final List<String> ALL_TEMPLATES = List.of(
       "WORKERS",
-      "PRODUCT",
+      "PRODUCTS",
       "FACILITY",
       "OWNED FACILITY",
       "ALL"
@@ -51,9 +51,10 @@ public class FormsService {
     Form form = new Form();
     form.setCompanyId(companyId);
     Company company = companiesService.getOneById(companyId);
+
     List<String> companyTemplates = new ArrayList<>();
     if (company.getNumberOfWorkers() > 0) companyTemplates.add("WORKERS");
-    if (company.isSellsProduct()) companyTemplates.add("PRODUCT");
+    if (company.isSellsProduct()) companyTemplates.add("PRODUCTS");
     if (company.isOwner()) companyTemplates.add("OWNED FACILITY");
     else companyTemplates.add("FACILITY");
     companyTemplates.add("ALL");
@@ -74,6 +75,7 @@ public class FormsService {
       otherQuestions.addAll(questionsService.getAllByTemplate(template));
     }
 
+    form.setSubmitted(false);
     form.setOtherQuestions(otherQuestions);
     form.setFormId((int) repository.count()+1);
     form.setQuestionList(questionList);
@@ -128,6 +130,7 @@ public class FormsService {
     }
     form.setSendAt(LocalDateTime.now());
     form.setCompleted(form.getTotal());
+    form.setSubmitted(true);
     return repository.save(form);
   }
 }

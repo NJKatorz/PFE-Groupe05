@@ -17,21 +17,21 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @AllArgsConstructor
 public class Question {
   private ObjectId id;
-
-  @Field("question_id")
+  @NonNull
   private int questionId;
 
   @NonNull
   private String question;
-  private List<String> choice;
+  private List<String> choice; // TODO ????
   @NonNull
   private String enjeux;
   @NonNull
   private String category;
   @NonNull
+  private char pilier; // E,S,G
+  @NonNull
   private String template;
   @NonNull
   private String type; //radio, check box, champ libre
 
-  private char pilier; // E,S,G #TODO
 }

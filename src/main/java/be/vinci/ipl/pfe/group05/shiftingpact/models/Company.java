@@ -34,12 +34,13 @@ public class Company {
   private String address;
   @NonNull
   private String naceCode;
+
   @NonNull
   private LocalDateTime registrationDate;
 
   @NonNull
   private List<String> templates;
-  private List<Integer> scores;
+  //private List<Integer> scores;
 
   @NonNull
   private String login;
@@ -60,6 +61,7 @@ public class Company {
   private boolean sellsProduct;
   @NonNull
   private boolean isOwner;
+  //champs a un formulaire en cours
 }
 
 //TODO
