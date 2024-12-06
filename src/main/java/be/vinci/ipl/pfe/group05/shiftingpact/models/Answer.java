@@ -20,6 +20,5 @@ public class Answer {
   @NonNull
   private int questionId;
   private String response;
-  private String responseInTwoYears;
-  private String comments;
 }
+//TODO

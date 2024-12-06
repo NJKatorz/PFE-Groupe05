@@ -4,11 +4,11 @@ import be.vinci.ipl.pfe.group05.shiftingpact.models.Answer;
 import be.vinci.ipl.pfe.group05.shiftingpact.models.Company;
 import be.vinci.ipl.pfe.group05.shiftingpact.models.Form;
 import be.vinci.ipl.pfe.group05.shiftingpact.models.Question;
+import be.vinci.ipl.pfe.group05.shiftingpact.repositories.CompaniesRepository;
 import be.vinci.ipl.pfe.group05.shiftingpact.repositories.FormsRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,27 +19,55 @@ public class FormsService {
   FormsRepository repository;
   @Autowired
   CompaniesService companiesService;
+
+  @Autowired
+  CompaniesRepository companiesRepository;
   @Autowired
   QuestionsService questionsService;
+
+  private static final List<String> ALL_TEMPLATES = List.of(
+      "WORKERS",
+      "PRODUCT",
+      "FACILITY",
+      "OWNED FACILITY",
+      "ALL"
+  );
 
   public Form createOne(Integer companyId){
     Form form = new Form();
     form.setCompanyId(companyId);
     Company company = companiesService.getOneById(companyId);
-    List<String> companyTemplatesTemplate = company.getTemplates();
+    List<String> companyTemplates = new ArrayList<>();
+    if (company.getNumberOfWorkers() > 0) companyTemplates.add("WORKERS");
+    if (company.isSellsProduct()) companyTemplates.add("PRODUCT");
+    if (company.isOwner()) companyTemplates.add("OWNED FACILITY");
+    else companyTemplates.add("FACILITY");
+    companyTemplates.add("ALL");
+    company.setTemplates(companyTemplates);
+
     List<Question> questionList = new ArrayList<>();
 
-    for (String temp : companyTemplatesTemplate){
+    for (String temp : companyTemplates){
       List<Question> list = questionsService.getAllByTemplate(temp);
       questionList.addAll(list);
     }
 
+    List<String> otherTemplates = new ArrayList<>(ALL_TEMPLATES);
+    otherTemplates.removeAll(companyTemplates);
+
+    List<Question> otherQuestions = new ArrayList<>();
+    for (String template : otherTemplates) {
+      otherQuestions.addAll(questionsService.getAllByTemplate(template));
+    }
+
+    form.setOtherQuestions(otherQuestions);
     form.setFormId((int) repository.count()+1);
     form.setQuestionList(questionList);
     form.setAnswersList(new ArrayList<>());
     form.setTotal(questionList.size());
     form.setCompleted(0);
     form.setCreatedAt(LocalDateTime.now());
+    companiesRepository.save(company);
     return repository.save(form);
   }
 

@@ -9,7 +9,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -32,8 +31,6 @@ public class Form {
   private LocalDateTime createdAt;
   @Field("send_at")
   private LocalDateTime sendAt;
-  //@NonNull
-  //private String template;
 
   @NonNull
   @Field("question_list")
@@ -42,9 +39,8 @@ public class Form {
   @Field("answer_list")
   private List<Answer> answersList;
 
-
-
+  @NonNull
+  private List<Question> otherQuestions;
   }
 
-
-
+//TODO
