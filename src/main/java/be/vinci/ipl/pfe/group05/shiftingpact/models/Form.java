@@ -19,10 +19,10 @@ public class Form {
   @Id
   private ObjectId id;
   private int formId;
+
   @NonNull
   @Field("company_id")
   private Integer companyId;
-
   @NonNull
   private int total;
   @NonNull
