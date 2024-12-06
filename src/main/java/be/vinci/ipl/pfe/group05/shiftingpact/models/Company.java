@@ -11,7 +11,6 @@ import lombok.NonNull;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 @Document(collection= "companies")
 @Getter
@@ -19,32 +18,29 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Company {
-
   @Id
   private String id;
+
   @NonNull
- // @Field("company_id")
   private int companyId;
+
   @NonNull
   private String name;
   @NonNull
-  //@Field("company_number")
   private String companyNumber;
   @NonNull
-//  @Field("legal_form")
   private String legalForm;
   @NonNull
   private String address;
   @NonNull
- // @Field("nace_code")
   private String naceCode;
+
   @NonNull
-//  @Field("registration_date")
   private LocalDateTime registrationDate;
 
   @NonNull
   private List<String> templates;
-  private List<Integer> scores;
+  //private List<Integer> scores;
 
   @NonNull
   private String login;
@@ -54,11 +50,18 @@ public class Company {
   private String password;
 
   @NonNull
- // @Field("is_validated")
   private boolean isValidated;
 
   @NonNull
-  //@Field("contact_email")
   private String contactEmail;
 
+  @NonNull
+  private int numberOfWorkers;
+  @NonNull
+  private boolean sellsProduct;
+  @NonNull
+  private boolean isOwner;
+  //champs a un formulaire en cours
 }
+
+//TODO

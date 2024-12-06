@@ -22,7 +22,7 @@ public class QuestionsController {
   JwtUtil jwtUtil;
 
   @GetMapping("/questions")
-  public Iterable<Question> getAllByTemplate(@RequestParam(required = false) String template, @RequestHeader("Authorization") String token ) {
+  public Iterable<Question> getAllByTemplate(@RequestParam(required = false) String template ) {
    // if (jwtUtil.verify(token) == null) {
      // System.out.println("error");
       //return null;

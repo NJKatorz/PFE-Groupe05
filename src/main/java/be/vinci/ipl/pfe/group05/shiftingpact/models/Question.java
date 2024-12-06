@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -18,21 +17,21 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @AllArgsConstructor
 public class Question {
   private ObjectId id;
-
-  @Field("question_id")
+  @NonNull
   private int questionId;
-//  @NonNull
- // @Field("company_id")
- // private int companyID;
+
   @NonNull
   private String question;
-  private List<String> choice;
+  private List<String> choice; // TODO ????
   @NonNull
   private String enjeux;
   @NonNull
   private String category;
   @NonNull
+  private char pilier; // E,S,G
+  @NonNull
   private String template;
   @NonNull
   private String type; //radio, check box, champ libre
+
 }

@@ -7,8 +7,6 @@ import lombok.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
-
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,30 +19,27 @@ public class Form {
   private int formId;
 
   @NonNull
-  @Field("company_id")
   private Integer companyId;
   @NonNull
   private int total;
   @NonNull
   private int completed;
   @NonNull
-  @Field("created_at")
   private LocalDateTime createdAt;
-  @Field("send_at")
   private LocalDateTime sendAt;
-  //@NonNull
-  //private String template;
 
   @NonNull
-  @Field("question_list")
   private List<Question> questionList;
   @NonNull
-  @Field("answer_list")
   private List<Answer> answersList;
 
+  @NonNull
+  private List<Question> otherQuestions;
 
+  @NonNull
+  private double progression;
+  @NonNull
+  private boolean isSubmitted;
 
   }
-
-
 

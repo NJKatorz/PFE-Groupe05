@@ -12,20 +12,23 @@ Content-Type: application/json
 %}
 
 ### Validate a company
-POST http://localhost:8080/companies/3/validate
+POST http://localhost:8080/companies/6/validate
 Content-Type: application/json
 
 {
-  "companyId": 3,
-  "name": "Blue Horizon Ventures",
-  "companyNumber": "45432345678",
-  "legalForm": "SARL",
-  "address": "L'adresse de la company",
-  "naceCode": "1234",
-  "templates": ["ALL"],
+  "companyId": 6,
+  "name": "Innovative Solutions Ltd",
+  "companyNumber": "BE9876543210",
+  "legalForm": "Société à Responsabilité Limitée",
+  "address": "45 Innovation Drive, Antwerp, Belgium",
+  "naceCode": "6311",
+  "registrationDate": "2024-12-05T14:30:00",
   "scores": [],
   "isValidated": false,
-  "contactEmail": "ouarrad.dania@gmail.com"
+  "contactEmail": "ouarrad.dania@gmail.com",
+  "numberOfWorkers": 100,
+  "sellsProduct": true,
+  "isOwner": true
 }
 
 ### Validate a company

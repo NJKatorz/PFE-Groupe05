@@ -1,15 +1,17 @@
 version: "3.8"
 services:
+
+# MongoDB Service
   mongodb:
     image: mongo
     container_name: mongodb
     ports:
       - 27017:27017
     volumes:
-      - data:/data
+      - data:/data/db
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=rootuser
-      - MONGO_INITDB_ROOT_PASSWORD=rootpass
+      - MONGO_INITDB_ROOT_USERNAME=ouarraddania
+      - MONGO_INITDB_ROOT_PASSWORD=NAXV81maQvxDfWB0
   mongo-express:
     image: mongo-express
     container_name: mongo-express
@@ -17,9 +19,35 @@ services:
     ports:
       - 8081:8081
     environment:
-      - ME_CONFIG_MONGODB_ADMINUSERNAME=rootuser
-      - ME_CONFIG_MONGODB_ADMINPASSWORD=rootpass
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=ouarraddania
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=NAXV81maQvxDfWB0
       - ME_CONFIG_MONGODB_SERVER=mongodb
+
+# Spring Boot Backend
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: spring-backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: mongodb://ouarraddania:NAXV81maQvxDfWB0@mongodb:27017/project-pfe
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      - mongodb
+
+# Vue.js Frontend
+  frontend:
+    build:
+      context: ./webapp/PFE
+      dockerfile: Dockerfile
+    container_name: vue-frontend
+    ports:
+      - "5173:5173" 
+    depends_on:
+      - backend  
+
 volumes:
   data: {}
 
