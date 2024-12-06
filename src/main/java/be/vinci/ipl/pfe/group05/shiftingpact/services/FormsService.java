@@ -9,6 +9,7 @@ import be.vinci.ipl.pfe.group05.shiftingpact.repositories.FormsRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +33,19 @@ public class FormsService {
       "OWNED FACILITY",
       "ALL"
   );
+
+  public List<Form> getAllFormsInProgress(int companyId) {
+    List<Form> allFormsInProgress = repository.findByCompanyId(companyId);
+
+    for (Form formsInProgress : allFormsInProgress) {
+      int totalQuestions = formsInProgress.getTotal();
+      int completed = formsInProgress.getCompleted();
+
+      int progression = completed/totalQuestions*100;
+      formsInProgress.setProgression(progression);
+    }
+    return allFormsInProgress;
+  }
 
   public Form createOne(Integer companyId){
     Form form = new Form();
@@ -68,19 +82,30 @@ public class FormsService {
     form.setCompleted(0);
     form.setCreatedAt(LocalDateTime.now());
     companiesRepository.save(company);
+    form.setProgression(0);
     return repository.save(form);
+  }
+
+  public Iterable<Form> getAllForms() {
+    return repository.findAll();
+  }
+
+  public Form getOneFormById(int formId) {
+    return repository.findByFormId(formId).orElse(null);
   }
 
   public Form saveAnswers(int formId, List<Answer> answers) {
   Form form = repository.findByFormId(formId).orElse(null);
   if (form == null) {
-    throw new IllegalArgumentException("Formulaire introuvable");
+      throw new IllegalArgumentException("Formulaire introuvable");
+    }
+  if(form.getSendAt()!=null){
+    throw new IllegalArgumentException("Le formulaire a déjà été envoyé");
   }
-
   List<Answer> existingAnswers = form.getAnswersList();
   for (Answer newAnswer : answers) {
     if (newAnswer.getResponse() != null && !newAnswer.getResponse().isEmpty()) {
-      existingAnswers.removeIf(existingAnswer -> existingAnswer.getQuestionId() == newAnswer.getQuestionId() || existingAnswer.getResponse()==null || existingAnswer.getResponse().isEmpty());
+      existingAnswers.removeIf(existingAnswer -> existingAnswer.getQuestionId() == newAnswer.getQuestionId());
       existingAnswers.add(newAnswer);
     }
   }
@@ -95,10 +120,13 @@ public class FormsService {
     if (form == null) {
       throw new IllegalArgumentException("Formulaire introuvable");
     }
-    form.setSendAt(LocalDateTime.now());
     if (form.getCompleted() != form.getTotal()) {
       throw new IllegalArgumentException("Le formulaire n'est pas complet");
     }
+    if(form.getSendAt()!=null){
+      throw new IllegalArgumentException("Le formulaire a déjà été envoyé");
+    }
+    form.setSendAt(LocalDateTime.now());
     form.setCompleted(form.getTotal());
     return repository.save(form);
   }

@@ -18,11 +18,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Company {
-
   @Id
   private String id;
+
   @NonNull
   private int companyId;
+
   @NonNull
   private String name;
   @NonNull

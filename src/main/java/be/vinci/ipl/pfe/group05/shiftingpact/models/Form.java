@@ -31,6 +31,8 @@ public class Form {
   private LocalDateTime createdAt;
   @Field("send_at")
   private LocalDateTime sendAt;
+  //@NonNull
+  //private String template;
 
   @NonNull
   @Field("question_list")
@@ -38,6 +40,10 @@ public class Form {
   @NonNull
   @Field("answer_list")
   private List<Answer> answersList;
+
+  @NonNull
+  private double progression;
+
 
   @NonNull
   private List<Question> otherQuestions;

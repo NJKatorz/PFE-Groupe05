@@ -5,8 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection= "answers")
@@ -15,10 +13,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Answer {
-  @Id
-  private ObjectId id;
+  //@Id
+  //private ObjectId id;
   @NonNull
   private int questionId;
   private String response;
+  private String comments;
 }
-//TODO
