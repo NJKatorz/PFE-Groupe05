@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface FormsRepository extends MongoRepository<Form, Integer> {
   Optional<Form> findByFormId(int formId);
-  List<Form> findByCompanyId(Integer companyId);
+  List<Form> findByCompanyId(int companyId);
 
 
 }

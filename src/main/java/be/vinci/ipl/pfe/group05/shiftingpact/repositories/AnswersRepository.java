@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AnswersRepository extends MongoRepository<Answer, Integer> {
-Optional<Answer> findAnswerId(ObjectId answerId);
+Optional<Answer> findByAnswerId(Integer answerId);
 }

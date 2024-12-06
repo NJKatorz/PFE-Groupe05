@@ -27,7 +27,6 @@ public class FormsController {
   public Form createOne(@PathVariable int companyId) {
     return service.createOne(companyId);
   }
-
   @PostMapping("/forms/{formId}/saveAnswers")
   public Form saveAnswers(@PathVariable int formId, @RequestBody List<Answer> answers) {
     if(answers == null || answers.isEmpty()) {
