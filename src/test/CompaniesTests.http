@@ -1,0 +1,3 @@
+### Read a company
+GET http://localhost:8080/companies/1
+

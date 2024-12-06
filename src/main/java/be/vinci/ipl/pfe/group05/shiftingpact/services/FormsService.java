@@ -57,6 +57,14 @@ public class FormsService {
     return repository.save(form);
   }
 
+  public Iterable<Form> getAllForms() {
+    return repository.findAll();
+  }
+
+  public Form getOneFormById(int formId) {
+    return repository.findByFormId(formId).orElse(null);
+  }
+
   public Form saveAnswers(int formId, List<Answer> answers) {
   Form form = repository.findByFormId(formId).orElse(null);
   if (form == null) {
