@@ -3,7 +3,7 @@ GET http://localhost:8080/forms/1/progress
 
 
 ### Create a form
-POST http://localhost:8080/forms/6
+POST http://localhost:8080/forms/2
 
 ### Get all forms
 GET http://localhost:8080/forms
@@ -12,7 +12,7 @@ GET http://localhost:8080/forms
 GET http://localhost:8080/forms/1
 
 ### Save the form
-POST http://localhost:8080/forms/10/saveAnswers
+POST http://localhost:8080/forms/2/saveAnswers
 Content-Type: application/json
 
 [

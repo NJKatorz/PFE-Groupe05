@@ -3,13 +3,14 @@
 import { ref, computed, onMounted } from 'vue';
 import OurCard from '../components/OurCard.vue';
 import api from '../services/api';
-
+import { useRouter } from 'vue-router';
 
 const questionsByCategory = ref({});
 const categories = ref([]);
 const currentCategoryIndex = ref(0);
 const selectedAnswers = ref({});
 const progress = ref(0);
+const router = useRouter(); // Router pour la navigation
 
 // Données de la catégorie actuelle
 const currentCategory = computed(() => categories.value[currentCategoryIndex.value]);
@@ -98,15 +99,6 @@ const scrollToTop = () => {
   });
 };
 
-// Navigation entre les catégories
-const goToNextCategory = () => {
-  if (currentCategoryIndex.value < categories.value.length - 1) {
-    currentCategoryIndex.value++;
-    scrollToTop(); 
-    updateProgress();
-  }
-};
-
 const goToPreviousCategory = () => {
   if (currentCategoryIndex.value > 0) {
     currentCategoryIndex.value--;
@@ -114,6 +106,60 @@ const goToPreviousCategory = () => {
     updateProgress();
   }
 };
+
+// Sauvegarder les réponses d'une catégorie
+const saveAnswers = async () => {
+  try {
+    const category = currentCategory.value;
+    const answers = Object.entries(selectedAnswers.value[category]).map(
+      ([questionId, value]) => ({
+        questionId: parseInt(questionId, 10), // Convertir en nombre si nécessaire
+        answer: value,
+      })
+    );
+
+    // Appeler l'API pour sauvegarder les réponses
+    const response = await api.post(`/forms/1/saveAnswers`, answers);
+
+    if (response.status === 200) {
+      console.log('Réponses sauvegardées avec succès pour la catégorie :', category);
+    } else {
+      throw new Error('Erreur lors de la sauvegarde des réponses.');
+    }
+  } catch (error) {
+    console.error('Erreur lors de la sauvegarde des réponses :', error);
+  }
+};
+
+const submitForm = async () => {
+  try {
+    const response = await api.post(`/forms/1/submit`);
+
+    if (response.status === 200) {
+      console.log('Formulaire soumis avec succès :', response.data);
+      router.push('/validation'); // Rediriger vers la page de validation
+    } else {
+      throw new Error('Erreur lors de la soumission du formulaire.');
+    }
+  } catch (error) {
+    console.error('Erreur lors de la soumission du formulaire :', error);
+  }
+};
+
+// Naviguer vers la catégorie suivante
+const goToNextCategory = async () => {
+  await saveAnswers(); // Sauvegarder les réponses de la catégorie actuelle
+
+  if (currentCategoryIndex.value < categories.value.length - 1) {
+    currentCategoryIndex.value++;
+    scrollToTop();
+    updateProgress();
+  } else {
+    await submitForm();
+    // Redirection après la dernière catégorie
+    router.push('/validation');
+  }
+}; 
 
 </script>
 
@@ -192,24 +238,27 @@ const goToPreviousCategory = () => {
           </div>
         </div>
       </div>
+    
 
-      <!-- Navigation Buttons -->
-      <div class="navigation-buttons">
-        <button
-          class="btn btn-previous"
-          @click="goToPreviousCategory"
-          :disabled="currentCategoryIndex === 0"
-        >
-          Précédent
-        </button>
-        <button
-          class="btn btn-next"
-          @click="goToNextCategory"
-          :disabled="currentCategoryIndex === categories.length - 1"
-        >
-          Suivant
-        </button>
-      </div>
+      <!-- Boutons de navigation -->
+        <div class="navigation-buttons">
+    <!-- Bouton précédent -->
+    <button
+      class="btn btn-previous"
+      @click="goToPreviousCategory"
+      :disabled="currentCategoryIndex === 0"
+    >
+      Précédent
+    </button>
+
+    <!-- Bouton suivant -->
+    <button
+      class="btn btn-next"
+      @click="goToNextCategory"
+    >
+      {{ currentCategoryIndex === categories.length - 1 ? 'Soumettre' : 'Suivant' }}
+    </button>
+  </div>
     </OurCard>
   </div>
 </template>
