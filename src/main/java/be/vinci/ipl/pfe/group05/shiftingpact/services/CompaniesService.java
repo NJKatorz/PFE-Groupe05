@@ -4,7 +4,6 @@ import be.vinci.ipl.pfe.group05.shiftingpact.models.Company;
 import be.vinci.ipl.pfe.group05.shiftingpact.repositories.CompaniesRepository;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -54,7 +53,7 @@ public class CompaniesService {
         "Login : " + company.getLogin() + "\n" +
         "Mot de passe : " + generatedPassword + "\n\n" +
         "Veuillez changer votre mot de passe dès votre première connexion.\n\n" +
-        "Cordialement,\nL'équipe";
+        "Cordialement,\nL'équipe ShiftingPact";
     emailService.sendSimpleEmail(company.getContactEmail(), "Validation de votre entreprise", emailContent);
     return true;
   }
