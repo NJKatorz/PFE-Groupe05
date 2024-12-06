@@ -21,6 +21,19 @@ public class FormsService {
   CompaniesService companiesService;
   @Autowired
   QuestionsService questionsService;
+  public List<Form> getAllFormsInProgress(int companyId) {
+    List<Form> allFormsInProgress = repository.findByCompanyId(companyId);
+
+    for (Form formsInProgress : allFormsInProgress) {
+      int totalQuestions = formsInProgress.getTotal();
+      int completed = formsInProgress.getCompleted();
+
+      int progression = completed/totalQuestions*100;
+      formsInProgress.setProgression(progression);
+    }
+    return allFormsInProgress;
+  }
+
 
   public Form createOne(Integer companyId){
     Form form = new Form();
@@ -40,6 +53,7 @@ public class FormsService {
     form.setTotal(questionList.size());
     form.setCompleted(0);
     form.setCreatedAt(LocalDateTime.now());
+    form.setProgression(0);
     return repository.save(form);
   }
 

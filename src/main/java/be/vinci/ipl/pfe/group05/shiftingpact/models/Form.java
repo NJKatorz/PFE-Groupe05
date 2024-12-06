@@ -42,6 +42,8 @@ public class Form {
   @Field("answer_list")
   private List<Answer> answersList;
 
+  @NonNull
+  private double progression;
 
 
   }
