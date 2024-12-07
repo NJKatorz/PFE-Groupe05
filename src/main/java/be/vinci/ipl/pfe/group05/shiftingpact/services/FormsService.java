@@ -1,6 +1,7 @@
 package be.vinci.ipl.pfe.group05.shiftingpact.services;
 
 import be.vinci.ipl.pfe.group05.shiftingpact.models.Answer;
+import be.vinci.ipl.pfe.group05.shiftingpact.models.Choice;
 import be.vinci.ipl.pfe.group05.shiftingpact.models.Company;
 import be.vinci.ipl.pfe.group05.shiftingpact.models.Form;
 import be.vinci.ipl.pfe.group05.shiftingpact.models.Question;
@@ -9,6 +10,9 @@ import be.vinci.ipl.pfe.group05.shiftingpact.repositories.FormsRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -133,4 +137,51 @@ public class FormsService {
     form.setSubmitted(true);
     return repository.save(form);
   }
+
+
+  private double calculateScore(Form form) {
+    if (form == null || form.getAnswersList() == null || form.getQuestionList() == null) {
+      throw new IllegalArgumentException("Form or its required data cannot be null");
+    }
+
+    // Préparer une Map pour associer questionId -> Answer
+    Map<Integer, Answer> answerMap = form.getAnswersList().stream()
+        .collect(Collectors.toMap(Answer::getQuestionId, Function.identity()));
+
+    // Calculer le score total
+    return form.getQuestionList().stream()
+        .mapToDouble(question -> {
+          int questionWeight = question.getPoids(); // Poids de la question
+          Answer answer = answerMap.get(question.getQuestionId()); // Recherche O(1)
+
+          if (answer != null && answer.getResponse() != null) {
+            // Récupérer le poids du choix
+            int choiceWeight = getChoiceWeight(question, answer.getResponse());
+            // Retourner le score du choix, en respectant le poids maximum de la question
+            return Math.min(choiceWeight, questionWeight); // Ne pas dépasser le poids max de la question
+          }
+
+          return 0; // Si aucune réponse ou réponse invalide
+        })
+        .sum();
+  }
+
+
+  /**
+   * Récupère le poids d'un choix donné dans une question.
+   */
+  private int getChoiceWeight(Question question, String response) {
+    if (question.getChoice() == null) {
+      return 0; // Aucun choix défini
+    }
+    return question.getChoice().stream()
+        .filter(choice -> choice.getChoice().equals(response))
+        .map(Choice::getPoids)
+        .findFirst()
+        .orElse(0); // Retourne 0 si la réponse ne correspond à aucun choix
+  }
+
+
 }
+
+// TODO 2
