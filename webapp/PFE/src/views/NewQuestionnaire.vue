@@ -55,33 +55,43 @@
     </OurCard>
 
     <!-- Section pour les questionnaires en cours -->
-    <div v-else-if="activeTab === 'progress'" class="progress-cards">
-      <OurCard
-        v-for="(q) in questionnaires"
-        :key="q.id"
-        :title="q.name === 'ESG' ? 'Questionnaire ESG' : 'Questionnaire ODD'"
-      >
-        <template v-slot:default>
-          <div class="card-info">
-            <span>Progression : {{ q.progress }}%</span>
-            <span v-if="q.created">Créé le : {{ q.created }}</span>
-            <span v-if="q.submitted">Soumis le : {{ q.submitted }}</span>
+    <div v-else-if="activeTab === 'progress'">
+      <div v-if="questionnaires.length > 0" class="progress-cards">
+        <OurCard
+          v-for="q in questionnaires"
+          :key="q.id"
+          :title="q.name === 'ESG' ? 'Questionnaire ESG' : 'Questionnaire ODD'"
+        >
+          <div class="card-progress-info">
+            <div class="progress-header">
+              <span class="progress-text">
+                Progression : {{ q.progress < 100 ? `${q.progress}%` : 'Terminé' }}
+              </span>
+              <span class="date-text">
+                {{ q.submitted ? `Soumis le : ${q.submitted}` : `Créé le : ${q.created}` }}
+              </span>
+            </div>
+
+            <div class="progress-bar-container">
+              <div
+                class="progress-bar-fill"
+                :style="{ width: `${q.progress}%` }"
+              ></div>
+            </div>
+
+            <button
+              v-if="q.progress < 100"
+              class="continue-button"
+              @click="router.push('/questionnaire/' + q.name)"
+            >
+              Continuer →
+            </button>
           </div>
-          <div class="progress-bar">
-            <div class="progress-fill" :style="{ width: q.progress + '%' }"></div>
-          </div>
-          <button
-            v-if="q.progress < 100"
-            class="continue-button"
-            @click="router.push('/questionnaire/' + q.name)"
-          >
-            Continuer →
-          </button>
-        </template>
-      </OurCard>
-    </div>
-    <div v-else>
-      <p class="no-questionnaires">Aucun questionnaire en cours</p>
+        </OurCard>
+      </div>
+      <div v-else>
+        <p class="no-questionnaires">Aucun questionnaire en cours</p>
+      </div>
     </div>
   </div>
 </template>
@@ -218,5 +228,64 @@ const startQuestionnaire = () => {
     .questionnaire-container {
       margin: 1rem auto;
     }
+  }
+
+  .progress-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .card-progress-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #4A5568;
+  }
+
+  .progress-text {
+    font-size: 1rem;
+    font-weight: 500;
+  }
+
+  .date-text {
+    font-size: 0.875rem;
+  }
+
+  .progress-bar-container {
+    width: 100%;
+    height: 8px;
+    background-color: #E2E8F0;
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(to right, #004851, #40867A);
+    border-radius: 999px;
+    transition: width 0.3s ease;
+  }
+
+  .continue-button {
+    width: 100%;
+    padding: 0.875rem;
+    background-color: #004851;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .continue-button:hover {
+    background-color: #003840;
   }
   </style>
