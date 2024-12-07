@@ -1,6 +1,5 @@
 package be.vinci.ipl.pfe.group05.shiftingpact.models;
 
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

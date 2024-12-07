@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Homepage from "@/views/Homepage.vue";
+import ClientFormDetails from "@/views/ClientFormDetails.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -7,7 +7,6 @@ const router = createRouter({
     {
       path: '/',
       name: 'HomePage',
-      //component: NewQuestionnaire,
       component: ()=>import ("@/views/Homepage.vue"),
     },
 
@@ -32,10 +31,15 @@ const router = createRouter({
       component: () => import('@/views/EndQuestionnaire.vue')
     },
     {
-      path: '/score',
-      name: 'Score',
-      component:() => import('@/views/EsgScore.vue')
-    }
+      path: '/allClientForms',
+      name: 'AllClientForms',
+      component: () => import('@/views/AllClientForms.vue')
+    },
+    {
+      path: '/Forms/:formId',
+      name: 'ClientFormDetails',
+      component: ClientFormDetails,
+    },
   ],
 })
 
