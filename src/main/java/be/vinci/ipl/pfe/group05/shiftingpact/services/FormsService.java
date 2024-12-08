@@ -52,6 +52,7 @@ public class FormsService {
     form.setCompanyId(companyId);
     Company company = companiesService.getOneById(companyId);
 
+
     List<String> companyTemplates = new ArrayList<>();
     if (company.getNumberOfWorkers() > 0) companyTemplates.add("WORKERS");
     if (company.isSellsProduct()) companyTemplates.add("PRODUCTS");
@@ -123,7 +124,7 @@ public class FormsService {
       throw new IllegalArgumentException("Formulaire introuvable");
     }
     if (form.getCompleted() != form.getTotal()) {
-      throw new IllegalArgumentException("Le formulaire n'est pas complet");
+      throw new IllegalArgumentException("Le formulaire n'est pas complet"); // mettre un commentaire dans le front qui dit quon a oublier de completer
     }
     if(form.getSendAt()!=null){
       throw new IllegalArgumentException("Le formulaire a déjà été envoyé");

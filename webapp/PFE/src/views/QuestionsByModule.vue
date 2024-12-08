@@ -19,7 +19,8 @@ const currentQuestions = computed(() => questionsByCategory.value[currentCategor
 onMounted(async () => {
   try {
     // Récupérer les données via l'API
-    const response = await api.post('/forms/1');
+    const response = await api.post('/forms/6');
+    console.log('Réponse de l’API :', response.data);
     const formData = response.data;
 
     if (!formData  || !formData.questionList) {
@@ -107,22 +108,23 @@ const goToPreviousCategory = () => {
   }
 };
 
-// Sauvegarder les réponses d'une catégorie
 const saveAnswers = async () => {
   try {
     const category = currentCategory.value;
     const answers = Object.entries(selectedAnswers.value[category]).map(
       ([questionId, value]) => ({
-        questionId: parseInt(questionId, 10), // Convertir en nombre si nécessaire
-        answer: value,
+        questionId: parseInt(questionId, 10),
+        response: Array.isArray(value) ? JSON.stringify(value) : value, // Sérialiser les tableaux en chaînes JSON
+        comments: "", 
       })
     );
 
-    // Appeler l'API pour sauvegarder les réponses
-    const response = await api.post(`/forms/1/saveAnswers`, answers);
+    console.log('Données envoyées au backend :', JSON.stringify(answers));
+
+    const response = await api.post(`/forms/102/saveAnswers`, answers);
 
     if (response.status === 200) {
-      console.log('Réponses sauvegardées avec succès pour la catégorie :', category);
+      console.log('Réponses sauvegardées avec succès.');
     } else {
       throw new Error('Erreur lors de la sauvegarde des réponses.');
     }
@@ -131,9 +133,10 @@ const saveAnswers = async () => {
   }
 };
 
+
 const submitForm = async () => {
   try {
-    const response = await api.post(`/forms/1/submit`);
+    const response = await api.post(`/forms/102/submit`);
 
     if (response.status === 200) {
       console.log('Formulaire soumis avec succès :', response.data);

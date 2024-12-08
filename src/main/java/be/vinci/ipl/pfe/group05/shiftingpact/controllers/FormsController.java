@@ -43,9 +43,11 @@ public class FormsController {
 
   @PostMapping("/forms/{formId}/saveAnswers")
   public Form saveAnswers(@PathVariable int formId, @RequestBody List<Answer> answers) {
+
     if(answers == null || answers.isEmpty()) {
       throw new IllegalArgumentException("Les réponses ne peuvent pas être vides");
     }
+
     return service.saveAnswers(formId, answers);
   }
 
