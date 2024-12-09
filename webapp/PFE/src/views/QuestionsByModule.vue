@@ -20,7 +20,7 @@ const fetchProgression = async () => {
   try {
     const response = await api.get(`/forms/1/progression`);
     progress
-    .value = response.data; // Mise à jour de la progression
+      .value = response.data; // Mise à jour de la progression
     console.log('Progression actuelle :', progress.value);
   } catch (error) {
     console.error('Erreur lors de la récupération de la progression :', error);
@@ -40,6 +40,22 @@ onMounted(async () => {
     }
 
     const questions = formData.questionList;
+
+    // Parser les choix pour chaque question
+    questions.forEach((question) => {
+      if (question.choice) {
+        question.choice = question.choice.map((option) => {
+          try {
+            return JSON.parse(option); // Parser chaque option de choix
+          } catch (error) {
+            console.error('Erreur lors du parsing du choix :', option, error);
+            return { choice: option, poids: 0 }; // Retour de secours en cas d'erreur
+          }
+          console.log("", question);
+
+        });
+      }
+    });
 
     // Regrouper les questions par catégorie
     questionsByCategory.value = questions.reduce((acc, question) => {
@@ -202,7 +218,7 @@ const goToNextCategory = async () => {
                     v-if="selectedAnswers[categories[currentCategoryIndex]][question.questionId] === option"
                   ></div>
                 </div>
-                <span>{{ option }}</span>
+                <span>{{ option.choice.choice }}</span>
               </div>
             </template>
 
@@ -252,103 +268,103 @@ const goToNextCategory = async () => {
   </div>
 </template>
 
-  <style scoped>
-  .questionnaire-container {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 1rem;
-  }
-  
-  .progress-bar {
-    height: 8px;
-    background-color: rgba(255, 255, 255, 0.3);
-    border-radius: 4px;
-    margin: 1rem 0;
-  }
-  
-  .progress-fill {
-    height: 100%;
-    background-color: #fff;
-    border-radius: 4px;
-    transition: width 0.3s ease;
-  }
-  
-  .module-header {
-    background-color: #2F8886;
-    padding: 1.5rem;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin: 2rem 0;
-  }
-  
-  .module-icon {
-    position: relative;
-    width: 60px;
-    height: 60px;
-    background-color: #4CAF50;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .module-icon img {
-    width: 32px;
-    height: 32px;
-  }
-  
-  .module-number {
-    position: absolute;
-    top: -8px;
-    left: -8px;
-    background-color: white;
-    color: #2F8886;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-  }
-  
-  .module-info {
-    color: white;
-  }
-  
-  .module-title {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin: 0;
-  }
-  
-  .module-subtitle {
-    margin: 0;
-    opacity: 0.9;
-  }
-  
-  .questions-container {
-    padding: 2rem 0;
-  }
-  
-  .question {
-    margin-bottom: 2rem;
-  }
-  
-  .question h3 {
-    color: #004851;
-    margin-bottom: 1rem;
-  }
-  
-  .options {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-  
-  .radio-option, .checkbox-option {
+<style scoped>
+.questionnaire-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.progress-bar {
+  height: 8px;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  margin: 1rem 0;
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: #fff;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.module-header {
+  background-color: #2F8886;
+  padding: 1.5rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.module-icon {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  background-color: #4CAF50;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.module-icon img {
+  width: 32px;
+  height: 32px;
+}
+
+.module-number {
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  background-color: white;
+  color: #2F8886;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.module-info {
+  color: white;
+}
+
+.module-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+.module-subtitle {
+  margin: 0;
+  opacity: 0.9;
+}
+
+.questions-container {
+  padding: 2rem 0;
+}
+
+.question {
+  margin-bottom: 2rem;
+}
+
+.question h3 {
+  color: #004851;
+  margin-bottom: 1rem;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.radio-option, .checkbox-option {
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -393,54 +409,54 @@ const goToNextCategory = async () => {
 
   border-radius: 50%; /* Assure que l'intérieur reste rond */
 }
-  
-  .checkbox-option {
-    justify-content: space-between;
-  }
-  
-  .checkbox-option i {
-    color: #2F8886;
-  }
-  
-  .navigation-buttons {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-top: 2rem;
-  }
-  
-  .btn {
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-weight: 500;
-    transition: opacity 0.2s ease;
-  }
-  
-  .btn:hover {
-    opacity: 0.9;
-  }
-  
-  .btn-previous {
-    background-color: #004851;
-    color: white;
-  }
-  
-  .btn-save {
-    background-color: #E2E8F0;
-    color: #004851;
-  }
-  
-  .btn-next {
-    background-color: #004851;
-    color: white;
-  }
 
-  .text-input {
+.checkbox-option {
+  justify-content: space-between;
+}
+
+.checkbox-option i {
+  color: #2F8886;
+}
+
+.navigation-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  transition: opacity 0.2s ease;
+}
+
+.btn:hover {
+  opacity: 0.9;
+}
+
+.btn-previous {
+  background-color: #004851;
+  color: white;
+}
+
+.btn-save {
+  background-color: #E2E8F0;
+  color: #004851;
+}
+
+.btn-next {
+  background-color: #004851;
+  color: white;
+}
+
+.text-input {
   width: 95%;
   padding: 1rem;
   border: 2px solid #E2E8F0;
@@ -455,16 +471,16 @@ const goToNextCategory = async () => {
   background-color: #F7FAFC;
 }
 
-  
-  @media (max-width: 640px) {
-    .navigation-buttons {
-      flex-direction: column;
-    }
-    
-    .btn {
-      width: 100%;
-      justify-content: center;
-    }
+
+@media (max-width: 640px) {
+  .navigation-buttons {
+    flex-direction: column;
   }
-  
-  </style>
+
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+</style>
