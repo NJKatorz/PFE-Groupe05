@@ -64,4 +64,9 @@ public class FormsController {
   public int getFormsSubmitted() {
     return service.getNumberOfSubmittedForms();
   }
+
+  @GetMapping("/forms/averageScoreESG")
+  public double getAverageScoreESG() {
+    return service.getAverageScoreESG();
+  }
 }

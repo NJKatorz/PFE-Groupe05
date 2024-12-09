@@ -191,3 +191,6 @@ POST http://localhost:8080/forms/67/submit
 
 ### Get all forms submitted
 GET http://localhost:8080/forms/formsSubmitted
+
+### Get average scoreESG of all forms
+GET http://localhost:8080/forms/averageScoreESG

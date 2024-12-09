@@ -41,7 +41,7 @@ public class FormsService {
     if (total == 0) {
       return 0;
     }
-   // return (int) ((double) completed / total * 100);
+    // return (int) ((double) completed / total * 100);
     return completed / total * 100;
   }
 
@@ -119,25 +119,25 @@ public class FormsService {
   }
 
   public Form saveAnswers(int formId, List<Answer> answers) {
-  Form form = repository.findByFormId(formId).orElse(null);
-  if (form == null) {
+    Form form = repository.findByFormId(formId).orElse(null);
+    if (form == null) {
       throw new IllegalArgumentException("Formulaire introuvable");
     }
-  if(form.getSendAt()!=null){
-    throw new IllegalArgumentException("Le formulaire a déjà été envoyé");
-  }
-  List<Answer> existingAnswers = form.getAnswersList();
-  for (Answer newAnswer : answers) {
-    if (newAnswer.getResponse() != null && !newAnswer.getResponse().isEmpty()) {
-      existingAnswers.removeIf(existingAnswer -> existingAnswer.getQuestionId() == newAnswer.getQuestionId());
-      existingAnswers.add(newAnswer);
+    if(form.getSendAt()!=null){
+      throw new IllegalArgumentException("Le formulaire a déjà été envoyé");
     }
-  }
+    List<Answer> existingAnswers = form.getAnswersList();
+    for (Answer newAnswer : answers) {
+      if (newAnswer.getResponse() != null && !newAnswer.getResponse().isEmpty()) {
+        existingAnswers.removeIf(existingAnswer -> existingAnswer.getQuestionId() == newAnswer.getQuestionId());
+        existingAnswers.add(newAnswer);
+      }
+    }
 
-  form.setAnswersList(existingAnswers);
-  form.setCompleted(existingAnswers.size());
-  return repository.save(form);
-}
+    form.setAnswersList(existingAnswers);
+    form.setCompleted(existingAnswers.size());
+    return repository.save(form);
+  }
 
   public Form submit(int formId) {
     Form form = repository.findByFormId(formId).orElse(null);
@@ -172,7 +172,67 @@ public class FormsService {
     return repository.save(form);
   }
 
-  public int getNumberOfSubmittedForms() {
-    return repository.findAll().stream().filter(Form::isSubmitted).toList().size();
+
+  private double calculateScoreByPillar(Form form, char pillar) {
+    if (form == null || form.getAnswersList() == null || form.getQuestionList() == null) {
+      throw new IllegalArgumentException("Form or its required data cannot be null");
+    }
+
+    // Calcul du score total pour un pilier spécifique
+    return form.getQuestionList().stream()
+        .filter(question -> question.getPilier() == pillar) // Filtrer par pilier
+        .mapToDouble(question -> {
+          // Récupérer toutes les réponses pour cette question
+          List<Answer> answersForQuestion = form.getAnswersList().stream()
+              .filter(answer -> answer.getQuestionId() == question.getQuestionId())
+              .toList();
+
+          if (!answersForQuestion.isEmpty()) {
+            // Calculer la somme des poids des choix sélectionnés
+            double totalChoiceWeight = answersForQuestion.stream()
+                .mapToDouble(answer -> getChoiceWeight(question, answer.getResponse()))
+                .sum();
+
+            // Diviser le score total pour cette question par 2
+            return totalChoiceWeight / 2.0;
+          }
+
+          return 0; // Aucun score si pas de réponses pour cette question
+        })
+        .sum();
   }
+
+  /**
+   * Récupère le poids d'un choix donné dans une question.
+   */
+  private double getChoiceWeight(Question question, String response) {
+    if (response == null || response.isEmpty() || question.getChoice() == null) {
+      return 0; // Aucun score si pas de réponse ou pas de choix définis
+    }
+
+    // Trouver le poids correspondant au choix donné
+    return question.getChoice().stream()
+        .filter(choice -> choice.getChoice().equals(response))
+        .mapToDouble(Choice::getPoids)
+        .findFirst()
+        .orElse(0); // Retourne 0 si le choix n'est pas trouvé
+  }
+
+
+  public int getNumberOfSubmittedForms() {
+    return repository.findAll().stream()
+        .filter(Form::isSubmitted)
+        .toList()
+        .size();
+  }
+
+  public double getAverageScoreESG() {
+    List<Form> forms = (List<Form>) repository.findAll();
+    double totalScore = 0;
+    for (Form form : forms) {
+      totalScore += form.getScoreESG();
+    }
+    return totalScore / forms.size();
+  }
+
 }
