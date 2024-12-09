@@ -41,5 +41,13 @@ public class Form {
   @NonNull
   private boolean isSubmitted;
 
+  private double scoreE;
+
+  private double scoreS;
+
+  private double scoreG;
+
+  private double scoreESG;
+
   }
 
