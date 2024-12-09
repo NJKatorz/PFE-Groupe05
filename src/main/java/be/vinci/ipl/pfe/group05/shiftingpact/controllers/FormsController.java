@@ -69,4 +69,9 @@ public class FormsController {
   public double getAverageScoreESG() {
     return service.getAverageScoreESG();
   }
+
+  @GetMapping("/forms/formsInProgress")
+  public int getFormsInProgress() {
+    return service.getNumberOfFormsInProgress();
+  }
 }

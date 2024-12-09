@@ -235,4 +235,9 @@ public class FormsService {
     return totalScore / forms.size();
   }
 
+  public int getNumberOfFormsInProgress() {
+    return (int) repository.findAll().
+        stream().filter(form -> !form.isSubmitted()).count();
+  }
+
 }

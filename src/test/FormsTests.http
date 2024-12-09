@@ -194,3 +194,6 @@ GET http://localhost:8080/forms/formsSubmitted
 
 ### Get average scoreESG of all forms
 GET http://localhost:8080/forms/averageScoreESG
+
+### Gett all forms in progress
+GET http://localhost:8080/forms/formsInProgress
