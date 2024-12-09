@@ -51,7 +51,6 @@ onMounted(async () => {
             console.error('Erreur lors du parsing du choix :', option, error);
             return { choice: option, poids: 0 }; // Retour de secours en cas d'erreur
           }
-          console.log("", question);
 
         });
       }
@@ -235,7 +234,7 @@ const goToNextCategory = async () => {
                     v-if="selectedAnswers[categories[currentCategoryIndex]][question.questionId]?.includes(option)"
                   ></div>
                 </div>
-                <span>{{ option }}</span>
+                <span>{{ option.choice.choice }}</span>
               </div>
             </template>
 
@@ -250,7 +249,6 @@ const goToNextCategory = async () => {
           </div>
         </div>
       </div>
-
       <!-- Boutons de navigation -->
       <div class="navigation-buttons">
         <button
