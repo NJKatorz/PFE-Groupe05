@@ -466,4 +466,5 @@ const goToNextCategory = async () => {
       justify-content: center;
     }
   }
+  
   </style>
