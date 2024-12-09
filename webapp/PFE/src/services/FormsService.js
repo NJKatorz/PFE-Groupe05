@@ -33,7 +33,11 @@ const FormsService = {
 
     getAverageScoreESG(){
       return api.get('/forms/averageScoreESG');
-    }
+    },
+
+    getNumberOfFormsInProgress(){
+      return api.get('/forms/formsInProgress');
+    },
 
 };
 

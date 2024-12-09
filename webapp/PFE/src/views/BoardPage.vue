@@ -49,7 +49,8 @@
   const initializeStats = async () => {
     try {
       const users = (await FormsService.getNumberOfRegisteredUsers()).data;
-      const forms = (await FormsService.getNumberOfFormsSubmitted()).data;
+      const submittedForms = (await FormsService.getNumberOfFormsSubmitted()).data;
+      const formsInProgress = (await FormsService.getNumberOfFormsInProgress()).data;
       const averageESG = (await FormsService.getAverageScoreESG()).data;
   
       stats.value = [
@@ -61,14 +62,14 @@
         },
         {
           title: "Questionnaires soumis",
-          value: forms,
+          value: submittedForms,
           change: "+201 depuis le mois dernier",
           icon: Activity,
         },
         {
           title: "Questionnaires en cours de complétetion",
           // title: "Taux de complétion",
-          value: "67%", // Valeur statique ou calculée séparément
+          value: formsInProgress, // Valeur statique ou calculée séparément
           change: "+5% depuis le mois dernier",
           icon: BarChart2,
         },
