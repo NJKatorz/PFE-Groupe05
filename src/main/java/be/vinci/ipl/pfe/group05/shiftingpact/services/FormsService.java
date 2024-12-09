@@ -1,6 +1,7 @@
 package be.vinci.ipl.pfe.group05.shiftingpact.services;
 
 import be.vinci.ipl.pfe.group05.shiftingpact.models.Answer;
+import be.vinci.ipl.pfe.group05.shiftingpact.models.Choice;
 import be.vinci.ipl.pfe.group05.shiftingpact.models.Company;
 import be.vinci.ipl.pfe.group05.shiftingpact.models.Form;
 import be.vinci.ipl.pfe.group05.shiftingpact.models.Question;
@@ -149,6 +150,22 @@ public class FormsService {
     if(form.getSendAt()!=null){
       throw new IllegalArgumentException("Le formulaire a déjà été envoyé");
     }
+
+    // Calcul des scores pour chaque pilier
+    double scoreE = calculateScoreByPillar(form, 'E');
+    double scoreS = calculateScoreByPillar(form, 'S');
+    double scoreG = calculateScoreByPillar(form, 'G');
+
+    // Calcul du score total ESG
+    double scoreESG = scoreE + scoreS + scoreG;
+
+    // Mise à jour des scores dans le formulaire
+    form.setScoreE(scoreE);
+    form.setScoreS(scoreS);
+    form.setScoreG(scoreG);
+    form.setScoreESG(scoreESG);
+
+
     form.setSendAt(LocalDateTime.now());
     form.setCompleted(form.getTotal());
     form.setSubmitted(true);

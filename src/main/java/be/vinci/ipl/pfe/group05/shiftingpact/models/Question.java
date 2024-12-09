@@ -22,7 +22,7 @@ public class Question {
 
   @NonNull
   private String question;
-  private List<String> choice; // TODO ????
+  private List<Choice> choice;
   @NonNull
   private String enjeux;
   @NonNull
@@ -33,5 +33,4 @@ public class Question {
   private String template;
   @NonNull
   private String type; //radio, check box, champ libre
-
 }
