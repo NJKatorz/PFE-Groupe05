@@ -18,7 +18,7 @@ const currentQuestions = computed(() => questionsByCategory.value[currentCategor
 // Fonction pour récupérer la progression depuis le backend
 const fetchProgression = async () => {
   try {
-    const response = await api.get(`/forms/2/progression`);
+    const response = await api.get(`/forms/15/progression`);
     progress
       .value = response.data; // Mise à jour de la progression
     console.log('Progression actuelle :', progress.value);
@@ -43,18 +43,21 @@ onMounted(async () => {
 
     // Parser les choix pour chaque question
     questions.forEach((question) => {
-      if (question.choice) {
+    if (question.choice) {
         question.choice = question.choice.map((option) => {
-          try {
-            return JSON.parse(option); // Parser chaque option de choix
-          } catch (error) {
-            console.error('Erreur lors du parsing du choix :', option, error);
-            return { choice: option, poids: 0 }; // Retour de secours en cas d'erreur
-          }
-
+            if (typeof option === 'string') {
+                try {
+                    return JSON.parse(option); // Parser seulement si c'est une chaîne JSON
+                } catch (error) {
+                    console.error('Erreur lors du parsing du choix :', option, error);
+                    return { choice: option, poids: 0 }; // Valeur par défaut en cas d'erreur
+                }
+            }
+            return option; // Retourner directement si c'est déjà un objet
         });
-      }
-    });
+    }
+});
+
 
     // Regrouper les questions par catégorie
     questionsByCategory.value = questions.reduce((acc, question) => {
@@ -132,14 +135,18 @@ const saveAnswers = async () => {
     const answers = Object.entries(selectedAnswers.value[category]).map(
       ([questionId, value]) => ({
         questionId: parseInt(questionId, 10),
-        response: Array.isArray(value) ? JSON.stringify(value) : value,
+        // response: Array.isArray(value) ? JSON.stringify(value) : value,
+        response: Array.isArray(value)
+          ? JSON.stringify(value.map(v => v.choice || v)) 
+          : value.choice || value, 
+          
         comments: '',
       })
     );
 
     console.log('Données envoyées au backend :', JSON.stringify(answers));
-
-    const response = await api.post(`/forms/2/saveAnswers`, answers);
+    const response = await api.post(`/forms/21/saveAnswers`, answers);
+    console.log('id : ', response.data.id);
 
     if (response.status === 200) {
       console.log('Réponses sauvegardées avec succès.');
@@ -153,7 +160,7 @@ const saveAnswers = async () => {
 
 const submitForm = async () => {
   try {
-    const response = await api.post(`/forms/2/submit`);
+    const response = await api.post(`/forms/21/submit`);
 
     if (response.status === 200) {
       console.log('Formulaire soumis avec succès :', response.data);
@@ -217,7 +224,7 @@ const goToNextCategory = async () => {
                     v-if="selectedAnswers[categories[currentCategoryIndex]][question.questionId] === option"
                   ></div>
                 </div>
-                <span>{{ option.choice.choice }}</span>
+                <span>{{ option.choice}}</span>
               </div>
             </template>
 
@@ -234,7 +241,7 @@ const goToNextCategory = async () => {
                     v-if="selectedAnswers[categories[currentCategoryIndex]][question.questionId]?.includes(option)"
                   ></div>
                 </div>
-                <span>{{ option.choice.choice }}</span>
+                <span>{{ option.choice }}</span>
               </div>
             </template>
 
