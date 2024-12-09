@@ -34,18 +34,39 @@ public class FormsService {
       "ALL"
   );
 
+
+  private int calculateProgression(Form form) {
+    int completed = form.getCompleted();
+    int total = form.getTotal();
+    if (total == 0) {
+      return 0;
+    }
+   // return (int) ((double) completed / total * 100);
+    return completed / total * 100;
+  }
+
   public List<Form> getAllFormsInProgress(int companyId) {
     List<Form> allFormsInProgress = repository.findByCompanyId(companyId);
 
-    for (Form formsInProgress : allFormsInProgress) {
-      int totalQuestions = formsInProgress.getTotal();
-      int completed = formsInProgress.getCompleted();
-
-      int progression = completed/totalQuestions*100;
-      formsInProgress.setProgression(progression);
+    for (Form form : allFormsInProgress) {
+      int progression = calculateProgression(form);
+      form.setProgression(progression);
     }
     return allFormsInProgress;
   }
+
+
+  public Form updateProgression(int formId) {
+    Form form = repository.findByFormId(formId).orElse(null);
+    if (form == null) {
+      throw new IllegalArgumentException("Formulaire introuvable");
+    }
+    int progression = calculateProgression(form);
+    form.setProgression(progression);
+    repository.save(form);
+    return form;
+  }
+
 
   public Form createOne(Integer companyId){
     Form form = new Form();

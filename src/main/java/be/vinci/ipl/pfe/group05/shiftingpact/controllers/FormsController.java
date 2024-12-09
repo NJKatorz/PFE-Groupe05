@@ -26,6 +26,12 @@ public class FormsController {
   public List<Form> getAllFormsInProgress(@PathVariable Integer companyId) {
     return service.getAllFormsInProgress(companyId);
   }
+  @GetMapping("/forms/{formId}/progression")
+  public double getProgression(@PathVariable int formId) {
+    Form form = service.getOneFormById(formId);
+    return form.getProgression();
+  }
+
   @PostMapping("/forms/{companyId}")
   public Form createOne(@PathVariable int companyId) {
     return service.createOne(companyId);
