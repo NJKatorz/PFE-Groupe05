@@ -41,6 +41,20 @@ onMounted(async () => {
 
     const questions = formData.questionList;
 
+     // Parser les choix pour chaque question
+     questions.forEach((question) => {
+      if (question.choice) {
+        question.choice = question.choice.map((option) => {
+          try {
+            return JSON.parse(option); // Parser chaque option de choix
+          } catch (error) {
+            console.error('Erreur lors du parsing du choix :', option, error);
+            return { choice: option, poids: 0 }; // Retour de secours en cas d'erreur
+          }
+        });
+      }
+    });
+
     // Regrouper les questions par catégorie
     questionsByCategory.value = questions.reduce((acc, question) => {
       const category = question.category || 'Non catégorisé'; // Gérer les catégories manquantes
@@ -202,7 +216,7 @@ const goToNextCategory = async () => {
                     v-if="selectedAnswers[categories[currentCategoryIndex]][question.questionId] === option"
                   ></div>
                 </div>
-                <span>{{ option }}</span>
+                <span>{{ option.choice }}</span>
               </div>
             </template>
 
@@ -466,5 +480,5 @@ const goToNextCategory = async () => {
       justify-content: center;
     }
   }
-  
+
   </style>
