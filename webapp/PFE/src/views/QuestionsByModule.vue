@@ -18,7 +18,7 @@ const currentQuestions = computed(() => questionsByCategory.value[currentCategor
 // Fonction pour récupérer la progression depuis le backend
 const fetchProgression = async () => {
   try {
-    const response = await api.get(`/forms/119/progression`);
+    const response = await api.get(`/forms/1/progression`);
     progress
     .value = response.data; // Mise à jour de la progression
     console.log('Progression actuelle :', progress.value);
@@ -124,7 +124,7 @@ const saveAnswers = async () => {
 
     console.log('Données envoyées au backend :', JSON.stringify(answers));
 
-    const response = await api.post(`/forms/119/saveAnswers`, answers);
+    const response = await api.post(`/forms/1/saveAnswers`, answers);
 
     if (response.status === 200) {
       console.log('Réponses sauvegardées avec succès.');
@@ -138,7 +138,7 @@ const saveAnswers = async () => {
 
 const submitForm = async () => {
   try {
-    const response = await api.post(`/forms/119/submit`);
+    const response = await api.post(`/forms/1/submit`);
 
     if (response.status === 200) {
       console.log('Formulaire soumis avec succès :', response.data);
