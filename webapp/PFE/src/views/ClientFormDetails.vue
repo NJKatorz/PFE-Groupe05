@@ -1,20 +1,56 @@
 <template>
   <div class="form-details">
-    <h1 class="title">Détails du Formulaire</h1>
+    <div class="header">
+      <h1 class="title">Détails du Formulaire</h1>
+      <p class="subtitle">Consultation des réponses</p>
+    </div>
+
     <div v-if="form && company" class="form-container">
+      <!-- Company Info -->
       <div class="company-info">
-        <h2>Entreprise : {{ company.name }}</h2>
-        <p><strong>ID Entreprise :</strong> {{ company.id }}</p>
+        <h2>{{ company.name }}</h2>
+        <div class="company-meta">
+          <span>ID Entreprise : {{ company.id }}</span>
+          <span class="separator">•</span>
+          <span>{{ formatDate(form.createdAt) }}</span>
+        </div>
       </div>
-      <div class="form-info">
-        <p><strong>Date de création :</strong> {{ formatDate(form.createdAt) }}</p>
-        <p><strong>Total des questions :</strong> {{ form.total }}</p>
-        <p><strong>Total des questions complétées :</strong> {{ form.completed }}</p>
-        <h3>Questions :</h3>
-        <ul>
-          <li v-for="question in form.questionList" :key="question.question_id">{{ question.question }}
-          </li>
-        </ul>
+
+      <!-- Statistics Cards -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value">{{ form.total }}</div>
+          <div class="stat-label">Questions Totales</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">{{ form.completed }}</div>
+          <div class="stat-label">Questions Complétées</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">{{ calculateProgress }}%</div>
+          <div class="stat-label">Progression</div>
+        </div>
+      </div>
+
+      <!-- Questions List -->
+      <div class="questions-section">
+        <h3>Questions et Réponses</h3>
+        <div class="questions-list">
+          <div
+            v-for="(question, index) in form.questionList"
+            :key="question.question_id"
+            class="question-card"
+          >
+            <div class="question-header">
+              <div class="question-number">Q{{ index + 1 }}</div>
+              <div class="question-text">{{ question.question }}</div>
+            </div>
+            <div class="answer-section">
+              <p v-if="question.answer" class="answer">{{ }}</p> <!--todo-get--->
+              <p v-else class="no-answer">Aucune réponse fournie</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -26,18 +62,23 @@ import FormsService from "@/services/FormsService";
 export default {
   data() {
     return {
-      form: null, 
-      company: null, 
+      form: null,
+      company: null,
     };
+  },
+  computed: {
+    calculateProgress() {
+      if (!this.form?.total) return 0;
+      return Math.round((this.form.completed / this.form.total) * 100);
+    }
   },
   methods: {
     async fetchFormDetails() {
-      const formId = Number(this.$route.params.formId); // Récupère formId depuis l'URL
+      const formId = Number(this.$route.params.formId);
       try {
         const formResponse = await FormsService.getFormClientByFormId(formId);
         this.form = formResponse.data;
 
-        // Récupérer les informations de l'entreprise via company_id du formulaire
         const companyResponse = await FormsService.getFormClientByCompanyId(
           this.form.companyId
         );
@@ -62,30 +103,131 @@ export default {
 
 <style scoped>
 .form-details {
-  font-family: Arial, sans-serif;
-  padding: 20px;
-  max-width: 800px;
-  margin: auto;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+  background: #006D77;
+  color: white;
+  padding: 2rem;
+  border-radius: 8px;
 }
 
 .title {
-  text-align: center;
-  margin-bottom: 20px;
+  font-size: 2rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.subtitle {
+  margin-top: 0.5rem;
+  opacity: 0.9;
 }
 
 .form-container {
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
 }
 
 .company-info {
-  margin-bottom: 20px;
+  margin-bottom: 2rem;
 }
 
-.form-info ul {
-  list-style-type: disc;
-  margin-left: 20px;
+.company-info h2 {
+  color: #006D77;
+  margin: 0 0 0.5rem 0;
+}
+
+.company-meta {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.separator {
+  margin: 0 0.5rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #006D77;
+}
+
+.stat-label {
+  color: #666;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.questions-section {
+  margin-top: 2rem;
+}
+
+.questions-section h3 {
+  color: #006D77;
+  margin-bottom: 1rem;
+}
+
+.questions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.question-card {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.question-header {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.question-number {
+  background: #006D77;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.question-text {
+  font-weight: 500;
+}
+
+.answer-section {
+  padding-left: 3rem;
+}
+
+.answer {
+  color: #333;
+}
+
+.no-answer {
+  color: #666;
+  font-style: italic;
 }
 </style>
