@@ -1,6 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-// import NewQuestionnaire from '../views/NewQuestionnaire.vue'
-import Homepage from "@/views/Homepage.vue";
 import ClientFormDetails from "@/views/ClientFormDetails.vue";
 
 const router = createRouter({
@@ -8,9 +6,8 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'home',
-      //component: NewQuestionnaire,
-      component: Homepage,
+      name: 'HomePage',
+      component: ()=>import ("@/views/Homepage.vue"),
     },
 
     {
@@ -43,6 +40,11 @@ const router = createRouter({
       name: 'ClientFormDetails',
       component: ClientFormDetails,
     },
+    {
+      path: '/login',
+      name: 'Connexion',
+      component: () => import('@/views/Connexion.vue')
+    }
   ],
 })
 

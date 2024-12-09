@@ -3,3 +3,18 @@ GET http://localhost:8080/questions
 
 ### Read questions by template
 GET http://localhost:8080/questions?template=ALL
+//Authorization: {{johnToken}}
+
+
+### Login a user
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "psw"
+}
+
+> {%
+  client.global.set("johnToken", response.body.token);
+%}
