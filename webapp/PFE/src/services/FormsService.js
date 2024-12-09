@@ -15,6 +15,9 @@ const FormsService = {
     getFormClientByCompanyId(companyId) {
       return api.get(`/companies/${companyId}`);
     },
+    login(crendentials){
+      return api.post('/auth/login', crendentials);
+    },
 };
 
 export default FormsService;
