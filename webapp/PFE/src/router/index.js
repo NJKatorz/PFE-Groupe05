@@ -40,6 +40,11 @@ const router = createRouter({
       name: 'ClientFormDetails',
       component: ClientFormDetails,
     },
+    {
+      path: '/login',
+      name: 'Connexion',
+      component: () => import('@/views/Connexion.vue')
+    }
   ],
 })
 
