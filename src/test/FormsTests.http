@@ -3,7 +3,7 @@ GET http://localhost:8080/forms/1/progress
 
 
 ### Create a form
-POST http://localhost:8080/forms/4
+POST http://localhost:8080/forms/company/4
 
 ### Get all forms
 GET http://localhost:8080/forms

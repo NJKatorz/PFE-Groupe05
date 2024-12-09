@@ -27,10 +27,11 @@ const fetchProgression = async () => {
   }
 };
 
+const formId = ref(null); // Ajoutez une variable réactive pour l'ID du formulaire
 onMounted(async () => {
   try {
     // Récupérer les données via l'API
-    const response = await api.post(`/forms/6`);
+    const response = await api.post(`/forms/company/4`);
     console.log('Réponse de l’API :', response.data);
     const formData = response.data;
 
@@ -38,6 +39,9 @@ onMounted(async () => {
       console.error('Aucune question trouvée dans la réponse de l’API.');
       return;
     }
+
+    formId.value = formData.formId; // Stockez l'ID du formulaire
+    console.log('ID du formulaire :', formId.value);
 
     const questions = formData.questionList;
 
@@ -138,8 +142,8 @@ const saveAnswers = async () => {
     );
 
     console.log('Données envoyées au backend :', JSON.stringify(answers));
-
-    const response = await api.post(`/forms/1/saveAnswers`, answers);
+    console.log("Id du form dans saveAnsware : ", formId.value);
+    const response = await api.post(`/forms/${formId.value}/saveAnswers`, answers);
 
     if (response.status === 200) {
       console.log('Réponses sauvegardées avec succès.');
@@ -153,7 +157,7 @@ const saveAnswers = async () => {
 
 const submitForm = async () => {
   try {
-    const response = await api.post(`/forms/1/submit`);
+    const response = await api.post(`/forms/${formId.value}/submit`);
 
     if (response.status === 200) {
       console.log('Formulaire soumis avec succès :', response.data);
