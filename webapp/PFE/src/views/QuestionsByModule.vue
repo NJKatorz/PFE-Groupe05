@@ -1,68 +1,81 @@
-
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import OurCard from '../components/OurCard.vue';
 import api from '../services/api';
-
+import { useRouter } from 'vue-router';
 
 const questionsByCategory = ref({});
 const categories = ref([]);
 const currentCategoryIndex = ref(0);
 const selectedAnswers = ref({});
-const progress = ref(0);
+const progress = ref(0); // Progression venant du backend
+const router = useRouter(); // Router pour la navigation
 
 // Données de la catégorie actuelle
 const currentCategory = computed(() => categories.value[currentCategoryIndex.value]);
 const currentQuestions = computed(() => questionsByCategory.value[currentCategory.value] || []);
 
-// Charger les questions depuis l'API
+// Fonction pour récupérer la progression depuis le backend
+const fetchProgression = async () => {
+  try {
+    const response = await api.get(`/forms/1/progression`);
+    progress
+    .value = response.data; // Mise à jour de la progression
+    console.log('Progression actuelle :', progress.value);
+  } catch (error) {
+    console.error('Erreur lors de la récupération de la progression :', error);
+  }
+};
+
 onMounted(async () => {
   try {
-    const response = await api.get('/questions');
-    const questions = response.data;
+    // Récupérer les données via l'API
+    const response = await api.post(`/forms/6`);
+    console.log('Réponse de l’API :', response.data);
+    const formData = response.data;
 
-    // Regrouper par catégorie
+    if (!formData || !formData.questionList) {
+      console.error('Aucune question trouvée dans la réponse de l’API.');
+      return;
+    }
+
+    const questions = formData.questionList;
+
+    // Regrouper les questions par catégorie
     questionsByCategory.value = questions.reduce((acc, question) => {
-      const category = question.category;
+      const category = question.category || 'Non catégorisé'; // Gérer les catégories manquantes
       if (!acc[category]) acc[category] = [];
       acc[category].push(question);
       return acc;
     }, {});
 
+    // Extraire les catégories
     categories.value = Object.keys(questionsByCategory.value);
 
     // Initialiser les réponses par catégorie
-    selectedAnswers.value = Object.fromEntries(
-      categories.value.map((category) => [
-        category,
-        questionsByCategory.value[category].reduce((answers, question) => {
-          answers[question.questionId] = question.type === 'checkbox' ? [] : '';
-          return answers;
-        }, {}),
-      ])
-    );
+    selectedAnswers.value = categories.value.reduce((acc, category) => {
+      acc[category] = questionsByCategory.value[category].reduce((answers, question) => {
+        answers[question.questionId] = question.type === 'checkbox' ? [] : '';
+        return answers;
+      }, {});
+      return acc;
+    }, {});
 
-    updateProgress();
+    console.log('Questions regroupées par catégorie :', questionsByCategory.value);
+    console.log('Réponses initialisées :', selectedAnswers.value);
+
+    // Charger la progression initiale
+    await fetchProgression();
   } catch (error) {
-    console.error('Erreur lors de la récupération des questions:', error);
+    console.error('Erreur lors du chargement des données :', error);
   }
 });
-
-// Mettre à jour le progrès
-const updateProgress = () => {
-  const category = currentCategory.value;
-  const totalQuestions = currentQuestions.value.length;
-  const answered = Object.values(selectedAnswers.value[category] || {}).filter((answer) =>
-    Array.isArray(answer) ? answer.length > 0 : answer !== ''
-  ).length;
-  progress.value = totalQuestions > 0 ? (answered / totalQuestions) * 100 : 0;
-};
 
 // Gestion des réponses
 const selectOption = (questionId, option) => {
   const category = currentCategory.value;
   selectedAnswers.value[category][questionId] = option;
-  updateProgress();
+  console.log('Option sélectionnée :', selectedAnswers.value[category]);
 };
 
 const toggleCheckbox = (questionId, option) => {
@@ -75,13 +88,13 @@ const toggleCheckbox = (questionId, option) => {
     answers.splice(index, 1);
   }
   selectedAnswers.value[category][questionId] = answers;
-  updateProgress();
+  console.log('Réponse mise à jour :', selectedAnswers.value[category]);
 };
 
 const handleTextInput = (questionId, value) => {
   const category = currentCategory.value;
   selectedAnswers.value[category][questionId] = value;
-  updateProgress();
+  console.log('Texte saisi :', selectedAnswers.value[category]);
 };
 
 const scrollToTop = () => {
@@ -91,36 +104,75 @@ const scrollToTop = () => {
   });
 };
 
-// Navigation entre les catégories
-const goToNextCategory = () => {
-  if (currentCategoryIndex.value < categories.value.length - 1) {
-    currentCategoryIndex.value++;
-    scrollToTop(); 
-    updateProgress();
-  }
-};
-
 const goToPreviousCategory = () => {
   if (currentCategoryIndex.value > 0) {
     currentCategoryIndex.value--;
-    scrollToTop(); 
-    updateProgress();
+    scrollToTop();
   }
 };
 
-</script>
+const saveAnswers = async () => {
+  try {
+    const category = currentCategory.value;
+    const answers = Object.entries(selectedAnswers.value[category]).map(
+      ([questionId, value]) => ({
+        questionId: parseInt(questionId, 10),
+        response: Array.isArray(value) ? JSON.stringify(value) : value,
+        comments: '',
+      })
+    );
 
+    console.log('Données envoyées au backend :', JSON.stringify(answers));
+
+    const response = await api.post(`/forms/1/saveAnswers`, answers);
+
+    if (response.status === 200) {
+      console.log('Réponses sauvegardées avec succès.');
+    } else {
+      throw new Error('Erreur lors de la sauvegarde des réponses.');
+    }
+  } catch (error) {
+    console.error('Erreur lors de la sauvegarde des réponses :', error);
+  }
+};
+
+const submitForm = async () => {
+  try {
+    const response = await api.post(`/forms/1/submit`);
+
+    if (response.status === 200) {
+      console.log('Formulaire soumis avec succès :', response.data);
+      router.push('/validation'); // Rediriger vers la page de validation
+    } else {
+      throw new Error('Erreur lors de la soumission du formulaire.');
+    }
+  } catch (error) {
+    console.error('Erreur lors de la soumission du formulaire :', error);
+  }
+};
+
+const goToNextCategory = async () => {
+  await saveAnswers(); // Sauvegarder les réponses de la catégorie actuelle
+
+  if (currentCategoryIndex.value < categories.value.length - 1) {
+    currentCategoryIndex.value++;
+    scrollToTop();
+  } else {
+    await submitForm();
+  }
+};
+</script>
 
 <template>
   <div class="questionnaire-container">
     <OurCard :title="'QUESTIONNAIRE ESG '">
-      <!-- Progress Bar -->
+      <!-- Barre de progression -->
       <div class="progress-bar">
         <div class="progress-fill" :style="{ width: progress + '%' }"></div>
       </div>
 
       <!-- Titre de la catégorie -->
-      <div class="module-header" >
+      <div class="module-header">
         <div class="module-info">
           <div class="module-title">
             <p>{{ categories[currentCategoryIndex] }}</p>
@@ -137,7 +189,6 @@ const goToPreviousCategory = () => {
         >
           <h3>{{ question.question }}</h3>
           <div class="options">
-            <!-- Si le type est "radio" -->
             <template v-if="question.type === 'radio'">
               <div
                 v-for="option in question.choice"
@@ -155,7 +206,6 @@ const goToPreviousCategory = () => {
               </div>
             </template>
 
-            <!-- Si le type est "checkbox" -->
             <template v-else-if="question.type === 'checkbox'">
               <div
                 v-for="option in question.choice"
@@ -173,7 +223,6 @@ const goToPreviousCategory = () => {
               </div>
             </template>
 
-            <!-- Pour le texte libre -->
             <template v-else-if="question.type === 'champ libre'">
               <input
                 type="text"
@@ -186,7 +235,7 @@ const goToPreviousCategory = () => {
         </div>
       </div>
 
-      <!-- Navigation Buttons -->
+      <!-- Boutons de navigation -->
       <div class="navigation-buttons">
         <button
           class="btn btn-previous"
@@ -195,21 +244,14 @@ const goToPreviousCategory = () => {
         >
           Précédent
         </button>
-        <button
-          class="btn btn-next"
-          @click="goToNextCategory"
-          :disabled="currentCategoryIndex === categories.length - 1"
-        >
-          Suivant
+        <button class="btn btn-next" @click="goToNextCategory">
+          {{ currentCategoryIndex === categories.length - 1 ? 'Soumettre' : 'Suivant' }}
         </button>
       </div>
     </OurCard>
   </div>
 </template>
 
-
-
-  
   <style scoped>
   .questionnaire-container {
     max-width: 1000px;
