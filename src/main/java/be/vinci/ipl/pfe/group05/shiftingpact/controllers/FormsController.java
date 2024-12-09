@@ -59,4 +59,9 @@ public class FormsController {
 
   @PostMapping("/forms/{formId}/submit")
   public Form submit(@PathVariable int formId) {return service.submit(formId);}
+
+  @GetMapping("/forms/formsSubmitted")
+  public int getFormsSubmitted() {
+    return service.getNumberOfSubmittedForms();
+  }
 }

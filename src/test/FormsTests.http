@@ -188,3 +188,6 @@ Content-Type: application/json
 
 ###Submit the form
 POST http://localhost:8080/forms/67/submit
+
+### Get all forms submitted
+GET http://localhost:8080/forms/formsSubmitted

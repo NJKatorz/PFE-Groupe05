@@ -154,4 +154,8 @@ public class FormsService {
     form.setSubmitted(true);
     return repository.save(form);
   }
+
+  public int getNumberOfSubmittedForms() {
+    return repository.findAll().stream().filter(Form::isSubmitted).toList().size();
+  }
 }
