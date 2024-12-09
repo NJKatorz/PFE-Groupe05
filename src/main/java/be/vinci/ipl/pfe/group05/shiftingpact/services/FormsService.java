@@ -10,6 +10,7 @@ import be.vinci.ipl.pfe.group05.shiftingpact.repositories.FormsRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -147,14 +148,14 @@ public class FormsService {
     if (form.getCompleted() != form.getTotal()) {
       throw new IllegalArgumentException("Le formulaire n'est pas complet"); // mettre un commentaire dans le front qui dit quon a oublier de completer
     }
-    if(form.getSendAt()!=null){
-      throw new IllegalArgumentException("Le formulaire a déjà été envoyé");
-    }
+ //   if(form.getSendAt()!=null){
+   //   throw new IllegalArgumentException("Le formulaire a déjà été envoyé");
+    //}
 
     // Calcul des scores pour chaque pilier
-    double scoreE = calculateScoreByPillar(form, 'E');
-    double scoreS = calculateScoreByPillar(form, 'S');
-    double scoreG = calculateScoreByPillar(form, 'G');
+    double scoreE = calculateScoreByPillar(form, "E");
+    double scoreS = calculateScoreByPillar(form, "S");
+    double scoreG = calculateScoreByPillar(form, "G");
 
     // Calcul du score total ESG
     double scoreESG = scoreE + scoreS + scoreG;
@@ -173,34 +174,40 @@ public class FormsService {
   }
 
 
-  private double calculateScoreByPillar(Form form, char pillar) {
+  private double calculateScoreByPillar(Form form, String pillar) {
     if (form == null || form.getAnswersList() == null || form.getQuestionList() == null) {
       throw new IllegalArgumentException("Form or its required data cannot be null");
     }
 
-    // Calcul du score total pour un pilier spécifique
-    return form.getQuestionList().stream()
-        .filter(question -> question.getPilier() == pillar) // Filtrer par pilier
-        .mapToDouble(question -> {
-          // Récupérer toutes les réponses pour cette question
-          List<Answer> answersForQuestion = form.getAnswersList().stream()
-              .filter(answer -> answer.getQuestionId() == question.getQuestionId())
-              .toList();
+    // Liste des questions filtrées par pilier
+    List<Question> questionsForPillar = form.getQuestionList().stream()
+        .filter(question -> question.getPillar().startsWith(pillar))
+        .collect(Collectors.toList());
 
-          if (!answersForQuestion.isEmpty()) {
-            // Calculer la somme des poids des choix sélectionnés
-            double totalChoiceWeight = answersForQuestion.stream()
-                .mapToDouble(answer -> getChoiceWeight(question, answer.getResponse()))
-                .sum();
+    double totalScore = 0;
 
-            // Diviser le score total pour cette question par 2
-            return totalChoiceWeight / 2.0;
-          }
+    // Pour chaque question, calculer le score total
+    for (Question question : questionsForPillar) {
+      // Récupérer toutes les réponses associées à la question
+      List<Answer> answersForQuestion = form.getAnswersList().stream()
+          .filter(answer -> answer.getQuestionId() == question.getQuestionId())
+          .collect(Collectors.toList());
 
-          return 0; // Aucun score si pas de réponses pour cette question
-        })
-        .sum();
+      if (!answersForQuestion.isEmpty()) {
+        // Calculer la somme des poids des choix sélectionnés
+        double totalChoiceWeight = 0;
+        for (Answer answer : answersForQuestion) {
+          totalChoiceWeight += getChoiceWeight(question, answer.getResponse());
+        }
+
+        // Diviser le score total pour cette question par 2
+        totalScore += totalChoiceWeight / 2.0;
+      }
+    }
+
+    return totalScore;
   }
+
 
   /**
    * Récupère le poids d'un choix donné dans une question.
