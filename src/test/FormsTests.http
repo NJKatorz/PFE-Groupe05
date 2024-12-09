@@ -3,26 +3,54 @@ GET http://localhost:8080/forms/1/progress
 
 
 ### Create a form
-POST http://localhost:8080/forms/6
+POST http://localhost:8080/forms/company/4
 
 ### Get all forms
 GET http://localhost:8080/forms
 
 ### Get a form
-GET http://localhost:8080/forms/67
+GET http://localhost:8080/forms/6
 
 ### Save the form
-POST http://localhost:8080/forms/67/saveAnswers
+POST http://localhost:8080/forms/6/saveAnswers
 Content-Type: application/json
 
 [
   {
+    "questionId": 18,
+    "response": "Oui"
+  },
+  {
+    "questionId": 19,
+    "response": "test"
+  },
+  {
+    "questionId": 20,
+    "response": "Nous avons installé des systèmes de détection des fuites."
+  },
+  {
+    "questionId": 26,
+    "response": "Oui"
+  },
+  {
+    "questionId": 27,
+    "response": "test"
+  },
+  {
+    "questionId": 28,
+    "response": "test"
+  },
+  {
+    "questionId": 29,
+    "response": "Autre : veuillez expliquer dans les commentaires"
+  },
+  {
     "questionId": 1,
-    "response": "Non"
+    "response": "Oui"
   },
   {
     "questionId": 2,
-    "response": "test"
+    "response": "Je ne sais pas"
   },
   {
     "questionId": 7,
@@ -30,23 +58,23 @@ Content-Type: application/json
   },
   {
     "questionId": 8,
-    "response": "test"
+    "response": "Aucune de ces réponses."
   },
   {
     "questionId": 9,
-    "response": "test"
+    "response": "Aucune de ces réponses."
   },
   {
     "questionId": 10,
-    "response": "test"
+    "response": "Non"
   },
   {
     "questionId": 11,
-    "response": "Nous n'avons pas réalisé de rapport d'empreinte carbone."
+    "response": "Notre rapport d'empreinte carbone inclut une déclaration claire de notre engagement en faveur de la réduction de notre empreinte carbone."
   },
   {
     "questionId": 12,
-    "response": "Aucune de ces réponses."
+    "response": "Nous choisissons en priorité des fournisseurs qui adoptent les meilleures pratiques en matière de durabilité."
   },
   {
     "questionId": 14,
@@ -54,47 +82,47 @@ Content-Type: application/json
   },
   {
     "questionId": 17,
-    "response": "Aucune de ces réponses."
+    "response": "Nous intégrons des critères environnementaux dans nos contrats fournisseurs, afin de les inciter à adopter des pratiques durables."
   },
   {
     "questionId": 22,
-    "response": "Aucune de ces réponses."
+    "response": "Nous avons défini des objectifs pour réduire l'empreinte hydrique de notre chaîne d'approvisionnement."
   },
   {
     "questionId": 60,
-    "response": "Aucune de ces réponses."
+    "response": "Nous offrons des produits ou des services à prix réduit aux groupes défavorisés."
   },
   {
     "questionId": 61,
-    "response": "Non"
+    "response": "Oui : veuillez indiquer le nombre d'heures"
   },
   {
     "questionId": 62,
-    "response": "Aucune des réponses ci-dessus."
-  },
-  {
-    "questionId": 63,
-    "response": "Pas de philantropie"
+    "response": "Nous mettons en place un programme de jumelage des dons des travailleur·euses où l'entreprise égale les contributions des travailleur·euses aux œuvres de bienfaisance locales, doublant ainsi efficacement l'impact."
   },
   {
     "questionId": 64,
-    "response": "Notre organisation est dirigée par ses fondateur·trices ou propriétaires uniquement."
+    "response": "Notre conseil d'administration est composé d'au moins un·e membre qui n'est pas un·e fondateur·trice ou un·e propriétaire de l'entreprise."
+  },
+  {
+    "questionId": 63,
+    "response": "<1%"
   },
   {
     "questionId": 65,
-    "response": "Aucune de ces réponses."
+    "response": "Une expertise environnementale. Par exemple un·e expert·e en développement durable, un·e expert·e scientifique, une organisation territoriale ou sans but lucratif."
   },
   {
     "questionId": 66,
-    "response": "test"
+    "response": "Aucune de ces réponses."
   },
   {
     "questionId": 67,
-    "response": "test"
+    "response": "Aucune de ces réponses."
   },
   {
     "questionId": 68,
-    "response": "0%"
+    "response": "1-24%"
   },
   {
     "questionId": 69,
@@ -102,92 +130,92 @@ Content-Type: application/json
   },
   {
     "questionId": 70,
-    "response": "test"
+    "response": "Aucune de ces réponses."
   },
   {
     "questionId": 71,
-    "response": "Nous ne procédons à aucun contrôle ou audit de nos fournisseurs."
+    "response": "1-24%"
   },
   {
     "questionId": 72,
-    "response": "Aucune de ces réponses."
+    "response": "Nous intégrons des critères ESG dans la sélection des fournisseurs."
   },
   {
     "questionId": 73,
-    "response": "Aucune de ces réponses."
+    "response": "Nous disposons d'une ou plusieurs certifications de qualité ou d'accréditations de tiers attestant de la qualité de nos produits ou services."
   },
   {
     "questionId": 74,
-    "response": "Aucune de ces réponses."
+    "response": "Nous intégrons explicitement les performances sociales et environnementales dans les descriptions de poste des cadres."
   },
   {
     "questionId": 75,
-    "response": "Nous n'avons pas de mission écrite et formelle."
+    "response": "Un engagement général en matière de responsabilité sociale ou environnementale (par exemple, préservation de l'environnement)."
   },
   {
     "questionId": 76,
-    "response": "Aucune de ces réponses."
+    "response": "Nous sensibilisons nos travailleur·euses aux ODD et les impliquons dans la poursuite de ces objectifs."
   },
   {
     "questionId": 77,
-    "response": "Aucune de ces réponses."
+    "response": "Évaluation de la matérialité d'impact : Nous avons analysé les enjeux environnementaux, sociaux et de gouvernance (ESG) les plus importants pour l'entreprise, en termes d'impact sur la société et l'environnement."
   },
   {
     "questionId": 78,
-    "response": "Aucune de ces réponses."
+    "response": "Notre empreinte carbone, notre stratégie et nos pratiques pour la réduire."
   },
   {
     "questionId": 79,
-    "response": "Aucune de ces réponses."
+    "response": "Notre politique et nos performances en matière de promotion de la santé et du bien-être."
   },
   {
     "questionId": 80,
-    "response": "Aucune de ces réponses."
+    "response": "Les résultats financiers (au moins transparents pour les travailleur·euses)."
   },
   {
     "questionId": 81,
-    "response": "Nous n'avons pas de rapport d'impact."
+    "response": "Élaborer un rapport complet de durabilité qui divulgue de manière transparente les impacts, les performances et les progrès de l'entreprise sur les questions importantes."
   },
   {
     "questionId": 82,
-    "response": "Aucune des réponses ci-dessus."
+    "response": "Code de conduite interne : déclaration écrite sur les normes de conduite professionnelle attendues de tous·tes les travailleur·euses, y compris l'interdiction de comportements inappropriés tels que la fraude, la corruption, le harcèlement et la discrimination."
   },
   {
     "questionId": 83,
-    "response": "Aucune des réponses ci-dessus."
+    "response": "Des lignes directrices sur l'acceptation et l'offre de cadeaux, divertissements et hospitalités, conformément aux normes légales et éthiques."
   },
   {
     "questionId": 84,
-    "response": "Non"
+    "response": "Litige social"
   },
   {
     "questionId": 85,
-    "response": "Non"
+    "response": "Oui : préciser"
   },
   {
     "questionId": 86,
-    "response": "Aucune de ces réponses."
+    "response": "La désignation d'un·e responsable à la protection des données (DPO - Data Protection Officer)."
   },
   {
     "questionId": 87,
-    "response": "Nous avons mis en place quelques mesures de base mais nous ne disposons pas d'une politique de protection de la vie privée formelle."
+    "response": "Nous avons formalisé la politique de protection de la vie privée avec une déclaration claire sur notre engagement à protéger la vie privée et la confidentialité des informations personnelles."
   },
   {
     "questionId": 88,
-    "response": "Je ne sais pas"
+    "response": "Non"
   },
   {
     "questionId": 89,
-    "response": "0%"
+    "response": "1-24%"
   },
   {
     "questionId": 90,
-    "response": "Non"
+    "response": "EMAS ou ISO 14001 - Système de management environnemental"
   }
 ]
 
 ###Submit the form
-POST http://localhost:8080/forms/67/submit
+POST http://localhost:8080/forms/19/submit
 
 ### Get all forms submitted
 GET http://localhost:8080/forms/formsSubmitted
