@@ -9,7 +9,7 @@
       </div>
     </div>
 
-    <router-link to="/new-questionnaire" class="cta-button">
+    <router-link to="/login" class="cta-button">
       Commencer l'expérience
       <span class="arrow">→</span>
     </router-link>
@@ -44,10 +44,12 @@ export default {
 .why-choose-section {
   padding: 30px 0;
   text-align: center;
+  background-color: #013238;
+  margin-top: 80px;
 }
 
 .section-title {
-  color: #004D56;
+  color: #ffffff;
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 3rem;
@@ -82,7 +84,7 @@ export default {
 
 .feature-title {
   color: #004D56;
-  font-size: 1.5rem;
+  font-size: 30px;
   font-weight: 600;
   margin-bottom: 1rem;
 }
@@ -90,12 +92,12 @@ export default {
 .feature-text {
   color: #4A5568;
   line-height: 1.6;
-  font-size: 1rem;
+  font-size: 20px;
 }
 
 .cta-button {
-  background: #004D56;
-  color: white;
+  background: white;
+  color:#004D56 ;
   border: none;
   padding: 1rem 2.5rem;
   border-radius: 50px;
@@ -110,7 +112,7 @@ export default {
 }
 
 .cta-button:hover {
-  background: #003842;
+  background: #b5cdbf;
   transform: translateY(-2px);
 }
 
