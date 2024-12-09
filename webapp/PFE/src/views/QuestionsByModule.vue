@@ -249,7 +249,6 @@ const goToNextCategory = async () => {
           </div>
         </div>
       </div>
-
       <!-- Boutons de navigation -->
       <div class="navigation-buttons">
         <button
