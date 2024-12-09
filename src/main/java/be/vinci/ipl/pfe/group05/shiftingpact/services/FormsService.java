@@ -1,6 +1,7 @@
 package be.vinci.ipl.pfe.group05.shiftingpact.services;
 
 import be.vinci.ipl.pfe.group05.shiftingpact.models.Answer;
+import be.vinci.ipl.pfe.group05.shiftingpact.models.Choice;
 import be.vinci.ipl.pfe.group05.shiftingpact.models.Company;
 import be.vinci.ipl.pfe.group05.shiftingpact.models.Form;
 import be.vinci.ipl.pfe.group05.shiftingpact.models.Question;
@@ -149,9 +150,75 @@ public class FormsService {
     if(form.getSendAt()!=null){
       throw new IllegalArgumentException("Le formulaire a déjà été envoyé");
     }
+
+    // Calcul des scores pour chaque pilier
+    double scoreE = calculateScoreByPillar(form, 'E');
+    double scoreS = calculateScoreByPillar(form, 'S');
+    double scoreG = calculateScoreByPillar(form, 'G');
+
+    // Calcul du score total ESG
+    double scoreESG = scoreE + scoreS + scoreG;
+
+    // Mise à jour des scores dans le formulaire
+    form.setScoreE(scoreE);
+    form.setScoreS(scoreS);
+    form.setScoreG(scoreG);
+    form.setScoreESG(scoreESG);
+
+
     form.setSendAt(LocalDateTime.now());
     form.setCompleted(form.getTotal());
     form.setSubmitted(true);
     return repository.save(form);
   }
+
+
+  private double calculateScoreByPillar(Form form, char pillar) {
+    if (form == null || form.getAnswersList() == null || form.getQuestionList() == null) {
+      throw new IllegalArgumentException("Form or its required data cannot be null");
+    }
+
+    // Calcul du score total pour un pilier spécifique
+    return form.getQuestionList().stream()
+        .filter(question -> question.getPilier() == pillar) // Filtrer par pilier
+        .mapToDouble(question -> {
+          // Récupérer toutes les réponses pour cette question
+          List<Answer> answersForQuestion = form.getAnswersList().stream()
+              .filter(answer -> answer.getQuestionId() == question.getQuestionId())
+              .toList();
+
+          if (!answersForQuestion.isEmpty()) {
+            // Calculer la somme des poids des choix sélectionnés
+            double totalChoiceWeight = answersForQuestion.stream()
+                .mapToDouble(answer -> getChoiceWeight(question, answer.getResponse()))
+                .sum();
+
+            // Diviser le score total pour cette question par 2
+            return totalChoiceWeight / 2.0;
+          }
+
+          return 0; // Aucun score si pas de réponses pour cette question
+        })
+        .sum();
+  }
+
+  /**
+   * Récupère le poids d'un choix donné dans une question.
+   */
+  private double getChoiceWeight(Question question, String response) {
+    if (response == null || response.isEmpty() || question.getChoice() == null) {
+      return 0; // Aucun score si pas de réponse ou pas de choix définis
+    }
+
+    // Trouver le poids correspondant au choix donné
+    return question.getChoice().stream()
+        .filter(choice -> choice.getChoice().equals(response))
+        .mapToDouble(Choice::getPoids)
+        .findFirst()
+        .orElse(0); // Retourne 0 si le choix n'est pas trouvé
+  }
+
+
+
+
 }
