@@ -11,6 +11,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class Choice {
   private String choice;
-  private int poids; // ex : 2
+  private int poids;
 }
-// TODO 1

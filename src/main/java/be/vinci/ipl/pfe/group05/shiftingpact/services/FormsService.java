@@ -10,10 +10,6 @@ import be.vinci.ipl.pfe.group05.shiftingpact.repositories.FormsRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -132,6 +128,22 @@ public class FormsService {
     if(form.getSendAt()!=null){
       throw new IllegalArgumentException("Le formulaire a déjà été envoyé");
     }
+
+    // Calcul des scores pour chaque pilier
+    double scoreE = calculateScoreByPillar(form, 'E');
+    double scoreS = calculateScoreByPillar(form, 'S');
+    double scoreG = calculateScoreByPillar(form, 'G');
+
+    // Calcul du score total ESG
+    double scoreESG = scoreE + scoreS + scoreG;
+
+    // Mise à jour des scores dans le formulaire
+    form.setScoreE(scoreE);
+    form.setScoreS(scoreS);
+    form.setScoreG(scoreG);
+    form.setScoreESG(scoreESG);
+
+
     form.setSendAt(LocalDateTime.now());
     form.setCompleted(form.getTotal());
     form.setSubmitted(true);
@@ -139,49 +151,52 @@ public class FormsService {
   }
 
 
-  private double calculateScore(Form form) {
+  private double calculateScoreByPillar(Form form, char pillar) {
     if (form == null || form.getAnswersList() == null || form.getQuestionList() == null) {
       throw new IllegalArgumentException("Form or its required data cannot be null");
     }
 
-    // Préparer une Map pour associer questionId -> Answer
-    Map<Integer, Answer> answerMap = form.getAnswersList().stream()
-        .collect(Collectors.toMap(Answer::getQuestionId, Function.identity()));
-
-    // Calculer le score total
+    // Calcul du score total pour un pilier spécifique
     return form.getQuestionList().stream()
+        .filter(question -> question.getPilier() == pillar) // Filtrer par pilier
         .mapToDouble(question -> {
-          int questionWeight = question.getPoids(); // Poids de la question
-          Answer answer = answerMap.get(question.getQuestionId()); // Recherche O(1)
+          // Récupérer toutes les réponses pour cette question
+          List<Answer> answersForQuestion = form.getAnswersList().stream()
+              .filter(answer -> answer.getQuestionId() == question.getQuestionId())
+              .toList();
 
-          if (answer != null && answer.getResponse() != null) {
-            // Récupérer le poids du choix
-            int choiceWeight = getChoiceWeight(question, answer.getResponse());
-            // Retourner le score du choix, en respectant le poids maximum de la question
-            return Math.min(choiceWeight, questionWeight); // Ne pas dépasser le poids max de la question
+          if (!answersForQuestion.isEmpty()) {
+            // Calculer la somme des poids des choix sélectionnés
+            double totalChoiceWeight = answersForQuestion.stream()
+                .mapToDouble(answer -> getChoiceWeight(question, answer.getResponse()))
+                .sum();
+
+            // Diviser le score total pour cette question par 2
+            return totalChoiceWeight / 2.0;
           }
 
-          return 0; // Si aucune réponse ou réponse invalide
+          return 0; // Aucun score si pas de réponses pour cette question
         })
         .sum();
   }
 
-
   /**
    * Récupère le poids d'un choix donné dans une question.
    */
-  private int getChoiceWeight(Question question, String response) {
-    if (question.getChoice() == null) {
-      return 0; // Aucun choix défini
+  private double getChoiceWeight(Question question, String response) {
+    if (response == null || response.isEmpty() || question.getChoice() == null) {
+      return 0; // Aucun score si pas de réponse ou pas de choix définis
     }
+
+    // Trouver le poids correspondant au choix donné
     return question.getChoice().stream()
         .filter(choice -> choice.getChoice().equals(response))
-        .map(Choice::getPoids)
+        .mapToDouble(Choice::getPoids)
         .findFirst()
-        .orElse(0); // Retourne 0 si la réponse ne correspond à aucun choix
+        .orElse(0); // Retourne 0 si le choix n'est pas trouvé
   }
 
 
-}
 
-// TODO 2
+
+}
