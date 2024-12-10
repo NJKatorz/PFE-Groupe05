@@ -15,7 +15,8 @@
   
           <button 
             class="view-score-button"
-            @click="$router.push('/score')"
+            @click="$router.push({path: '/score',
+            query: { scoreE, scoreS, scoreG, scoreESG }})"
           >
             Consulter mon score →
           </button>
@@ -26,6 +27,17 @@
   
   <script setup>
   import OurCard from '../components/OurCard.vue'
+
+  import { useRoute } from 'vue-router';
+
+    const route = useRoute();
+
+
+    // Récupérer les scores depuis les paramètres de l'URL
+    const scoreE = route.query.scoreE || 0;
+    const scoreS = route.query.scoreS || 0;
+    const scoreG = route.query.scoreG || 0;
+    const scoreESG = route.query.scoreESG || 0;
   </script>
   
   <style scoped>

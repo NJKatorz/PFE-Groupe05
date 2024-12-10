@@ -55,17 +55,8 @@ public class FormsService {
     }
     return allFormsInProgress;
   }
-
-
-  public Form updateProgression(int formId) {
-    Form form = repository.findByFormId(formId).orElse(null);
-    if (form == null) {
-      throw new IllegalArgumentException("Formulaire introuvable");
-    }
-    int progression = calculateProgression(form);
-    form.setProgression(progression);
-    repository.save(form);
-    return form;
+  public Form getFormByCompanyId(int companyID){
+    return repository.findByCompanyId(companyID).stream().findFirst().orElse(null);
   }
 
 
@@ -148,9 +139,9 @@ public class FormsService {
     if (form.getCompleted() != form.getTotal()) {
       throw new IllegalArgumentException("Le formulaire n'est pas complet"); // mettre un commentaire dans le front qui dit quon a oublier de completer
     }
- //   if(form.getSendAt()!=null){
-   //   throw new IllegalArgumentException("Le formulaire a déjà été envoyé");
-    //}
+    if(form.getSendAt()!=null){
+      throw new IllegalArgumentException("Le formulaire a déjà été envoyé");
+    }
 
     // Calcul des scores pour chaque pilier
     double scoreE = calculateScoreByPillar(form, "E");
@@ -159,6 +150,13 @@ public class FormsService {
 
     // Calcul du score total ESG
     double scoreESG = scoreE + scoreS + scoreG;
+
+    // Normalisation des scores par 30 et conversion en pourcentage
+    scoreE = (scoreE / 30) * 100;
+    scoreS = (scoreS / 30) * 100;
+    scoreG = (scoreG / 30) * 100;
+    scoreESG = (scoreESG / 90) * 100; // Diviser par 90 (30 * 3) pour obtenir le pourcentage total ESG // TODO ?
+
 
     // Mise à jour des scores dans le formulaire
     form.setScoreE(scoreE);
@@ -200,8 +198,7 @@ public class FormsService {
           totalChoiceWeight += getChoiceWeight(question, answer.getResponse());
         }
 
-        // Diviser le score total pour cette question par 2
-        totalScore += totalChoiceWeight / 2.0;
+        totalScore += totalChoiceWeight;
       }
     }
 

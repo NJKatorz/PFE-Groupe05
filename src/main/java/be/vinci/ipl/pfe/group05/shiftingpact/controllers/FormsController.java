@@ -22,15 +22,11 @@ public class FormsController {
   @Autowired
   FormsService service;
 
-  @GetMapping("/forms/{companyId}/progress")
+  @GetMapping("/forms/company/{companyId}/progression")
   public List<Form> getAllFormsInProgress(@PathVariable Integer companyId) {
     return service.getAllFormsInProgress(companyId);
   }
-  @GetMapping("/forms/{formId}/progression")
-  public double getProgression(@PathVariable int formId) {
-    Form form = service.getOneFormById(formId);
-    return form.getProgression();
-  }
+
 
   @PostMapping("/forms/company/{companyId}")
   public Form createOne(@PathVariable int companyId) {
@@ -59,6 +55,10 @@ public class FormsController {
 
   @PostMapping("/forms/{formId}/submit")
   public Form submit(@PathVariable int formId) {return service.submit(formId);}
+  @GetMapping("/forms/company/{companyId}")
+  public Form getOneByCompanyId(@PathVariable int companyId){
+    return service.getFormByCompanyId(companyId);
+  }
 
   @GetMapping("/forms/formsSubmitted")
   public int getFormsSubmitted() {

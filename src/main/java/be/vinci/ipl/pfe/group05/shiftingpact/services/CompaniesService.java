@@ -19,6 +19,7 @@ public class CompaniesService {
   public Company getOneById(int id){
     return repository.findByCompanyId(id).orElse(null);
   }
+  public Iterable<Company> getAll(){return repository.findAll();}
 
   public Company login(String login, String password) {
       Company company =  repository.findByLogin(login).orElse(null);

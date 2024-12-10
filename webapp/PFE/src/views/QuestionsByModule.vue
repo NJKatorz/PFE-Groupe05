@@ -3,35 +3,30 @@ import { ref, computed, onMounted } from 'vue';
 import OurCard from '../components/OurCard.vue';
 import api from '../services/api';
 import { useRouter } from 'vue-router';
+import {getAuthenticatedUser} from "@/services/auths.js";
 
 const questionsByCategory = ref({});
 const categories = ref([]);
 const currentCategoryIndex = ref(0);
 const selectedAnswers = ref({});
-const progress = ref(0); // Progression venant du backend
 const router = useRouter(); // Router pour la navigation
 
 // Données de la catégorie actuelle
 const currentCategory = computed(() => categories.value[currentCategoryIndex.value]);
 const currentQuestions = computed(() => questionsByCategory.value[currentCategory.value] || []);
-
-// Fonction pour récupérer la progression depuis le backend
-const fetchProgression = async () => {
-  try {
-    const response = await api.get(`/forms/15/progression`);
-    progress
-      .value = response.data; // Mise à jour de la progression
-    console.log('Progression actuelle :', progress.value);
-  } catch (error) {
-    console.error('Erreur lors de la récupération de la progression :', error);
-  }
-};
+const company = getAuthenticatedUser();
 
 const formId = ref(null); // Ajoutez une variable réactive pour l'ID du formulaire
+
+const progressPercentage = computed(() => {
+  if (!categories.value.length) return 0;
+  return (currentCategoryIndex.value  / categories.value.length) * 100;
+});
+
 onMounted(async () => {
   try {
     // Récupérer les données via l'API
-    const response = await api.post(`/forms/company/4`);
+    const response = await api.post(`/forms/company/${company.companyId}`);
     console.log('Réponse de l’API :', response.data);
     const formData = response.data;
 
@@ -44,6 +39,22 @@ onMounted(async () => {
     console.log('ID du formulaire :', formId.value);
 
     const questions = formData.questionList;
+
+
+
+    // Fonction pour remplacer "XXX" par le nom de l'entreprise
+    const replaceXXXWithCompanyName = (questions, companyName) => {
+      return questions.map((question) => {
+        if (typeof question.question === 'string') {
+          question.question = question.question.replace(/XXX/g, companyName);
+        }
+        return question;
+      });
+    };
+
+    // Appliquer la fonction de remplacement
+    const companyName = company.name || 'Votre entreprise';
+    replaceXXXWithCompanyName(questions, companyName);
 
     // Parser les choix pour chaque question
     questions.forEach((question) => {
@@ -70,6 +81,7 @@ onMounted(async () => {
       acc[category].push(question);
       return acc;
     }, {});
+     
 
     // Extraire les catégories
     categories.value = Object.keys(questionsByCategory.value);
@@ -87,7 +99,9 @@ onMounted(async () => {
     console.log('Réponses initialisées :', selectedAnswers.value);
 
     // Charger la progression initiale
-    await fetchProgression();
+    //await progressPercentage();
+
+    // Charger la progression initiale
   } catch (error) {
     console.error('Erreur lors du chargement des données :', error);
   }
@@ -139,21 +153,21 @@ const saveAnswers = async () => {
     const answers = Object.entries(selectedAnswers.value[category]).map(
       ([questionId, value]) => ({
         questionId: parseInt(questionId, 10),
-        // response: Array.isArray(value) ? JSON.stringify(value) : value,
         response: Array.isArray(value)
           ? JSON.stringify(value.map(v => v.choice || v))
           : value.choice || value,
-
         comments: '',
       })
     );
 
     console.log('Données envoyées au backend :', JSON.stringify(answers));
-    console.log("Id du form dans saveAnsware : ", formId.value);
+
     const response = await api.post(`/forms/${formId.value}/saveAnswers`, answers);
 
     if (response.status === 200) {
       console.log('Réponses sauvegardées avec succès.');
+
+
     } else {
       throw new Error('Erreur lors de la sauvegarde des réponses.');
     }
@@ -162,13 +176,27 @@ const saveAnswers = async () => {
   }
 };
 
+
+
 const submitForm = async () => {
   try {
     const response = await api.post(`/forms/${formId.value}/submit`);
 
     if (response.status === 200) {
       console.log('Formulaire soumis avec succès :', response.data);
-      router.push('/validation'); // Rediriger vers la page de validation
+
+      const scoreE = response.data.scoreE ;
+      const scoreS = response.data.scoreS;
+      const scoreG = response.data.scoreG;
+      const scoreESG = response.data.scoreESG;
+
+      // Rediriger vers la page de validation avec les scores comme paramètres
+      router.push({
+        path: '/validation',
+        query: { scoreE, scoreS, scoreG, scoreESG }
+      });
+
+      // Extraire les scores de l'objet renvoyé
     } else {
       throw new Error('Erreur lors de la soumission du formulaire.');
     }
@@ -177,14 +205,16 @@ const submitForm = async () => {
   }
 };
 
+
 const goToNextCategory = async () => {
   await saveAnswers(); // Sauvegarder les réponses de la catégorie actuelle
 
   if (currentCategoryIndex.value < categories.value.length - 1) {
     currentCategoryIndex.value++;
+
     scrollToTop();
   } else {
-    await submitForm();
+     await submitForm();
   }
 };
 </script>
@@ -194,7 +224,11 @@ const goToNextCategory = async () => {
     <OurCard :title="'QUESTIONNAIRE ESG '">
       <!-- Barre de progression -->
       <div class="progress-bar">
-        <div class="progress-fill" :style="{ width: progress + '%' }"></div>
+        <div
+          class="progress-fill"
+          :style="{ width: `${progressPercentage}%` }"
+        ></div>
+        <div class="progress-percentage">{{ progressPercentage.toFixed(0) }}%</div>
       </div>
 
       <!-- Titre de la catégorie -->
@@ -228,7 +262,7 @@ const goToNextCategory = async () => {
                     v-if="selectedAnswers[categories[currentCategoryIndex]][question.questionId] === option"
                   ></div>
                 </div>
-                <span>{{ option.choice}}</span>
+                <span>{{ option.choice }}</span>
               </div>
             </template>
 
@@ -260,6 +294,7 @@ const goToNextCategory = async () => {
           </div>
         </div>
       </div>
+
       <!-- Boutons de navigation -->
       <div class="navigation-buttons">
         <button
@@ -276,7 +311,6 @@ const goToNextCategory = async () => {
     </OurCard>
   </div>
 </template>
-
 <style scoped>
 .questionnaire-container {
   max-width: 1000px;
@@ -285,17 +319,29 @@ const goToNextCategory = async () => {
 }
 
 .progress-bar {
-  height: 8px;
-  background-color: rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
+  position: relative;
+  height: 16px;
+  background-color: #e0e0e0;
+  border-radius: 8px;
   margin: 1rem 0;
+  overflow: hidden;
 }
 
 .progress-fill {
   height: 100%;
-  background-color: #fff;
-  border-radius: 4px;
+  background-color: #4caf50;
+  border-radius: 8px;
   transition: width 0.3s ease;
+}
+
+.progress-percentage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 14px;
+  font-weight: bold;
+  color: #ffffff;
 }
 
 .module-header {
@@ -308,50 +354,10 @@ const goToNextCategory = async () => {
   margin: 2rem 0;
 }
 
-.module-icon {
-  position: relative;
-  width: 60px;
-  height: 60px;
-  background-color: #4CAF50;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.module-icon img {
-  width: 32px;
-  height: 32px;
-}
-
-.module-number {
-  position: absolute;
-  top: -8px;
-  left: -8px;
-  background-color: white;
-  color: #2F8886;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-}
-
-.module-info {
-  color: white;
-}
-
 .module-title {
   font-size: 1.5rem;
   font-weight: bold;
-  margin: 0;
-}
-
-.module-subtitle {
-  margin: 0;
-  opacity: 0.9;
+  color: white;
 }
 
 .questions-container {
@@ -382,7 +388,7 @@ const goToNextCategory = async () => {
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
-  min-height: 60px; /* Fixe une hauteur minimale */
+  min-height: 60px;
 }
 
 .radio-option:hover, .checkbox-option:hover {
@@ -391,7 +397,7 @@ const goToNextCategory = async () => {
 }
 
 .radio-circle, .checkbox {
-  flex-shrink: 0; /* Empêche la réduction de taille des cercles/carrés */
+  flex-shrink: 0;
   width: 24px;
   height: 24px;
   border: 2px solid #2F8886;
@@ -415,16 +421,7 @@ const goToNextCategory = async () => {
 }
 
 .radio-inner {
-
-  border-radius: 50%; /* Assure que l'intérieur reste rond */
-}
-
-.checkbox-option {
-  justify-content: space-between;
-}
-
-.checkbox-option i {
-  color: #2F8886;
+  border-radius: 50%;
 }
 
 .navigation-buttons {
@@ -455,11 +452,6 @@ const goToNextCategory = async () => {
   color: white;
 }
 
-.btn-save {
-  background-color: #E2E8F0;
-  color: #004851;
-}
-
 .btn-next {
   background-color: #004851;
   color: white;
@@ -480,7 +472,6 @@ const goToNextCategory = async () => {
   background-color: #F7FAFC;
 }
 
-
 @media (max-width: 640px) {
   .navigation-buttons {
     flex-direction: column;
@@ -491,5 +482,5 @@ const goToNextCategory = async () => {
     justify-content: center;
   }
 }
-
 </style>
+
