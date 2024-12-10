@@ -18,10 +18,10 @@ const FormsService = {
     getFormProgression(formId) {
       return api.get(`/forms/${formId}/progression`);
   },
-
     login(crendentials){
       return api.post('/auth/login', crendentials);
     },
+   
 };
 
 export default FormsService;

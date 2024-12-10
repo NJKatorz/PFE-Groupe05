@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,15 +23,11 @@ public class FormsController {
   @Autowired
   FormsService service;
 
-  @GetMapping("/forms/{companyId}/progress")
+  @GetMapping("/forms/company/{companyId}/progression")
   public List<Form> getAllFormsInProgress(@PathVariable Integer companyId) {
     return service.getAllFormsInProgress(companyId);
   }
-  @GetMapping("/forms/{formId}/progression")
-  public double getProgression(@PathVariable int formId) {
-    Form form = service.getOneFormById(formId);
-    return form.getProgression();
-  }
+
 
   @PostMapping("/forms/company/{companyId}")
   public Form createOne(@PathVariable int companyId) {

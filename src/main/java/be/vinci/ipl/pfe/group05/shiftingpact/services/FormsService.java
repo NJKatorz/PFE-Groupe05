@@ -57,17 +57,6 @@ public class FormsService {
   }
 
 
-  public Form updateProgression(int formId) {
-    Form form = repository.findByFormId(formId).orElse(null);
-    if (form == null) {
-      throw new IllegalArgumentException("Formulaire introuvable");
-    }
-    int progression = calculateProgression(form);
-    form.setProgression(progression);
-    repository.save(form);
-    return form;
-  }
-
 
   public Form createOne(Integer companyId){
     Form form = new Form();
