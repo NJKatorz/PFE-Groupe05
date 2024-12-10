@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import OurCard from '../components/OurCard.vue';
 import FormsService from '../services/FormsService';
 import { useRouter } from 'vue-router';
+import {setAuthenticatedUser} from "@/services/auths.js";
 
 // Champs du formulaire
 const emailOrLogin = ref('');
