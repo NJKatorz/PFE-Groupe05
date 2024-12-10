@@ -3,6 +3,7 @@ import { ref, computed, onMounted } from 'vue';
 import OurCard from '../components/OurCard.vue';
 import api from '../services/api';
 import { useRouter } from 'vue-router';
+import {getAuthenticatedUser} from "@/utils/auths.js";
 
 const questionsByCategory = ref({});
 const categories = ref([]);
@@ -14,6 +15,7 @@ const router = useRouter(); // Router pour la navigation
 // Données de la catégorie actuelle
 const currentCategory = computed(() => categories.value[currentCategoryIndex.value]);
 const currentQuestions = computed(() => questionsByCategory.value[currentCategory.value] || []);
+const company = getAuthenticatedUser();
 
 // Fonction pour récupérer la progression depuis le backend
 const fetchProgression = async () => {
@@ -31,7 +33,7 @@ const formId = ref(null); // Ajoutez une variable réactive pour l'ID du formula
 onMounted(async () => {
   try {
     // Récupérer les données via l'API
-    const response = await api.post(`/forms/company/4`);
+    const response = await api.post(`/forms/company/${company.companyId}`);
     console.log('Réponse de l’API :', response.data);
     const formData = response.data;
 
