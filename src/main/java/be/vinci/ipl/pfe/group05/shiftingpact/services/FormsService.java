@@ -56,7 +56,9 @@ public class FormsService {
     return allFormsInProgress;
   }
 
-
+  public Form getFormByCompanyId(int companyID){
+    return repository.findByCompanyId(companyID).stream().findFirst().orElse(null);
+  }
   public Form updateProgression(int formId) {
     Form form = repository.findByFormId(formId).orElse(null);
     if (form == null) {
@@ -207,8 +209,7 @@ public class FormsService {
           totalChoiceWeight += getChoiceWeight(question, answer.getResponse());
         }
 
-        // Diviser le score total pour cette question par 2
-        totalScore += totalChoiceWeight / 2.0;
+        totalScore += totalChoiceWeight;
       }
     }
 

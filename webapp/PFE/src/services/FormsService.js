@@ -22,6 +22,10 @@ const FormsService = {
     login(crendentials){
       return api.post('/auth/login', crendentials);
     },
+
+   getFormByCompanyId(companyId){
+    return api.get(`/forms/company/${companyId}`);
+  }
 };
 
 export default FormsService;
