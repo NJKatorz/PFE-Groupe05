@@ -56,7 +56,9 @@ public class FormsService {
     return allFormsInProgress;
   }
 
-
+  public Form getFormByCompanyId(int companyID){
+    return repository.findByCompanyId(companyID).stream().findFirst().orElse(null);
+  }
   public Form updateProgression(int formId) {
     Form form = repository.findByFormId(formId).orElse(null);
     if (form == null) {
