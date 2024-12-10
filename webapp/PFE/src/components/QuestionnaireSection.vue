@@ -24,7 +24,7 @@
             <h2 class="headline">Questionnaire ODD</h2>
           </div>
           <p class="subheading">
-            Alignez vos activités avec les ODD de l'ONU et contribuez à un avenir plus durable tout en renforçant votre impact positif sur la société.
+            Alignez vos activités avec les ODD de l'ONU et contribuez à un avenir plus durable <br> tout en renforçant votre impact positif sur la société.
           </p>
         </div>
       </div>
@@ -80,8 +80,8 @@ export default {
   background-color: #FFFFFF;
   border-radius: 21px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  width: 586px;
-  height: 272px;
+  width: 506px;
+  height: 202px;
   display: flex;
   align-items: center;
   padding-bottom: 3%;
@@ -96,7 +96,7 @@ export default {
   align-items: center;
   justify-content: center;
   margin-bottom: 16px;
-  padding-top: 4%;
+  padding-top: 10%;
 }
 
 .icon {
@@ -106,18 +106,20 @@ export default {
 
 .headline {
   font-family: 'Inter', sans-serif;
-  font-weight: 700;
-  font-size: 36px;
+  font-weight: 600;
+  font-size: 30px;
   line-height: 44px;
-  color: #000000;
+  color: #004D56;
+  
 }
 
 .subheading {
   font-family: 'Inter', sans-serif;
-  font-weight: 400;
-  font-size: 26px;
+  font-weight: 200;
+  font-size: 20px;
   line-height: 31px;
   color: #555555;
+  padding-bottom: 15px;
   
 }
 

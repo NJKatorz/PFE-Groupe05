@@ -19,7 +19,7 @@ export default {
 /* Styles spécifiques pour la section Hero */
 .hero-section {
   position: relative;
-  height: 335px;
+  height: 305px;
   display: flex;
   justify-content: center;
   align-items: center;

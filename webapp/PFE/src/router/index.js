@@ -1,15 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import NewQuestionnaire from '../views/NewQuestionnaire.vue'
-import Homepage from "@/views/Homepage.vue";
+import ClientFormDetails from "@/views/ClientFormDetails.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
-      name: 'home',
-      //component: NewQuestionnaire,
-      component: Homepage,
+      name: 'HomePage',
+      component: ()=>import ("@/views/Homepage.vue"),
     },
 
     {
@@ -31,6 +29,31 @@ const router = createRouter({
       path: '/EndQuestionnaire',
       name: 'EndQuestionnaire',
       component: () => import('@/views/EndQuestionnaire.vue')
+    },
+    {
+      path: '/allClientForms',
+      name: 'AllClientForms',
+      component: () => import('@/views/AllClientForms.vue')
+    },
+    {
+      path: '/Forms/:formId',
+      name: 'ClientFormDetails',
+      component: ClientFormDetails,
+    },
+    {
+      path: '/login',
+      name: 'Connexion',
+      component: () => import('@/views/Connexion.vue')
+    },
+    {
+      path: '/boardPage',
+      name: 'BoardPage',
+      component: () => import('@/views/BoardPage.vue')
+    },
+    {
+      path: '/allCompanies',
+      name: 'AllCompanies',
+      component: ()=>import ("@/views/AllCompanies.vue"),
     },
   ],
 })

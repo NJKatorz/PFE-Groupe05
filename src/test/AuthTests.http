@@ -1,0 +1,12 @@
+### Login a user
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "psw"
+}
+
+> {%
+  client.global.set("john", response.body.token);
+%}

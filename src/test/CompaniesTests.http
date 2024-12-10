@@ -1,0 +1,54 @@
+### Read a company
+GET http://localhost:8080/companies/1
+
+### Login a company
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "login": "tec234",
+  "password": "_heYauHSq)Qy"
+}
+
+> {%
+  client.global.set("tecToken", response.body.token);
+%}
+
+### Validate a company
+POST http://localhost:8080/companies/6/validate
+Content-Type: application/json
+
+{
+  "companyId": 6,
+  "name": "Innovative Solutions Ltd",
+  "companyNumber": "BE9876543210",
+  "legalForm": "Société à Responsabilité Limitée",
+  "address": "45 Innovation Drive, Antwerp, Belgium",
+  "naceCode": "6311",
+  "registrationDate": "2024-12-05T14:30:00",
+  "scores": [],
+  "isValidated": false,
+  "contactEmail": "ouarrad.dania@gmail.com",
+  "numberOfWorkers": 100,
+  "sellsProduct": true,
+  "isOwner": true
+}
+
+### Validate a company
+POST http://localhost:8080/companies/4/validate
+Content-Type: application/json
+
+{
+  "companyId": 4,
+  "name": "Test Didia",
+  "companyNumber": "BE9876543210",
+  "legalForm": "Société à Responsabilité Limitée",
+  "address": "45 Innovation Drive, Antwerp, Belgium",
+  "naceCode": "1234",
+  "scores": [],
+  "isValidated": false,
+  "contactEmail": "fechadodidia@hotmail.com",
+  "numberOfWorkers": 100,
+  "sellsProduct": true,
+  "isOwner": true
+}
