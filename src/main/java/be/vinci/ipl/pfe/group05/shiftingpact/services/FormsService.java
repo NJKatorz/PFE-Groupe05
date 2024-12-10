@@ -196,8 +196,7 @@ public class FormsService {
           totalChoiceWeight += getChoiceWeight(question, answer.getResponse());
         }
 
-        // Diviser le score total pour cette question par 2
-        totalScore += totalChoiceWeight / 2.0;
+        totalScore += totalChoiceWeight;
       }
     }
 

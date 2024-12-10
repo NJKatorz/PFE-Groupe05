@@ -55,6 +55,11 @@ const router = createRouter({
       name: 'AllCompanies',
       component: ()=>import ("@/views/AllCompanies.vue"),
     },
+    {
+      path: '/score',
+      name: 'score',
+      component: ()=>import ("@/views/EsgScore.vue"),
+    },
   ],
 })
 
