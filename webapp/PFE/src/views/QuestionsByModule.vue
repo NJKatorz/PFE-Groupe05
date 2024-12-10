@@ -3,6 +3,7 @@ import { ref, computed, onMounted } from 'vue';
 import OurCard from '../components/OurCard.vue';
 import api from '../services/api';
 import { useRouter } from 'vue-router';
+import {getAuthenticatedUser} from "@/services/auths.js";
 
 const questionsByCategory = ref({});
 const categories = ref([]);
@@ -14,23 +15,25 @@ const router = useRouter(); // Router pour la navigation
 // Données de la catégorie actuelle
 const currentCategory = computed(() => categories.value[currentCategoryIndex.value]);
 const currentQuestions = computed(() => questionsByCategory.value[currentCategory.value] || []);
+const company = getAuthenticatedUser();
 
 // Fonction pour récupérer la progression depuis le backend
 const fetchProgression = async () => {
   try {
-    const response = await api.get(`/forms/1/progression`);
+    const response = await api.get(`/forms/15/progression`);
     progress
-    .value = response.data; // Mise à jour de la progression
+      .value = response.data; // Mise à jour de la progression
     console.log('Progression actuelle :', progress.value);
   } catch (error) {
     console.error('Erreur lors de la récupération de la progression :', error);
   }
 };
 
+const formId = ref(null); // Ajoutez une variable réactive pour l'ID du formulaire
 onMounted(async () => {
   try {
     // Récupérer les données via l'API
-    const response = await api.post(`/forms/6`);
+    const response = await api.post(`/forms/company/${company.companyId}`);
     console.log('Réponse de l’API :', response.data);
     const formData = response.data;
 
@@ -39,21 +42,28 @@ onMounted(async () => {
       return;
     }
 
+    formId.value = formData.formId; // Stockez l'ID du formulaire
+    console.log('ID du formulaire :', formId.value);
+
     const questions = formData.questionList;
 
     // Parser les choix pour chaque question
     questions.forEach((question) => {
-      if (question.choice) {
+    if (question.choice) {
         question.choice = question.choice.map((option) => {
-          try {
-            return JSON.parse(option); // Parser chaque option de choix
-          } catch (error) {
-            console.error('Erreur lors du parsing du choix :', option, error);
-            return { choice: option, poids: 0 }; // Retour de secours en cas d'erreur
-          }
+            if (typeof option === 'string') {
+                try {
+                    return JSON.parse(option); // Parser seulement si c'est une chaîne JSON
+                } catch (error) {
+                    console.error('Erreur lors du parsing du choix :', option, error);
+                    return { choice: option, poids: 0 }; // Valeur par défaut en cas d'erreur
+                }
+            }
+            return option; // Retourner directement si c'est déjà un objet
         });
-      }
-    });
+    }
+});
+
 
     // Regrouper les questions par catégorie
     questionsByCategory.value = questions.reduce((acc, question) => {
@@ -131,14 +141,18 @@ const saveAnswers = async () => {
     const answers = Object.entries(selectedAnswers.value[category]).map(
       ([questionId, value]) => ({
         questionId: parseInt(questionId, 10),
-        response: Array.isArray(value) ? JSON.stringify(value) : value,
+        // response: Array.isArray(value) ? JSON.stringify(value) : value,
+        response: Array.isArray(value)
+          ? JSON.stringify(value.map(v => v.choice || v))
+          : value.choice || value,
+
         comments: '',
       })
     );
 
     console.log('Données envoyées au backend :', JSON.stringify(answers));
-
-    const response = await api.post(`/forms/1/saveAnswers`, answers);
+    console.log("Id du form dans saveAnsware : ", formId.value);
+    const response = await api.post(`/forms/${formId.value}/saveAnswers`, answers);
 
     if (response.status === 200) {
       console.log('Réponses sauvegardées avec succès.');
@@ -152,7 +166,7 @@ const saveAnswers = async () => {
 
 const submitForm = async () => {
   try {
-    const response = await api.post(`/forms/1/submit`);
+    const response = await api.post(`/forms/${formId.value}/submit`);
 
     if (response.status === 200) {
       console.log('Formulaire soumis avec succès :', response.data);
@@ -204,30 +218,28 @@ const goToNextCategory = async () => {
           <h3>{{ question.question }}</h3>
           <div class="options">
             <template v-if="question.type === 'radio'">
-            <div
-              v-for="option in question.choice"
-              :key="option.choice"
-              class="radio-option"
-              @click="selectOption(question.questionId, option.choice)"
-            >
-              <div class="radio-circle">
-                <div
-                  class="radio-inner"
-                  v-if="selectedAnswers[categories[currentCategoryIndex]][question.questionId] === option.choice"
-                ></div>
+              <div
+                v-for="option in question.choice"
+                :key="option"
+                class="radio-option"
+                @click="selectOption(question.questionId, option)"
+              >
+                <div class="radio-circle">
+                  <div
+                    class="radio-inner"
+                    v-if="selectedAnswers[categories[currentCategoryIndex]][question.questionId] === option"
+                  ></div>
+                </div>
+                <span>{{ option.choice}}</span>
               </div>
-              <span>{{ option.choice }}</span> <!-- Assurez-vous d'afficher option.choice ici -->
-            </div>
-          </template>
-
-
+            </template>
 
             <template v-else-if="question.type === 'checkbox'">
               <div
                 v-for="option in question.choice"
-                :key="option.choice"
+                :key="option"
                 class="checkbox-option"
-                @click="toggleCheckbox(question.questionId, option.choice)"
+                @click="toggleCheckbox(question.questionId, option)"
               >
                 <div class="checkbox">
                   <div
@@ -250,7 +262,6 @@ const goToNextCategory = async () => {
           </div>
         </div>
       </div>
-
       <!-- Boutons de navigation -->
       <div class="navigation-buttons">
         <button
@@ -268,103 +279,103 @@ const goToNextCategory = async () => {
   </div>
 </template>
 
-  <style scoped>
-  .questionnaire-container {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 1rem;
-  }
-  
-  .progress-bar {
-    height: 8px;
-    background-color: rgba(255, 255, 255, 0.3);
-    border-radius: 4px;
-    margin: 1rem 0;
-  }
-  
-  .progress-fill {
-    height: 100%;
-    background-color: #fff;
-    border-radius: 4px;
-    transition: width 0.3s ease;
-  }
-  
-  .module-header {
-    background-color: #2F8886;
-    padding: 1.5rem;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin: 2rem 0;
-  }
-  
-  .module-icon {
-    position: relative;
-    width: 60px;
-    height: 60px;
-    background-color: #4CAF50;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .module-icon img {
-    width: 32px;
-    height: 32px;
-  }
-  
-  .module-number {
-    position: absolute;
-    top: -8px;
-    left: -8px;
-    background-color: white;
-    color: #2F8886;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-  }
-  
-  .module-info {
-    color: white;
-  }
-  
-  .module-title {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin: 0;
-  }
-  
-  .module-subtitle {
-    margin: 0;
-    opacity: 0.9;
-  }
-  
-  .questions-container {
-    padding: 2rem 0;
-  }
-  
-  .question {
-    margin-bottom: 2rem;
-  }
-  
-  .question h3 {
-    color: #004851;
-    margin-bottom: 1rem;
-  }
-  
-  .options {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-  
-  .radio-option, .checkbox-option {
+<style scoped>
+.questionnaire-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.progress-bar {
+  height: 8px;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  margin: 1rem 0;
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: #fff;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.module-header {
+  background-color: #2F8886;
+  padding: 1.5rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.module-icon {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  background-color: #4CAF50;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.module-icon img {
+  width: 32px;
+  height: 32px;
+}
+
+.module-number {
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  background-color: white;
+  color: #2F8886;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.module-info {
+  color: white;
+}
+
+.module-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+.module-subtitle {
+  margin: 0;
+  opacity: 0.9;
+}
+
+.questions-container {
+  padding: 2rem 0;
+}
+
+.question {
+  margin-bottom: 2rem;
+}
+
+.question h3 {
+  color: #004851;
+  margin-bottom: 1rem;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.radio-option, .checkbox-option {
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -409,54 +420,54 @@ const goToNextCategory = async () => {
 
   border-radius: 50%; /* Assure que l'intérieur reste rond */
 }
-  
-  .checkbox-option {
-    justify-content: space-between;
-  }
-  
-  .checkbox-option i {
-    color: #2F8886;
-  }
-  
-  .navigation-buttons {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-top: 2rem;
-  }
-  
-  .btn {
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-weight: 500;
-    transition: opacity 0.2s ease;
-  }
-  
-  .btn:hover {
-    opacity: 0.9;
-  }
-  
-  .btn-previous {
-    background-color: #004851;
-    color: white;
-  }
-  
-  .btn-save {
-    background-color: #E2E8F0;
-    color: #004851;
-  }
-  
-  .btn-next {
-    background-color: #004851;
-    color: white;
-  }
 
-  .text-input {
+.checkbox-option {
+  justify-content: space-between;
+}
+
+.checkbox-option i {
+  color: #2F8886;
+}
+
+.navigation-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  transition: opacity 0.2s ease;
+}
+
+.btn:hover {
+  opacity: 0.9;
+}
+
+.btn-previous {
+  background-color: #004851;
+  color: white;
+}
+
+.btn-save {
+  background-color: #E2E8F0;
+  color: #004851;
+}
+
+.btn-next {
+  background-color: #004851;
+  color: white;
+}
+
+.text-input {
   width: 95%;
   padding: 1rem;
   border: 2px solid #E2E8F0;
@@ -471,15 +482,16 @@ const goToNextCategory = async () => {
   background-color: #F7FAFC;
 }
 
-  
-  @media (max-width: 640px) {
-    .navigation-buttons {
-      flex-direction: column;
-    }
-    
-    .btn {
-      width: 100%;
-      justify-content: center;
-    }
+
+@media (max-width: 640px) {
+  .navigation-buttons {
+    flex-direction: column;
   }
-  </style>
+
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+</style>

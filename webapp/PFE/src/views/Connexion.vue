@@ -4,6 +4,7 @@ import OurCard from '../components/OurCard.vue';
 import FormsService from '../services/FormsService';
 import { useRouter } from 'vue-router';
 
+// Champs du formulaire
 const emailOrLogin = ref('');
 const password = ref('');
 const errorMessage = ref('');
@@ -22,6 +23,12 @@ const submitForm = async () => {
     if (response.status === 200) {
       const { token, role } = response.data;
       localStorage.setItem('authToken', token);
+      if (role === 'company')
+      setAuthenticatedUser(response.data.company, token, role);
+      if (role === 'admin')
+        setAuthenticatedUser(response.data.user, token, role);
+
+        console.log('Connexion réussie en tant que :', role);
 
       if (role === 'admin') {
         router.push('/allClientForms');

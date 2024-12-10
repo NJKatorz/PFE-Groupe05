@@ -32,7 +32,7 @@ public class FormsController {
     return form.getProgression();
   }
 
-  @PostMapping("/forms/{companyId}")
+  @PostMapping("/forms/company/{companyId}")
   public Form createOne(@PathVariable int companyId) {
     return service.createOne(companyId);
   }
