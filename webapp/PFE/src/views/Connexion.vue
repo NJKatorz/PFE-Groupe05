@@ -36,7 +36,7 @@ const submitForm = async () => {
 
       // Redirect based on role
       if (role === 'admin') {
-        router.push('/allClientForms');
+        router.push('/boardPage');
       } else if (role === 'company') {
         router.push('/new-questionnaire');
       }
