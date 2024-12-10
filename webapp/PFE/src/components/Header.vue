@@ -7,7 +7,7 @@
     </div>
     <div class="auth-buttons">
       <template v-if="authenticatedUser">
-        <span class="user-email">{{ authenticatedUser.email }}</span>
+        <span class="user-email">{{ displayIdentifier }}</span>
         <button @click="logout" class="connect-btn">
           Se déconnecter
         </button>
@@ -24,7 +24,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import {
   getAuthenticatedUser,
@@ -36,6 +36,16 @@ const router = useRouter();
 const route = useRoute();
 
 const authenticatedUser = ref(null);
+
+const displayIdentifier = computed(() => {
+  const user = authenticatedUser.value;
+  if (!user) return '';
+
+  // Check if the user data is stored in localStorage as COMPANY
+  const isCompany = localStorage.getItem('company') !== null;
+
+  return isCompany ? user.login : user.email;
+});
 
 const checkAuthentication = () => {
   if (isAuthenticated()) {
