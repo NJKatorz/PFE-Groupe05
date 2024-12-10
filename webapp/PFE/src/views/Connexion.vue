@@ -1,14 +1,22 @@
 <script setup>
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 import OurCard from '../components/OurCard.vue';
 import FormsService from '../services/FormsService';
-import { useRouter } from 'vue-router';
 
-// Champs du formulaire
+// Form fields
 const emailOrLogin = ref('');
 const password = ref('');
 const errorMessage = ref('');
 const router = useRouter();
+
+const setAuthenticatedUser = (user, token, role) => {
+  // Implement your user authentication logic here
+  // For example:
+  localStorage.setItem('authToken', token);
+  localStorage.setItem('userRole', role);
+  localStorage.setItem('userData', JSON.stringify(user));
+};
 
 const submitForm = async () => {
   try {
@@ -21,15 +29,19 @@ const submitForm = async () => {
     const response = await FormsService.login(credentials);
 
     if (response.status === 200) {
-      const { token, role } = response.data;
-      localStorage.setItem('authToken', token);
-      if (role === 'company')
-      setAuthenticatedUser(response.data.company, token, role);
-      if (role === 'admin')
-        setAuthenticatedUser(response.data.user, token, role);
+      const { token, role, user, company } = response.data;
 
-        console.log('Connexion réussie en tant que :', role);
+      if (role === 'company') {
+        setAuthenticatedUser(company, token, role);
+      } else if (role === 'admin') {
+        setAuthenticatedUser(user, token, role);
+      } else {
+        throw new Error('Invalid user role');
+      }
 
+      console.log('Connexion réussie en tant que :', role);
+
+      // Redirect based on role
       if (role === 'admin') {
         router.push('/allClientForms');
       } else if (role === 'company') {
@@ -37,7 +49,7 @@ const submitForm = async () => {
       }
     }
   } catch (error) {
-    console.error(error);
+    console.error('Login error:', error);
     errorMessage.value = 'Connexion échouée. Veuillez vérifier vos identifiants.';
   }
 };
@@ -63,13 +75,25 @@ const submitForm = async () => {
         <div class="form-container">
           <form @submit.prevent="submitForm">
             <div class="input-group">
-              <label>Email ou Login</label>
-              <input v-model="emailOrLogin" type="text" placeholder="votreemail@exemple.com" required />
+              <label for="emailOrLogin">Email ou Login</label>
+              <input
+                id="emailOrLogin"
+                v-model="emailOrLogin"
+                type="text"
+                placeholder="votreemail@exemple.com"
+                required
+              />
             </div>
 
             <div class="input-group">
-              <label>Mot de passe</label>
-              <input v-model="password" type="password" placeholder="Mot de passe" required />
+              <label for="password">Mot de passe</label>
+              <input
+                id="password"
+                v-model="password"
+                type="password"
+                placeholder="Mot de passe"
+                required
+              />
             </div>
 
             <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
@@ -87,9 +111,7 @@ const submitForm = async () => {
   </div>
 </template>
 
-
 <style scoped>
-
 .img-size {
   width: 160px;
 }

@@ -6,14 +6,60 @@
       </router-link>
     </div>
     <div class="auth-buttons">
-      <router-link to="/login" class="connect-btn">Se connecter</router-link>
+      <span v-if="authenticatedUser" class="user-email">{{ authenticatedUser.email }}</span>
+      <router-link
+        v-if="!authenticatedUser"
+        to="/login"
+        class="connect-btn"
+      >
+        Se connecter
+      </router-link>
+      <button
+        v-if="authenticatedUser"
+        @click="logout"
+        class="connect-btn"
+      >
+        Se déconnecter
+      </button>
     </div>
   </header>
 </template>
 
 <script>
+import {
+  getAuthenticatedUser,
+  clearAuthenticatedUser,
+  isAuthenticated,
+} from "../services/auths.js";
+
 export default {
-  name: 'HeaderPart'
+  name: "HeaderPart",
+  data() {
+    return {
+      authenticatedUser: null,
+    };
+  },
+  created() {
+    this.checkAuthentication();
+  },
+  methods: {
+    checkAuthentication() {
+      if (isAuthenticated()) {
+        this.authenticatedUser = getAuthenticatedUser();
+      }
+    },
+    logout() {
+      clearAuthenticatedUser();
+      this.authenticatedUser = null;
+      this.$router.push("/login");
+    },
+  },
+  watch: {
+    $route() {
+      // Recheck authentication status on route change
+      this.checkAuthentication();
+    },
+  },
 };
 </script>
 
