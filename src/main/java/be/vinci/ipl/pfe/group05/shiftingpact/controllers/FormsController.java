@@ -5,12 +5,9 @@ import be.vinci.ipl.pfe.group05.shiftingpact.models.Answer;
 import be.vinci.ipl.pfe.group05.shiftingpact.models.Form;
 import be.vinci.ipl.pfe.group05.shiftingpact.services.FormsService;
 import java.util.List;
-import java.util.List;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -59,4 +56,8 @@ public class FormsController {
 
   @PostMapping("/forms/{formId}/submit")
   public Form submit(@PathVariable int formId) {return service.submit(formId);}
+  @GetMapping("/forms/company/{companyId}")
+  public Form getOneByCompanyId(@PathVariable int companyId){
+    return service.getFormByCompanyId(companyId);
+  }
 }
