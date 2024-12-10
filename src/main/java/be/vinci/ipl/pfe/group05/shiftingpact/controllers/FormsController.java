@@ -26,7 +26,13 @@ public class FormsController {
   public List<Form> getAllFormsInProgress(@PathVariable Integer companyId) {
     return service.getAllFormsInProgress(companyId);
   }
-  @PostMapping("/forms/{companyId}")
+  @GetMapping("/forms/{formId}/progression")
+  public double getProgression(@PathVariable int formId) {
+    Form form = service.getOneFormById(formId);
+    return form.getProgression();
+  }
+
+  @PostMapping("/forms/company/{companyId}")
   public Form createOne(@PathVariable int companyId) {
     return service.createOne(companyId);
   }
@@ -43,9 +49,11 @@ public class FormsController {
 
   @PostMapping("/forms/{formId}/saveAnswers")
   public Form saveAnswers(@PathVariable int formId, @RequestBody List<Answer> answers) {
+
     if(answers == null || answers.isEmpty()) {
       throw new IllegalArgumentException("Les réponses ne peuvent pas être vides");
     }
+
     return service.saveAnswers(formId, answers);
   }
 

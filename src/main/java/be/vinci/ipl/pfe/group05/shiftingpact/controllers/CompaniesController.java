@@ -31,5 +31,10 @@ public class CompaniesController {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     else return new ResponseEntity<>(HttpStatus.CREATED);
   }
+
+  @GetMapping("/companies")
+  public Iterable<Company> getAll(){
+      return service.getAll();
+  }
 }
 

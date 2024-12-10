@@ -6,15 +6,69 @@
       </router-link>
     </div>
     <div class="auth-buttons">
-      <router-link to="/login" class="connect-btn">Se connecter</router-link>
+      <template v-if="authenticatedUser">
+        <span class="user-email">{{ displayIdentifier }}</span>
+        <button @click="logout" class="connect-btn">
+          Se déconnecter
+        </button>
+      </template>
+      <router-link
+        v-else
+        to="/login"
+        class="connect-btn"
+      >
+        Se connecter
+      </router-link>
     </div>
   </header>
 </template>
 
-<script>
-export default {
-  name: 'HeaderPart'
+<script setup>
+import { ref, onMounted, watch, computed } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import {
+  getAuthenticatedUser,
+  clearAuthenticatedUser,
+  isAuthenticated,
+} from "../services/auths.js";
+
+const router = useRouter();
+const route = useRoute();
+
+const authenticatedUser = ref(null);
+
+const displayIdentifier = computed(() => {
+  const user = authenticatedUser.value;
+  if (!user) return '';
+
+  // Check if the user data is stored in localStorage as COMPANY
+  const isCompany = localStorage.getItem('company') !== null;
+
+  return isCompany ? user.login : user.email;
+});
+
+const checkAuthentication = () => {
+  if (isAuthenticated()) {
+    authenticatedUser.value = getAuthenticatedUser();
+    console.log('Authenticated user:', authenticatedUser.value);
+  } else {
+    authenticatedUser.value = null;
+  }
 };
+
+const logout = () => {
+  clearAuthenticatedUser();
+  authenticatedUser.value = null;
+  router.push("/login");
+};
+
+onMounted(() => {
+  checkAuthentication();
+});
+
+watch(() => route.path, () => {
+  checkAuthentication();
+});
 </script>
 
 <style scoped>
@@ -43,6 +97,14 @@ export default {
   right: 25px;
   top: 50%;
   transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+}
+
+.user-email {
+  color: white;
+  margin-right: 15px;
+  font-weight: 500;
 }
 
 .connect-btn {
@@ -53,6 +115,8 @@ export default {
   text-decoration: none;
   font-weight: 500;
   transition: background-color 0.3s ease;
+  border: none;
+  cursor: pointer;
 }
 
 .connect-btn:hover {

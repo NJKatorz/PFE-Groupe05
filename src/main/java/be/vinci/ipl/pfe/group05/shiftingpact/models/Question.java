@@ -22,16 +22,15 @@ public class Question {
 
   @NonNull
   private String question;
-  private List<String> choice; // TODO ????
+  private List<Choice> choice;
   @NonNull
   private String enjeux;
   @NonNull
   private String category;
   @NonNull
-  private char pilier; // E,S,G
+  private String pillar; // E,S,G
   @NonNull
   private String template;
   @NonNull
   private String type; //radio, check box, champ libre
-
 }
