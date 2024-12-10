@@ -16,9 +16,6 @@ const currentCategory = computed(() => categories.value[currentCategoryIndex.val
 const currentQuestions = computed(() => questionsByCategory.value[currentCategory.value] || []);
 const company = getAuthenticatedUser();
 
-const progress = ref(0); // Stocke la progression actuelle (récupérée du backend)
-
-
 const formId = ref(null); // Ajoutez une variable réactive pour l'ID du formulaire
 
 const progressPercentage = computed(() => {
@@ -214,13 +211,7 @@ const goToNextCategory = async () => {
 
   if (currentCategoryIndex.value < categories.value.length - 1) {
     currentCategoryIndex.value++;
-    try {
-      const response = await api.put(`/forms/${formId.value}/progression`);
-      progress.value = response.data.progression; // Mettre à jour la progression locale
-      console.log('Progression mise à jour :', progress.value);
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour de la progression :', error);
-    }
+
     scrollToTop();
   } else {
      await submitForm();

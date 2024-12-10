@@ -55,7 +55,9 @@ public class FormsService {
     }
     return allFormsInProgress;
   }
-
+  public Form getFormByCompanyId(int companyID){
+    return repository.findByCompanyId(companyID).stream().findFirst().orElse(null);
+  }
 
 
   public Form createOne(Integer companyId){
