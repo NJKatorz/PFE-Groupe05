@@ -10,7 +10,9 @@
       <div class="company-info">
         <h2>{{ company.name }}</h2>
         <div class="company-meta">
-          <span>ID Entreprise : {{ company.id }}</span>
+          <span>ID Entreprise : {{ company.companyId }}</span>
+          <span class="separator">•</span>
+          <span>ID Form : {{ form.formId }}</span>
           <span class="separator">•</span>
           <span>{{ formatDate(form.createdAt) }}</span>
         </div>
@@ -38,7 +40,7 @@
         <div class="questions-list">
           <div
             v-for="(question, index) in form.questionList"
-            :key="question.question_id"
+            :key="question.questionId"
             class="question-card"
           >
             <div class="question-header">
@@ -46,7 +48,10 @@
               <div class="question-text">{{ question.question }}</div>
             </div>
             <div class="answer-section">
-              <p v-if="question.answer" class="answer">{{ }}</p> <!--todo-get--->
+              <!-- Display answer or fallback message -->
+              <p v-if="getAnswerForQuestion(question.questionId)" class="answer">
+                {{ getAnswerForQuestion(question.questionId).response }}
+              </p>
               <p v-else class="no-answer">Aucune réponse fournie</p>
             </div>
           </div>
@@ -94,7 +99,13 @@ export default {
       const options = { year: "numeric", month: "long", day: "numeric" };
       return new Date(date).toLocaleDateString("fr-FR", options);
     },
+    // Helper method to find an answer for a specific questionId
+    getAnswerForQuestion(questionId) {
+      if (!this.form || !this.form.answersList) return null;
+      return this.form.answersList.find((answer) => answer.questionId === questionId);
+    },
   },
+
   mounted() {
     this.fetchFormDetails();
   },
