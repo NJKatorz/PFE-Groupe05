@@ -94,4 +94,13 @@ div {
 .card-link:hover {
   transform: scale(1.02);
 }
+
+.center{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin-top: 50px;
+  margin-bottom: 50px;
+}
 </style>
