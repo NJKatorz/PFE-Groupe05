@@ -3,7 +3,7 @@ import { ref, computed, onMounted } from 'vue';
 import OurCard from '../components/OurCard.vue';
 import api from '../services/api';
 import { useRouter } from 'vue-router';
-import {getAuthenticatedUser} from "@/utils/auths.js";
+import {getAuthenticatedUser} from "@/services/auths.js";
 
 const questionsByCategory = ref({});
 const categories = ref([]);
