@@ -2,7 +2,7 @@
 import { ref, computed, onMounted } from 'vue';
 import OurCard from '../components/OurCard.vue';
 import api from '../services/api';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import {getAuthenticatedUser} from "@/services/auths.js";
 
 const questionsByCategory = ref({});
@@ -10,6 +10,7 @@ const categories = ref([]);
 const currentCategoryIndex = ref(0);
 const selectedAnswers = ref({});
 const router = useRouter(); // Router pour la navigation
+const route = useRoute(); //  pour accéder aux paramètres
 
 // Données de la catégorie actuelle
 const currentCategory = computed(() => categories.value[currentCategoryIndex.value]);
@@ -17,10 +18,19 @@ const currentQuestions = computed(() => questionsByCategory.value[currentCategor
 const company = getAuthenticatedUser();
 
 const formId = ref(null); // Ajoutez une variable réactive pour l'ID du formulaire
+const formIdExisted = ref(null);
 
 const progressPercentage = computed(() => {
   if (!categories.value.length) return 0;
   return (currentCategoryIndex.value  / categories.value.length) * 100;
+});
+
+onMounted(() => {
+  if (route.params.id) {
+    console.log("id dans la route : ", route.params.id);
+    formIdExisted.value = route.params.id;
+  }
+  console.log("FORMMMMIDDD: ", formIdExisted.value);
 });
 
 onMounted(async () => {
@@ -81,7 +91,7 @@ onMounted(async () => {
       acc[category].push(question);
       return acc;
     }, {});
-     
+
 
     // Extraire les catégories
     categories.value = Object.keys(questionsByCategory.value);
