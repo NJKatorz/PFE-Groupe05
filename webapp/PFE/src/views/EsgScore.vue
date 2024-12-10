@@ -6,6 +6,7 @@
 
         <div class="category-scores">
           <h2>Scores par catégorie</h2>
+          
 
           <div class="score-item">
             <div class="score-label">
