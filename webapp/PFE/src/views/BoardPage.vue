@@ -40,52 +40,56 @@
   </template>
   
   <script setup>
-  import { ref } from 'vue';
+  import { ref, onMounted } from 'vue';
   import { Users, Activity, BarChart2, TrendingUp } from 'lucide-vue-next';
+  import FormsService from '@/services/FormsService';
   
-  const stats = ref([
-    {
-      title: "Utilisateurs inscrits",
-      value: "1,234",
-      change: "+180 depuis le mois dernier",
-      icon: Users
-    },
-    {
-      title: "Questionnaires complétés",
-      value: "789",
-      change: "+201 depuis le mois dernier",
-      icon: Activity
-    },
-    {
-      title: "Taux de complétion",
-      value: "67%",
-      change: "+5% depuis le mois dernier",
-      icon: BarChart2
-    },
-    {
-      title: "Score moyen ESG",
-      value: "4.8",
-      change: "+0.3 depuis le mois dernier",
-      icon: TrendingUp
+  const stats = ref([]);
+  
+  const initializeStats = async () => {
+    try {
+      const users = (await FormsService.getNumberOfRegisteredUsers()).data;
+      const submittedForms = (await FormsService.getNumberOfFormsSubmitted()).data;
+      const formsInProgress = (await FormsService.getNumberOfFormsInProgress()).data;
+      const averageESG = (await FormsService.getAverageScoreESG()).data;
+  
+      stats.value = [
+        {
+          title: "Utilisateurs inscrits",
+          value: users,
+          change: "+180 depuis le mois dernier",
+          icon: Users,
+        },
+        {
+          title: "Questionnaires soumis",
+          value: submittedForms,
+          change: "+201 depuis le mois dernier",
+          icon: Activity,
+        },
+        {
+          title: "Questionnaires en cours de complétetion",
+          // title: "Taux de complétion",
+          value: formsInProgress, // Valeur statique ou calculée séparément
+          change: "+5% depuis le mois dernier",
+          icon: BarChart2,
+        },
+        {
+          title: "Score moyen ESG",
+          value: Number(averageESG).toFixed(2) + "%",
+          change: "+0.3 depuis le mois dernier",
+          icon: TrendingUp,
+        },
+      ];
+    } catch (error) {
+      console.error("Erreur lors de l'initialisation des statistiques :", error);
     }
-  ]);
+  };
   
-  const chartData = ref([
-    { name: "Jan", total: 4000 },
-    { name: "Feb", total: 3000 },
-    { name: "Mar", total: 2000 },
-    { name: "Apr", total: 2780 },
-    { name: "May", total: 1890 },
-    { name: "Jun", total: 2390 },
-    { name: "Jul", total: 3490 },
-    { name: "Aug", total: 2000 },
-    { name: "Sep", total: 2780 },
-    { name: "Oct", total: 1890 },
-    { name: "Nov", total: 2390 },
-    { name: "Dec", total: 3490 },
-  ]);
-  
+  onMounted(() => {
+    initializeStats();
+  });
   </script>
+  
   
   <style scoped>
   .dashboard {

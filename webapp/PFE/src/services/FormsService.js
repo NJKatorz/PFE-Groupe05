@@ -19,6 +19,23 @@ const FormsService = {
       return api.post('/auth/login', crendentials);
     },
 
+    getNumberOfRegisteredUsers(){
+      return api.get('/users/count');
+    },
+
+    getNumberOfFormsSubmitted(){
+      return api.get('/forms/formsSubmitted');
+    },
+
+    getAverageScoreESG(){
+      return api.get('/forms/averageScoreESG');
+    },
+
+    getNumberOfFormsInProgress(){
+      return api.get('/forms/formsInProgress');
+    },
+
+
 };
 
 export default FormsService;
