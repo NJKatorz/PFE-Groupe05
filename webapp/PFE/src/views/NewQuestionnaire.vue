@@ -325,8 +325,5 @@ const startQuestionnaire = () => {
   pointer-events: none;
   cursor: not-allowed; /* Ajout du curseur interdit */
 }
-
-
-
 </style>
 
