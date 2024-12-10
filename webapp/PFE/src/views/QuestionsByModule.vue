@@ -35,10 +35,17 @@ onMounted(() => {
 
 onMounted(async () => {
   try {
-    // Récupérer les données via l'API
-    const response = await api.post(`/forms/company/${company.companyId}`);
-    console.log('Réponse de l’API :', response.data);
-    const formData = response.data;
+  
+    let formData = null;
+    if(formIdExisted.value){
+      const response = await api.get(`/forms/${formIdExisted.value}`);
+      console.log('Réponse de l’API GEEEEETT:', response.data);
+      formData = response.data;
+    } else {
+      const response = await api.post(`/forms/company/${company.companyId}`);
+      console.log('Réponse de l’API  :', response.data);
+      formData = response.data;
+    }
 
     if (!formData || !formData.questionList) {
       console.error('Aucune question trouvée dans la réponse de l’API.');
@@ -49,7 +56,6 @@ onMounted(async () => {
     console.log('ID du formulaire :', formId.value);
 
     const questions = formData.questionList;
-
 
 
     // Fonction pour remplacer "XXX" par le nom de l'entreprise
