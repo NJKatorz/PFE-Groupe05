@@ -184,7 +184,19 @@ const submitForm = async () => {
 
     if (response.status === 200) {
       console.log('Formulaire soumis avec succès :', response.data);
-      router.push('/validation'); // Rediriger vers la page de validation
+
+      const scoreE = response.data.scoreE ;
+      const scoreS = response.data.scoreS;
+      const scoreG = response.data.scoreG;
+      const scoreESG = response.data.scoreESG;
+
+      // Rediriger vers la page de validation avec les scores comme paramètres
+      router.push({
+        path: '/validation',
+        query: { scoreE, scoreS, scoreG, scoreESG }
+      });
+
+      // Extraire les scores de l'objet renvoyé
     } else {
       throw new Error('Erreur lors de la soumission du formulaire.');
     }
@@ -193,6 +205,7 @@ const submitForm = async () => {
   }
 };
 
+
 const goToNextCategory = async () => {
   await saveAnswers(); // Sauvegarder les réponses de la catégorie actuelle
 
@@ -200,7 +213,7 @@ const goToNextCategory = async () => {
     currentCategoryIndex.value++;
     scrollToTop();
   } else {
-    await submitForm();
+     await submitForm();
   }
 };
 </script>

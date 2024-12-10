@@ -2,7 +2,7 @@
   <div class="page-container">
     <OurCard title="Résultats de votre évaluation ESG" class="results-card">
       <div class="score-content">
-        <h1 class="global-score">Score global : 65%</h1>
+        <h1 class="global-score">Score global :{{ parseFloat(scoreESG).toFixed(2) }}%</h1>
 
         <div class="category-scores">
           <h2>Scores par catégorie</h2>
@@ -10,7 +10,7 @@
           <div class="score-item">
             <div class="score-label">
               <span>Environnement</span>
-              <span>60%</span>
+              <span>{{ parseFloat(scoreE).toFixed(2) }}</span>
             </div>
             <div class="progress-bar">
               <div class="progress" :style="{ width: '60%' }"></div>
@@ -20,7 +20,7 @@
           <div class="score-item">
             <div class="score-label">
               <span>Social</span>
-              <span>45%</span>
+              <span>{{ parseFloat(scoreS).toFixed(2) }}</span>
             </div>
             <div class="progress-bar">
               <div class="progress" :style="{ width: '45%' }"></div>
@@ -30,13 +30,15 @@
           <div class="score-item">
             <div class="score-label">
               <span>Gouvernance</span>
-              <span>80%</span>
+              <span>{{ parseFloat(scoreG).toFixed(2) }}</span>
             </div>
             <div class="progress-bar">
               <div class="progress" :style="{ width: '80%' }"></div>
             </div>
           </div>
         </div>
+
+      
 
         <div class="recommendations">
           <h2>Recommandations</h2>
@@ -60,7 +62,17 @@
 </template>
 
 <script setup>
-import OurCard from '../components/OurCard.vue'
+import { useRoute } from 'vue-router';
+import OurCard from '../components/OurCard.vue';
+const route = useRoute();
+
+
+// Récupérer les scores depuis les paramètres de l'URL
+const scoreE = route.query.scoreE || 0;
+const scoreS = route.query.scoreS || 0;
+const scoreG = route.query.scoreG || 0;
+const scoreESG = route.query.scoreESG || 0;
+
 </script>
 
 <style scoped>
