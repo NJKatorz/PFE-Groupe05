@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import FormsService from '../services/FormsService';
 import { useRouter } from 'vue-router';
+import {setAuthenticatedUser} from "@/utils/auths.js";
 
 // Champs du formulaire
 const emailOrLogin = ref('');
@@ -21,13 +22,18 @@ const submitForm = async () => {
 
     if (response.status === 200) {
       const { token, role } = response.data;
-      localStorage.setItem('authToken', token); 
-      console.log('Connexion réussie en tant que :', role);
+      localStorage.setItem('authToken', token);
+      if (role === 'company')
+      setAuthenticatedUser(response.data.company, token, role);
+      if (role === 'admin')
+        setAuthenticatedUser(response.data.user, token, role);
+
+        console.log('Connexion réussie en tant que :', role);
 
       if (role === 'admin') {
-        router.push('/allClientForms'); 
+        router.push('/allClientForms');
       } else if (role === 'company') {
-        router.push('/new-questionnaire'); 
+        router.push('/new-questionnaire');
       }
     }
   } catch (error) {
