@@ -24,14 +24,18 @@
     >
       <!-- Options de questionnaire -->
       <div
-        :class="['questionnaire-option', { selected: selectedQuestionnaire === 'ESG' }]"
-        @click="selectQuestionnaire('ESG')"
+        :class="['questionnaire-option', { selected: selectedQuestionnaire === 'ESG', disabled: hasESGForm }]"
+        @click="!hasESGForm && selectQuestionnaire('ESG')"
       >
         <div class="radio-circle">
           <div class="radio-inner" v-if="selectedQuestionnaire === 'ESG'"></div>
         </div>
         <div class="option-icon">🌱</div>
         <span>Questionnaire ESG</span>
+      </div>
+      <!-- Message d'avertissement pour le questionnaire ESG -->
+      <div v-if="hasESGForm" class="warning-message">
+        Vous avez déjà un questionnaire ESG en cours.
       </div>
 
       <div
@@ -59,8 +63,8 @@
       <div v-if="questionnaires.length > 0" class="progress-cards">
         <OurCard
           v-for="q in questionnaires"
-          :key="q.id"
-          :title="q.name === 'ESG' ? 'Questionnaire ESG' : 'Questionnaire ODD'"
+          :key="q.formId"
+          :title="'Questionnaire ESG'"
         >
           <div class="card-progress-info">
             <div class="progress-header">
@@ -80,9 +84,9 @@
             </div>
 
             <button
-              v-if="q.progress < 100"
+              v-if="!q.submitted"
               class="continue-button"
-              @click="router.push('/questionnaire/' + q.name)"
+              @click="router.push('/questionnaire/' + q.formId)"
             >
               Continuer →
             </button>
@@ -98,20 +102,41 @@
 
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import OurCard from '../components/OurCard.vue';
+import {getAuthenticatedUser} from "@/services/auths.js";
+import FormsService from "@/services/FormsService.js";
 
 const router = useRouter();
 const selectedQuestionnaire = ref('');
 const activeTab = ref('new');
+const hasESGForm = ref(false); // Nouvelle variable réactive
+const questionnaire = ref(null); // Un seul questionnaire de l'utilisateur
+// Charge l'utilisateur actuel
+const currentCompany = getAuthenticatedUser();
+const questionnaires = ref([]);
 
-// Dummy data for demonstration
-//à adapter avec les données de la base de données/backend
-const questionnaires = ref([
-  { id: 1, name: 'ESG', progress: 80, created: '03/12/2024' },
-  { id: 2, name: 'ODD', progress: 100, submitted: '03/12/2024' },
-]);
+const loadQuestionnaire = async () => {
+  try {
+    const response = await FormsService.getFormByCompanyId(currentCompany.companyId);
+    questionnaire.value = response.data;
+    console.log("QUESTIONNAIRE : ", response.data);
+    if(questionnaire.value){
+      hasESGForm.value = true;
+      questionnaires.value.push(questionnaire.value);  // Ajoute le questionnaire à la liste
+    }
+    else hasESGForm.value = false;
+  } catch (error) {
+    console.error("Erreur lors du chargement du formulaire :", error);
+  }
+};
+
+
+// Appelé au montage du composant
+onMounted(() => {
+  loadQuestionnaire();
+});
 
 const selectQuestionnaire = (type) => {
   selectedQuestionnaire.value = type;
@@ -286,7 +311,22 @@ const startQuestionnaire = () => {
     transition: background-color 0.3s ease;
   }
 
-  .continue-button:hover {
-    background-color: #003840;
-  }
-  </style>
+.continue-button:hover {
+  background-color: #003840;
+}
+.warning-message {
+  color: #d9534f;
+  font-size: 0.875rem;
+  margin-top: 1rem;
+}
+
+.questionnaire-option.disabled {
+  opacity: 0.6;
+  pointer-events: none;
+  cursor: not-allowed; /* Ajout du curseur interdit */
+}
+
+
+
+</style>
+
