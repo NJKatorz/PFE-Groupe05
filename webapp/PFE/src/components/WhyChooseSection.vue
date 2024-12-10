@@ -9,35 +9,50 @@
       </div>
     </div>
 
-    <router-link to="/login" class="cta-button">
+    <router-link :to="ctaLink" class="cta-button">
       Commencer l'expérience
       <span class="arrow">→</span>
     </router-link>
   </section>
 </template>
 
-<script>
-export default {
-  name: 'WhyChooseSection',
-  data() {
-    return {
-      features: [
-        {
-          title: "Fiabilité",
-          description: "Évaluations basées sur des normes internationales reconnues pour des résultats précis et pertinents."
-        },
-        {
-          title: "Personnalisation",
-          description: "Questionnaires adaptés à votre secteur d'activité et à la taille de votre entreprise."
-        },
-        {
-          title: "Analyse détaillée",
-          description: "Obtenez des rapports détaillés et des recommandations concrètes pour améliorer vos performances."
-        }
-      ]
-    };
+<script setup>
+import { ref, computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { isAuthenticated, getAuthenticatedUser } from '../services/auths';
+
+const router = useRouter();
+
+const features = ref([
+  {
+    title: "Fiabilité",
+    description: "Évaluations basées sur des normes internationales reconnues pour des résultats précis et pertinents."
+  },
+  {
+    title: "Personnalisation",
+    description: "Questionnaires adaptés à votre secteur d'activité et à la taille de votre entreprise."
+  },
+  {
+    title: "Analyse détaillée",
+    description: "Obtenez des rapports détaillés et des recommandations concrètes pour améliorer vos performances."
   }
-};
+]);
+
+const ctaLink = computed(() => {
+  if (!isAuthenticated()) {
+    return '/login';
+  }
+
+  const user = getAuthenticatedUser();
+  if (!user) return '/login';
+
+  const isCompany = localStorage.getItem('company') !== null;
+  if (isCompany) {
+    return '/new-questionnaire';
+  }
+
+  return '/boardPage';
+});
 </script>
 
 <style scoped>
@@ -139,3 +154,4 @@ export default {
   }
 }
 </style>
+
