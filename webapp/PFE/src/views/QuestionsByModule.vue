@@ -47,6 +47,20 @@ onMounted(async () => {
 
     const questions = formData.questionList;
 
+    // Fonction pour remplacer "XXX" par le nom de l'entreprise
+    const replaceXXXWithCompanyName = (questions, companyName) => {
+      return questions.map((question) => {
+        if (typeof question.question === 'string') {
+          question.question = question.question.replace(/XXX/g, companyName);
+        }
+        return question;
+      });
+    };
+
+    // Appliquer la fonction de remplacement
+    const companyName = company.name || 'Votre entreprise';
+    replaceXXXWithCompanyName(questions, companyName);
+
     // Parser les choix pour chaque question
     questions.forEach((question) => {
     if (question.choice) {
