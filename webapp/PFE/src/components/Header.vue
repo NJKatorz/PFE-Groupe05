@@ -20,6 +20,13 @@
           Formulaires Clients
         </router-link>
         <router-link
+          v-if="isAdmin"
+          to="/allCompanies"
+          class="connect-btn"
+        >
+          Liste des Clients
+        </router-link>
+        <router-link
           v-if="isCompany"
           to="/new-questionnaire"
           class="connect-btn"

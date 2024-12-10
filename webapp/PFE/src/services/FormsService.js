@@ -22,6 +22,23 @@ const FormsService = {
     return api.get(`/forms/company/${companyId}`);
   }
 
+    getNumberOfRegisteredUsers(){
+      return api.get('/users/count');
+    },
+
+    getNumberOfFormsSubmitted(){
+      return api.get('/forms/formsSubmitted');
+    },
+
+    getAverageScoreESG(){
+      return api.get('/forms/averageScoreESG');
+    },
+
+    getNumberOfFormsInProgress(){
+      return api.get('/forms/formsInProgress');
+    },
+
+
 };
 
 export default FormsService;
