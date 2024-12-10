@@ -13,7 +13,7 @@
               <span>{{ parseFloat(scoreE).toFixed(2) }}</span>
             </div>
             <div class="progress-bar">
-              <div class="progress" :style="{ width: '60%' }"></div>
+              <div class="progress" :style="{ width: calculateProgress(scoreE) }"></div>
             </div>
           </div>
 
@@ -23,7 +23,7 @@
               <span>{{ parseFloat(scoreS).toFixed(2) }}</span>
             </div>
             <div class="progress-bar">
-              <div class="progress" :style="{ width: '45%' }"></div>
+              <div class="progress" :style="{ width: calculateProgress(scoreS) }"></div>
             </div>
           </div>
 
@@ -33,7 +33,7 @@
               <span>{{ parseFloat(scoreG).toFixed(2) }}</span>
             </div>
             <div class="progress-bar">
-              <div class="progress" :style="{ width: '80%' }"></div>
+              <div class="progress" :style="{ width: calculateProgress(scoreG) }"></div>
             </div>
           </div>
         </div>
@@ -72,6 +72,12 @@ const scoreE = route.query.scoreE || 0;
 const scoreS = route.query.scoreS || 0;
 const scoreG = route.query.scoreG || 0;
 const scoreESG = route.query.scoreESG || 0;
+
+const calculateProgress = (score) => {
+  const percentage = Math.min(Math.max(parseFloat(score), 0), 100);
+  return `${percentage}%`;
+};
+
 
 </script>
 
