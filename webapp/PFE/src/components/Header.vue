@@ -6,61 +6,59 @@
       </router-link>
     </div>
     <div class="auth-buttons">
-      <span v-if="authenticatedUser" class="user-email">{{ authenticatedUser.email }}</span>
+      <template v-if="authenticatedUser">
+        <span class="user-email">{{ authenticatedUser.email }}</span>
+        <button @click="logout" class="connect-btn">
+          Se déconnecter
+        </button>
+      </template>
       <router-link
-        v-if="!authenticatedUser"
+        v-else
         to="/login"
         class="connect-btn"
       >
         Se connecter
       </router-link>
-      <button
-        v-if="authenticatedUser"
-        @click="logout"
-        class="connect-btn"
-      >
-        Se déconnecter
-      </button>
     </div>
   </header>
 </template>
 
-<script>
+<script setup>
+import { ref, onMounted, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import {
   getAuthenticatedUser,
   clearAuthenticatedUser,
   isAuthenticated,
 } from "../services/auths.js";
 
-export default {
-  name: "HeaderPart",
-  data() {
-    return {
-      authenticatedUser: null,
-    };
-  },
-  created() {
-    this.checkAuthentication();
-  },
-  methods: {
-    checkAuthentication() {
-      if (isAuthenticated()) {
-        this.authenticatedUser = getAuthenticatedUser();
-      }
-    },
-    logout() {
-      clearAuthenticatedUser();
-      this.authenticatedUser = null;
-      this.$router.push("/login");
-    },
-  },
-  watch: {
-    $route() {
-      // Recheck authentication status on route change
-      this.checkAuthentication();
-    },
-  },
+const router = useRouter();
+const route = useRoute();
+
+const authenticatedUser = ref(null);
+
+const checkAuthentication = () => {
+  if (isAuthenticated()) {
+    authenticatedUser.value = getAuthenticatedUser();
+    console.log('Authenticated user:', authenticatedUser.value);
+  } else {
+    authenticatedUser.value = null;
+  }
 };
+
+const logout = () => {
+  clearAuthenticatedUser();
+  authenticatedUser.value = null;
+  router.push("/login");
+};
+
+onMounted(() => {
+  checkAuthentication();
+});
+
+watch(() => route.path, () => {
+  checkAuthentication();
+});
 </script>
 
 <style scoped>
@@ -89,6 +87,14 @@ export default {
   right: 25px;
   top: 50%;
   transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+}
+
+.user-email {
+  color: white;
+  margin-right: 15px;
+  font-weight: 500;
 }
 
 .connect-btn {
@@ -99,6 +105,8 @@ export default {
   text-decoration: none;
   font-weight: 500;
   transition: background-color 0.3s ease;
+  border: none;
+  cursor: pointer;
 }
 
 .connect-btn:hover {
