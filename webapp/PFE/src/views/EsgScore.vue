@@ -23,7 +23,7 @@
               <span>45%</span>
             </div>
             <div class="progress-bar">
-              <div class="progress" :style="{ width: '45%' }"></div>
+              <div class="progress" :style="{ width: '45%' , color: '#0081c3' }"></div>
             </div>
           </div>
 
