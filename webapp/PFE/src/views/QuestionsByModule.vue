@@ -94,8 +94,8 @@ onMounted(async () => {
 
           console.log("Index de la catégorie : ", categoryIndex);
           if (categoryIndex !== -1) {
-            if (categoryIndex === 0) currentCategoryIndex.value = categoryIndex;
-           else currentCategoryIndex.value = categoryIndex+1;
+            
+           currentCategoryIndex.value = categoryIndex+1;
             console.log("currentCatIndex : ", currentCategoryIndex.value);
           }
         }
