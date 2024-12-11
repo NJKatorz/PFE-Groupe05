@@ -202,4 +202,10 @@ export default {
   box-shadow: 0 0 5px rgba(40, 167, 69, 0.8);
 }
 
+.title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
 </style>
+
