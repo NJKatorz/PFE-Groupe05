@@ -1,56 +1,51 @@
 version: "3.8"
 services:
 
-# MongoDB Service
+  #Mongo DB
   mongodb:
     image: mongo
     container_name: mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: pfe
+      MONGO_INITDB_DATABASE: project-pfe
     ports:
       - 27017:27017
     volumes:
-      - data:/data/db
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=ouarraddania
-      - MONGO_INITDB_ROOT_PASSWORD=NAXV81maQvxDfWB0
-  mongo-express:
-    image: mongo-express
-    container_name: mongo-express
-    restart: always
-    ports:
-      - 8081:8081
-    environment:
-      - ME_CONFIG_MONGODB_ADMINUSERNAME=ouarraddania
-      - ME_CONFIG_MONGODB_ADMINPASSWORD=NAXV81maQvxDfWB0
-      - ME_CONFIG_MONGODB_SERVER=mongodb
+      - data:/data/db # Monte le dossier local 'data' dans le conteneur
+      - ./initdb:/docker-entrypoint-initdb.d
 
-# Spring Boot Backend
+  # Spring Boot Backend
   backend:
+    image: maven:3.8.5-openjdk-17
     build:
       context: .
       dockerfile: Dockerfile
+    links:
+      - mongodb
     container_name: spring-backend
     ports:
       - "8080:8080"
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: ["mvn", "spring-boot:run"]
     environment:
-      SPRING_DATASOURCE_URL: mongodb://ouarraddania:NAXV81maQvxDfWB0@mongodb:27017/project-pfe
-      SPRING_PROFILES_ACTIVE: docker
+      - SPRING_DATA_MONGODB_URI=mongodb://root:pfe@mongodb:27017/project-pfe?authSource=admin
+      - JAVA_OPTS=-Dhttps.protocols=TLSv1.2
     depends_on:
       - mongodb
 
-# Vue.js Frontend
+  # Vue.js Frontend
   frontend:
     build:
       context: ./webapp/PFE
       dockerfile: Dockerfile
     container_name: vue-frontend
     ports:
-      - "5173:5173" 
+      - "5173:80"
     depends_on:
-      - backend  
+      - backend
 
 volumes:
-  data: {}
-
-networks:
-  default:
-    name: mongodb_network
+  data:
