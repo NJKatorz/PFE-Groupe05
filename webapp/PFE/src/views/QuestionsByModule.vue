@@ -326,6 +326,22 @@ const goToNextCategory = async () => {
      await submitForm();
   }
 };
+const showPopup = ref(false); // État pour afficher ou masquer le popup
+
+// Fonction appelée au clic sur "Sauvegarder"
+const goToNextCategoryForSave = async () => {
+  await saveAnswers(); // Sauvegarde les réponses
+  showPopup.value = true; // Affiche le popup
+
+  setTimeout(() => {
+    showPopup.value = false;
+  }, 5000);
+};
+// Fonction pour fermer le popup immédiatement
+const closePopup = () => {
+  showPopup.value = false;
+};
+
 
 const isQuestionAnswered = (questionId, category) => {
   const answer = selectedAnswers.value[category][questionId];
@@ -340,6 +356,13 @@ const isQuestionAnswered = (questionId, category) => {
 <template>
   <div class="questionnaire-container">
     <OurCard :title="'QUESTIONNAIRE ESG '">
+      <div v-if="showPopup" class="popup-overlay">
+        <div class="popup">
+          <h2>Vos réponses ont été sauvegardées avec succès 🎉 </h2>
+          <p></p>
+          <button class="btn btn-popup" @click="closePopup">Fermer</button>
+        </div>
+      </div>
       <!-- Barre de progression -->
       <div class="progress-bar">
         <div
@@ -434,6 +457,12 @@ const isQuestionAnswered = (questionId, category) => {
           :disabled="currentCategoryIndex === 0"
         >
           Précédent
+        </button>
+
+        
+        <button class="btn btn-next" @click="goToNextCategoryForSave">
+          <span class="btn-icon">💾</span>
+        Sauvegarder
         </button>
         <button class="btn btn-next" @click="goToNextCategory">
           {{ currentCategoryIndex === categories.length - 1 ? 'Soumettre' : 'Suivant' }}
@@ -647,5 +676,94 @@ const isQuestionAnswered = (questionId, category) => {
     justify-content: center;
   }
 }
-</style>
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
 
+.popup {
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 90%;
+  max-width: 400px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.popup h2 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  color: #4caf50;
+}
+
+.popup p {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 1.5rem;
+}
+
+.btn-popup {
+  background-color: #004851;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.2s ease;
+}
+
+.btn-popup:hover {
+  opacity: 0.9;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.btn-save {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem; /* Espace entre l'icône et le texte */
+  padding: 0.75rem 1.5rem;
+  background-color: #d1e7dd; /* Couleur de fond (vert clair comme sur l'image) */
+  border: 2px solid #0f5132; /* Bordure verte */
+  border-radius: 8px; /* Coins arrondis */
+  color: #0f5132; /* Couleur du texte */
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-save:hover {
+  background-color: #c8dfd3; /* Couleur plus claire au survol */
+  border-color: #0c3d24; /* Bordure plus foncée au survol */
+}
+
+.btn-save:active {
+  background-color: #b7d2c5; /* Couleur plus foncée au clic */
+}
+
+.btn-icon {
+  font-size: 1.2rem; /* Taille de l'icône */
+}
+
+
+</style>
