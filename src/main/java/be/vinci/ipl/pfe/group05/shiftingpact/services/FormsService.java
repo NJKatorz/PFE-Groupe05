@@ -116,7 +116,7 @@ public class FormsService {
       throw new IllegalArgumentException("Formulaire introuvable");
     }
     if(form.getSendAt()!=null){
-      throw new IllegalArgumentException("Le formulaire a déjà été envoyé");
+      throw new IllegalArgumentException("Le formulaire a déjà été soumis");
     }
     List<Answer> existingAnswers = form.getAnswersList();
     for (Answer newAnswer : answers) {
@@ -140,7 +140,7 @@ public class FormsService {
       throw new IllegalArgumentException("Le formulaire n'est pas complet"); // mettre un commentaire dans le front qui dit quon a oublier de completer
     }
     if(form.getSendAt()!=null){
-      throw new IllegalArgumentException("Le formulaire a déjà été envoyé");
+      throw new IllegalArgumentException("Le formulaire a déjà été soumis");
     }
 
     // Calcul des scores pour chaque pilier
