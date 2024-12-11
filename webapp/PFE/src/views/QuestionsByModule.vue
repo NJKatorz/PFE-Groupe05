@@ -325,9 +325,9 @@ const submitForm = async () => {
 
 
 const goToNextCategory = async () => {
-  await saveAnswers(); // Sauvegarder les réponses de la catégorie actuelle
 
   if (currentCategoryIndex.value < categories.value.length - 1) {
+    await saveAnswers(); // TODO
     currentCategoryIndex.value++;
 
     scrollToTop();
@@ -468,7 +468,7 @@ const isQuestionAnswered = (questionId, category) => {
           Précédent
         </button>
 
-        
+
         <button class="btn btn-next" @click="goToNextCategoryForSave">
           <span class="btn-icon">💾</span>
         Sauvegarder
