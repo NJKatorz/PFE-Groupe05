@@ -26,7 +26,7 @@ const progressPercentage = computed(() => {
 });
 
 onMounted(() => {
-  if (route.params.id) {
+  if (route.params.id && route.params.id !== "ESG") {
     console.log("id dans la route : ", route.params.id);
     formIdExisted.value = route.params.id;
   }
@@ -35,12 +35,37 @@ onMounted(() => {
 
 onMounted(async () => {
   try {
-  
+
     let formData = null;
     if(formIdExisted.value){
       const response = await api.get(`/forms/${formIdExisted.value}`);
       console.log('Réponse de l’API GEEEEETT:', response.data);
       formData = response.data;
+      console.log("FORMDATA : ", formData);
+
+      // Récupérer la catégorie de la dernière question répondue
+      if (formData.answersList && formData.answersList.length > 0) {
+        const lastAnswer = formData.answersList[formData.answersList.length - 1];
+        console.log("LastAnswer : ", lastAnswer);
+        const lastQuestion = formData.questionList.find(q => q.questionId === lastAnswer.questionId);
+        console.log("Dernière question répondu : ", lastQuestion);
+
+        if (lastQuestion) {
+          // Extraire toutes les catégories uniques présentes dans formData.questionList
+          const cats = [...new Set(formData.questionList.map(question => question.category))];
+
+          const categoryIndex = cats.findIndex(cat => cat.trim() === lastQuestion.category.trim());
+          console.log("Catégories disponibles : ", cats);
+          console.log("Catégorie recherchée : ", lastQuestion.category);
+
+          console.log("Index de la catégorie : ", categoryIndex);
+          if (categoryIndex !== -1) {
+            currentCategoryIndex.value = categoryIndex+1;
+            console.log("currentCatIndex : ", currentCategoryIndex.value);
+          }
+        }
+      }
+
     } else {
       const response = await api.post(`/forms/company/${company.companyId}`);
       console.log('Réponse de l’API  :', response.data);

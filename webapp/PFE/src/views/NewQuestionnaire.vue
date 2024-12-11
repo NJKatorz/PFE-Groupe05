@@ -72,7 +72,7 @@
                 Progression : {{ q.progress < 100 ? `${q.progress}%` : 'Terminé' }}
               </span>
               <span class="date-text">
-                {{ q.submitted ? `Soumis le : ${q.submitted}` : `Créé le : ${q.created}` }}
+                {{ q.submitted ? `Soumis le : ${formatDate(q.sendAt)}` : `Créé le : ${formatDate(q.createdAt)}` }}
               </span>
             </div>
 
@@ -140,6 +140,11 @@ onMounted(() => {
 
 const selectQuestionnaire = (type) => {
   selectedQuestionnaire.value = type;
+};
+
+const formatDate = (date) => {
+  const options = { year: 'numeric', month: 'long', day: 'numeric' }
+  return new Date(date).toLocaleDateString('fr-FR', options)
 };
 
 const startQuestionnaire = () => {
