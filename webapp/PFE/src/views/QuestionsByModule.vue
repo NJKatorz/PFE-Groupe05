@@ -8,7 +8,18 @@ import {getAuthenticatedUser} from "@/services/auths.js";
 const questionsByCategory = ref({});
 const categories = ref([]);
 const currentCategoryIndex = ref(0);
-const selectedAnswers = ref({});
+const selectedAnswers = ref({
+  ...categories.value.reduce((acc, category) => {
+    acc[category] = questionsByCategory.value[category].reduce((answers, question) => {
+      answers[question.questionId] = {
+        response: question.type === 'checkbox' ? [] : '',
+        comments: ''
+      };
+      return answers;
+    }, {});
+    return acc;
+  }, {})
+});
 const progress = ref(0); // Progression venant du backend
 const router = useRouter(); // Router pour la navigation
 
@@ -16,6 +27,12 @@ const router = useRouter(); // Router pour la navigation
 const currentCategory = computed(() => categories.value[currentCategoryIndex.value]);
 const currentQuestions = computed(() => questionsByCategory.value[currentCategory.value] || []);
 const company = getAuthenticatedUser();
+
+const handleCommentInput = (questionId, value) => {
+  const category = currentCategory.value;
+  selectedAnswers.value[category][questionId].comments = value;
+  console.log('Commentaire saisi :', selectedAnswers.value[category]);
+};
 
 // Fonction pour récupérer la progression depuis le backend
 const fetchProgression = async () => {
@@ -63,20 +80,20 @@ onMounted(async () => {
 
     // Parser les choix pour chaque question
     questions.forEach((question) => {
-    if (question.choice) {
+      if (question.choice) {
         question.choice = question.choice.map((option) => {
-            if (typeof option === 'string') {
-                try {
-                    return JSON.parse(option); // Parser seulement si c'est une chaîne JSON
-                } catch (error) {
-                    console.error('Erreur lors du parsing du choix :', option, error);
-                    return { choice: option, poids: 0 }; // Valeur par défaut en cas d'erreur
-                }
+          if (typeof option === 'string') {
+            try {
+              return JSON.parse(option); // Parser seulement si c'est une chaîne JSON
+            } catch (error) {
+              console.error('Erreur lors du parsing du choix :', option, error);
+              return { choice: option, poids: 0 }; // Valeur par défaut en cas d'erreur
             }
-            return option; // Retourner directement si c'est déjà un objet
+          }
+          return option; // Retourner directement si c'est déjà un objet
         });
-    }
-});
+      }
+    });
 
 
     // Regrouper les questions par catégorie
@@ -153,19 +170,30 @@ const saveAnswers = async () => {
   try {
     const category = currentCategory.value;
     const answers = Object.entries(selectedAnswers.value[category]).map(
-      ([questionId, value]) => ({
-        questionId: parseInt(questionId, 10),
-        // response: Array.isArray(value) ? JSON.stringify(value) : value,
-        response: Array.isArray(value)
-          ? JSON.stringify(value.map(v => v.choice || v))
-          : value.choice || value,
+      ([questionId, value]) => {
+        // Vérifiez si la réponse est un tableau
+        let response;
+        if (Array.isArray(value.response)) {
+          response = JSON.stringify(
+            value.response.map(v => (typeof v === 'object' && v.choice ? v.choice : v))
+          );
+        } else {
+          // Vérifiez si la réponse est un objet avec une propriété choice
+          response =
+            typeof value.response === 'object' && value.response?.choice
+              ? value.response.choice
+              : value.response || '';
+        }
 
-        comments: '',
-      })
+        return {
+          questionId: parseInt(questionId, 10),
+          response, // Réponse traitée
+          comments: value.comments || '', // Inclure les commentaires
+        };
+      }
     );
 
     console.log('Données envoyées au backend :', JSON.stringify(answers));
-    console.log("Id du form dans saveAnsware : ", formId.value);
     const response = await api.post(`/forms/${formId.value}/saveAnswers`, answers);
 
     if (response.status === 200) {
@@ -274,6 +302,15 @@ const goToNextCategory = async () => {
               />
             </template>
           </div>
+
+          <template v-if="question.type !== 'champ libre'">
+            <textarea
+              class="comment-input"
+              placeholder="Ajouter un commentaire"
+              @input="handleCommentInput(question.questionId, $event.target.value)"
+              :value="selectedAnswers[categories[currentCategoryIndex]][question.questionId].comments"
+            ></textarea>
+          </template>
         </div>
       </div>
       <!-- Boutons de navigation -->
@@ -506,6 +543,20 @@ const goToNextCategory = async () => {
     width: 100%;
     justify-content: center;
   }
+}
+
+.comment-input {
+  width: 95%;
+  padding: 0.5rem;
+  border: 2px solid #E2E8F0;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+.comment-input:focus {
+  outline: none;
+  border-color: #2F8886;
+  background-color: #F7FAFC;
 }
 
 </style>
