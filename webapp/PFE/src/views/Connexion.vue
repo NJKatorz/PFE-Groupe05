@@ -1,22 +1,15 @@
 <script setup>
 import { ref } from 'vue';
-import { useRouter } from 'vue-router';
 import OurCard from '../components/OurCard.vue';
 import FormsService from '../services/FormsService';
+import { useRouter } from 'vue-router';
+import {setAuthenticatedUser} from "@/services/auths.js";
 
 // Form fields
 const emailOrLogin = ref('');
 const password = ref('');
 const errorMessage = ref('');
 const router = useRouter();
-
-const setAuthenticatedUser = (user, token, role) => {
-  // Implement your user authentication logic here
-  // For example:
-  localStorage.setItem('authToken', token);
-  localStorage.setItem('userRole', role);
-  localStorage.setItem('userData', JSON.stringify(user));
-};
 
 const submitForm = async () => {
   try {
@@ -43,7 +36,7 @@ const submitForm = async () => {
 
       // Redirect based on role
       if (role === 'admin') {
-        router.push('/allClientForms');
+        router.push('/boardPage');
       } else if (role === 'company') {
         router.push('/new-questionnaire');
       }
@@ -112,6 +105,7 @@ const submitForm = async () => {
 </template>
 
 <style scoped>
+
 .img-size {
   width: 160px;
 }

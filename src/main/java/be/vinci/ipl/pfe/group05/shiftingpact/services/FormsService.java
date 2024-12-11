@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -43,7 +42,7 @@ public class FormsService {
     if (total == 0) {
       return 0;
     }
-   // return (int) ((double) completed / total * 100);
+    // return (int) ((double) completed / total * 100);
     return completed / total * 100;
   }
 
@@ -56,17 +55,8 @@ public class FormsService {
     }
     return allFormsInProgress;
   }
-
-
-  public Form updateProgression(int formId) {
-    Form form = repository.findByFormId(formId).orElse(null);
-    if (form == null) {
-      throw new IllegalArgumentException("Formulaire introuvable");
-    }
-    int progression = calculateProgression(form);
-    form.setProgression(progression);
-    repository.save(form);
-    return form;
+  public Form getFormByCompanyId(int companyID){
+    return repository.findByCompanyId(companyID).stream().findFirst().orElse(null);
   }
 
 
@@ -121,25 +111,25 @@ public class FormsService {
   }
 
   public Form saveAnswers(int formId, List<Answer> answers) {
-  Form form = repository.findByFormId(formId).orElse(null);
-  if (form == null) {
+    Form form = repository.findByFormId(formId).orElse(null);
+    if (form == null) {
       throw new IllegalArgumentException("Formulaire introuvable");
     }
-  if(form.getSendAt()!=null){
-    throw new IllegalArgumentException("Le formulaire a déjà été envoyé");
-  }
-  List<Answer> existingAnswers = form.getAnswersList();
-  for (Answer newAnswer : answers) {
-    if (newAnswer.getResponse() != null && !newAnswer.getResponse().isEmpty()) {
-      existingAnswers.removeIf(existingAnswer -> existingAnswer.getQuestionId() == newAnswer.getQuestionId());
-      existingAnswers.add(newAnswer);
+    if(form.getSendAt()!=null){
+      throw new IllegalArgumentException("Le formulaire a déjà été envoyé");
     }
-  }
+    List<Answer> existingAnswers = form.getAnswersList();
+    for (Answer newAnswer : answers) {
+      if (newAnswer.getResponse() != null && !newAnswer.getResponse().isEmpty()) {
+        existingAnswers.removeIf(existingAnswer -> existingAnswer.getQuestionId() == newAnswer.getQuestionId());
+        existingAnswers.add(newAnswer);
+      }
+    }
 
-  form.setAnswersList(existingAnswers);
-  form.setCompleted(existingAnswers.size());
-  return repository.save(form);
-}
+    form.setAnswersList(existingAnswers);
+    form.setCompleted(existingAnswers.size());
+    return repository.save(form);
+  }
 
   public Form submit(int formId) {
     Form form = repository.findByFormId(formId).orElse(null);
@@ -208,13 +198,13 @@ public class FormsService {
           totalChoiceWeight += getChoiceWeight(question, answer.getResponse());
         }
 
-        // Diviser le score total pour cette question par 2
-        totalScore += totalChoiceWeight / 2.0;
+        totalScore += totalChoiceWeight;
       }
     }
 
     return totalScore;
   }
+
 
   /**
    * Récupère le poids d'un choix donné dans une question.
@@ -231,4 +221,27 @@ public class FormsService {
         .findFirst()
         .orElse(0); // Retourne 0 si le choix n'est pas trouvé
   }
+
+
+  public int getNumberOfSubmittedForms() {
+    return repository.findAll().stream()
+        .filter(Form::isSubmitted)
+        .toList()
+        .size();
+  }
+
+  public double getAverageScoreESG() {
+    List<Form> forms = (List<Form>) repository.findAll();
+    double totalScore = 0;
+    for (Form form : forms) {
+      totalScore += form.getScoreESG();
+    }
+    return totalScore / forms.size();
+  }
+
+  public int getNumberOfFormsInProgress() {
+    return (int) repository.findAll().
+        stream().filter(form -> !form.isSubmitted()).count();
+  }
+
 }

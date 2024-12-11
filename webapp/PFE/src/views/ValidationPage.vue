@@ -15,6 +15,12 @@
               <span class="checkbox-text">
                 Je confirme que les réponses fournies dans ce questionnaire sont fiables et reflètent fidèlement la situation de mon entreprise.
               </span>
+
+              <p><strong>Score E (Environnement) :</strong> {{ scoreE }}</p>
+      <p><strong>Score S (Social) :</strong> {{ scoreS }}</p>
+      <p><strong>Score G (Gouvernance) :</strong> {{ scoreG }}</p>
+      <p><strong>Score ESG Total :</strong> {{ scoreESG }}</p>
+
             </label>
           </div>
   
@@ -46,13 +52,25 @@
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
   import OurCard from '../components/OurCard.vue'
+
+  import { useRoute } from 'vue-router';
+
+const route = useRoute();
+
+
+// Récupérer les scores depuis les paramètres de l'URL
+const scoreE = route.query.scoreE || 0;
+const scoreS = route.query.scoreS || 0;
+const scoreG = route.query.scoreG || 0;
+const scoreESG = route.query.scoreESG || 0;
   
   const router = useRouter()
   const isConfirmed = ref(false)
   
   const handleSubmit = () => {
     if (isConfirmed.value) {
-      router.push('/EndQuestionnaire')
+      router.push({path: '/EndQuestionnaire',
+      query: { scoreE, scoreS, scoreG, scoreESG }})
     }
   }
   </script>

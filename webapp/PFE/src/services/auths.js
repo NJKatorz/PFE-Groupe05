@@ -4,65 +4,68 @@ const COMPANY = 'company';
 
 let currentUser;
 
-/**
- * Retrieves the information of the currently authenticated user.
- * @returns The information of the currently authenticated user, or undefined if there's no authenticated user.
- */
 const getAuthenticatedUser = () => {
   if (currentUser !== undefined) return currentUser;
 
-  let serializedUser = localStorage.getItem(USER);
-  if (serializedUser === null){
-    serializedUser = localStorage.getItem(COMPANY);
-    console.log("company dans getAuth : ", serializedUser);
-  }
+  const serializedUser = localStorage.getItem(USER);
+  const serializedCompany = localStorage.getItem(COMPANY);
 
-  if (!serializedUser) return undefined;
-  currentUser = JSON.parse(serializedUser);
-  return currentUser;
+  console.log('Stored user:', serializedUser);
+  console.log('Stored company:', serializedCompany);
+
+  // Try to get company first, then fall back to user
+  const storedData = serializedCompany || serializedUser;
+
+  if (!storedData) return undefined;
+
+  try {
+    currentUser = JSON.parse(storedData);
+    console.log('Parsed currentUser:', currentUser);
+    return currentUser;
+  } catch (error) {
+    console.error('Error parsing stored user data:', error);
+    return undefined;
+  }
 };
 
-/**
- * Stores the information of the authenticated user.
- * @param  authenticatedUser the information of the authenticated user.
- */
 const setAuthenticatedUser = (authenticatedUser, token, role) => {
   const serializedUser = JSON.stringify(authenticatedUser);
-  console.log("serializedUser", serializedUser);
+  console.log('Setting authenticated user:', { authenticatedUser, role });
+
   localStorage.setItem(STORE_NAME, token);
-  if (role === 'company')
-  localStorage.setItem(COMPANY, serializedUser);
-  else if (role === 'admin') localStorage.setItem(USER, serializedUser);
+
+  // Clear both storages first to avoid conflicts
+  localStorage.removeItem(USER);
+  localStorage.removeItem(COMPANY);
+
+  if (role === 'company') {
+    localStorage.setItem(COMPANY, serializedUser);
+  } else if (role === 'admin') {
+    localStorage.setItem(USER, serializedUser);
+  }
+
   currentUser = authenticatedUser;
-  console.log("authenticatedUser : ", currentUser);
 };
 
-
-/**
- * Clears all authentication information of the user.
- */
 const clearAuthenticatedUser = () => {
-  localStorage.clear();
+  localStorage.removeItem(STORE_NAME);
+  localStorage.removeItem(USER);
+  localStorage.removeItem(COMPANY);
   sessionStorage.clear();
   currentUser = undefined;
 };
 
-/**
- * Checks if a user is currently authenticated.
- * @returns true if a user is authenticated, otherwise false.
- */
-const isAuthenticated = () => currentUser !== undefined;
-
-
-/**
- * Retrieves the authentication token of the currently authenticated user.
- * @returns The authentication token, or undefined if no user is authenticated.
- */
-const getToken = ()=>{
+const isAuthenticated = () => {
   const token = localStorage.getItem(STORE_NAME);
-  if (!token) return undefined;
-  return token;
-}
+  const user = localStorage.getItem(USER);
+  const company = localStorage.getItem(COMPANY);
+
+  return !!(token && (user || company));
+};
+
+const getToken = () => {
+  return localStorage.getItem(STORE_NAME);
+};
 
 export {
   setAuthenticatedUser,

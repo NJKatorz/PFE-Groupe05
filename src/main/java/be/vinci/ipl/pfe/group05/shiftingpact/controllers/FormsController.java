@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.List;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,20 +19,14 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
 public class FormsController {
-
   @Autowired
   FormsService service;
 
-  @GetMapping("/forms/{companyId}/progress")
+  @GetMapping("/forms/company/{companyId}/progression")
   public List<Form> getAllFormsInProgress(@PathVariable Integer companyId) {
     return service.getAllFormsInProgress(companyId);
   }
 
-  @GetMapping("/forms/{formId}/progression")
-  public double getProgression(@PathVariable int formId) {
-    Form form = service.getOneFormById(formId);
-    return form.getProgression();
-  }
 
   @PostMapping("/forms/company/{companyId}")
   public Form createOne(@PathVariable int companyId) {
@@ -51,30 +44,34 @@ public class FormsController {
   }
 
   @PostMapping("/forms/{formId}/saveAnswers")
-  public ResponseEntity<?> saveAnswers(@PathVariable int formId,
-      @RequestBody List<Answer> answers) {
-    try {
-      if (answers == null || answers.isEmpty()) {
-        throw new IllegalArgumentException("Les réponses ne peuvent pas être vides");
-      }
-      Form form = service.saveAnswers(formId, answers);
-      return ResponseEntity.ok(form);
-    } catch (IllegalArgumentException e) {
-      return ResponseEntity.badRequest().body(e.getMessage());
-    } catch (Exception e) {
-      return ResponseEntity.status(500).body("Une erreur interne s'est produite");
+  public Form saveAnswers(@PathVariable int formId, @RequestBody List<Answer> answers) {
+
+    if(answers == null || answers.isEmpty()) {
+      throw new IllegalArgumentException("Les réponses ne peuvent pas être vides");
     }
+
+    return service.saveAnswers(formId, answers);
   }
 
   @PostMapping("/forms/{formId}/submit")
-  public ResponseEntity<?> submit(@PathVariable int formId) {
-    try {
-      Form form = service.submit(formId);
-      return ResponseEntity.ok(form);
-    } catch (IllegalArgumentException e) {
-      return ResponseEntity.badRequest().body(e.getMessage());
-    } catch (Exception e) {
-      return ResponseEntity.status(500).body("Une erreur interne s'est produite");
-    }
+  public Form submit(@PathVariable int formId) {return service.submit(formId);}
+  @GetMapping("/forms/company/{companyId}")
+  public Form getOneByCompanyId(@PathVariable int companyId){
+    return service.getFormByCompanyId(companyId);
+  }
+
+  @GetMapping("/forms/formsSubmitted")
+  public int getFormsSubmitted() {
+    return service.getNumberOfSubmittedForms();
+  }
+
+  @GetMapping("/forms/averageScoreESG")
+  public double getAverageScoreESG() {
+    return service.getAverageScoreESG();
+  }
+
+  @GetMapping("/forms/formsInProgress")
+  public int getFormsInProgress() {
+    return service.getNumberOfFormsInProgress();
   }
 }
