@@ -14,7 +14,7 @@
               <span>{{ parseFloat(scoreE).toFixed(2) }}</span>
             </div>
             <div class="progress-bar">
-              <div class="progress" :style="{ width: calculateProgress(scoreE) }"></div>
+              <div class="progress" :style="{ width: calculateProgress(scoreE) , background:'#009a4a' }"></div>
             </div>
           </div>
 
@@ -24,7 +24,7 @@
               <span>{{ parseFloat(scoreS).toFixed(2) }}</span>
             </div>
             <div class="progress-bar">
-              <div class="progress" :style="{ width: calculateProgress(scoreS) }"></div>
+              <div class="progress" :style="{ width: calculateProgress(scoreS), background:'#0081c3' }"></div>
             </div>
           </div>
 
@@ -34,7 +34,7 @@
               <span>{{ parseFloat(scoreG).toFixed(2) }}</span>
             </div>
             <div class="progress-bar">
-              <div class="progress" :style="{ width: calculateProgress(scoreG) }"></div>
+              <div class="progress" :style="{ width: calculateProgress(scoreG), background:'#f07833' }"></div>
             </div>
           </div>
         </div>
@@ -141,7 +141,7 @@ const calculateProgress = (score) => {
 }
 
 .progress {
-  background: #40867A;
+  
   height: 100%;
   border-radius: 9999px;
   transition: width 0.3s ease;
