@@ -4,6 +4,36 @@
       <router-link to="/">
         <img src="../assets/logo.png" alt="Shifting Pact Logo" class="logo" />
       </router-link>
+      <div v-if="authenticatedUser" class="nav-buttons">
+        <router-link
+          v-if="isAdmin"
+          to="/boardPage"
+          class="connect-btn"
+        >
+          Tableau de Bord
+        </router-link>
+        <router-link
+          v-if="isAdmin"
+          to="/allClientForms"
+          class="connect-btn"
+        >
+          Formulaires Clients
+        </router-link>
+        <router-link
+          v-if="isAdmin"
+          to="/allCompanies"
+          class="connect-btn"
+        >
+          Liste des Clients
+        </router-link>
+        <router-link
+          v-if="isCompany"
+          to="/new-questionnaire"
+          class="connect-btn"
+        >
+          Nos Questionnaires
+        </router-link>
+      </div>
     </div>
     <div class="auth-buttons">
       <template v-if="authenticatedUser">
@@ -47,6 +77,14 @@ const displayIdentifier = computed(() => {
   return isCompany ? user.login : user.email;
 });
 
+const isAdmin = computed(() => {
+  return authenticatedUser.value && localStorage.getItem('company') === null;
+});
+
+const isCompany = computed(() => {
+  return authenticatedUser.value && localStorage.getItem('company') !== null;
+});
+
 const checkAuthentication = () => {
   if (isAuthenticated()) {
     authenticatedUser.value = getAuthenticatedUser();
@@ -84,12 +122,19 @@ watch(() => route.path, () => {
 .logo-container {
   position: absolute;
   left: 25px;
-  top: 22px;
+  display: flex;
+  align-items: center;
 }
 
 .logo {
   width: 180px;
   height: 70px;
+  margin-right: 15px;
+}
+
+.nav-buttons {
+  display: flex;
+  gap: 10px;
 }
 
 .auth-buttons {
@@ -117,9 +162,17 @@ watch(() => route.path, () => {
   transition: background-color 0.3s ease;
   border: none;
   cursor: pointer;
+  display: inline-block;
+  text-align: center;
+  line-height: 1.5;
+  white-space: nowrap;
 }
 
 .connect-btn:hover {
   background-color: #346d63;
+}
+
+.logo-container .connect-btn {
+  margin-left: 15px;
 }
 </style>

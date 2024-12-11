@@ -15,13 +15,27 @@ const FormsService = {
     getFormClientByCompanyId(companyId) {
       return api.get(`/companies/${companyId}`);
     },
-    getFormProgression(formId) {
-      return api.get(`/forms/${formId}/progression`);
-  },
-
     login(crendentials){
       return api.post('/auth/login', crendentials);
     },
+
+    getNumberOfRegisteredUsers(){
+      return api.get('/users/count');
+    },
+
+    getNumberOfFormsSubmitted(){
+      return api.get('/forms/formsSubmitted');
+    },
+
+    getAverageScoreESG(){
+      return api.get('/forms/averageScoreESG');
+    },
+
+    getNumberOfFormsInProgress(){
+      return api.get('/forms/formsInProgress');
+    },
+
+
 };
 
 export default FormsService;

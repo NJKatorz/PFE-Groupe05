@@ -23,4 +23,8 @@ public class UsersService {
       return null;
     return user;
   }
+
+  public int getNumberOfRegisteredUsers() {
+    return (int) repository.count();
+  }
 }
