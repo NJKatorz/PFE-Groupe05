@@ -25,15 +25,17 @@ const progressPercentage = computed(() => {
   return (currentCategoryIndex.value  / categories.value.length) * 100;
 });
 
-onMounted(() => {
+
+onMounted(async () => {
+
+  let bo = false;
+
   if (route.params.id && route.params.id !== "ESG") {
     console.log("id dans la route : ", route.params.id);
     formIdExisted.value = route.params.id;
   }
   console.log("FORMMMMIDDD: ", formIdExisted.value);
-});
 
-onMounted(async () => {
   try {
 
     let formData = null;
@@ -60,11 +62,15 @@ onMounted(async () => {
 
           console.log("Index de la catégorie : ", categoryIndex);
           if (categoryIndex !== -1) {
-            currentCategoryIndex.value = categoryIndex+1;
+            if (categoryIndex === 0) currentCategoryIndex.value = categoryIndex;
+           else currentCategoryIndex.value = categoryIndex+1;
             console.log("currentCatIndex : ", currentCategoryIndex.value);
           }
         }
       }
+
+      // TODO
+      bo = true;
 
     } else {
       const response = await api.post(`/forms/company/${company.companyId}`);
@@ -139,6 +145,30 @@ onMounted(async () => {
     console.log('Questions regroupées par catégorie :', questionsByCategory.value);
     console.log('Réponses initialisées :', selectedAnswers.value);
 
+    if (bo === true){
+      formData.answersList.forEach((answer) => {
+        const question = formData.questionList.find(q => q.questionId === answer.questionId);
+        if (!question) return;
+
+        const category = question.category;
+        if (!selectedAnswers.value[category]) return;
+
+        if (question.type === 'checkbox') {
+          try {
+            const parsedAnswer = JSON.parse(answer.response); // Assurez-vous que la réponse est bien un JSON
+            selectedAnswers.value[category][answer.questionId] = Array.isArray(parsedAnswer)
+              ? parsedAnswer.map(option => (typeof option === 'object' ? option.choice : option))
+              : [];
+          } catch (error) {
+            console.error(`Erreur lors du parsing de la réponse pour la question ${question.questionId} :`, error);
+            selectedAnswers.value[category][answer.questionId] = [];
+          }
+        } else {
+          selectedAnswers.value[category][answer.questionId] = answer.response;
+        }
+      });
+      bo = false;
+    }
     // Charger la progression initiale
     //await progressPercentage();
 
