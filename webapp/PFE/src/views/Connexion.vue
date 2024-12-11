@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/multi-word-component-names -->
 <script setup>
 import { ref } from 'vue';
 import OurCard from '../components/OurCard.vue';
@@ -126,8 +127,8 @@ const submitForm = async () => {
 
 .header {
   text-align: center;
-  margin-top: -180px;
-  margin-bottom: 30px;
+  margin-top: -250px;
+  margin-bottom: 10px;
 }
 
 .header h1 {

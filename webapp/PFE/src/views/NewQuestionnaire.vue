@@ -30,7 +30,7 @@
         <div class="radio-circle">
           <div class="radio-inner" v-if="selectedQuestionnaire === 'ESG'"></div>
         </div>
-        <div class="option-icon">🌱</div>
+        <div class="option-icon"></div>
         <span>Questionnaire ESG</span>
       </div>
 

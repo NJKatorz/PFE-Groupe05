@@ -81,10 +81,16 @@ export default {
   border-radius: 21px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   width: 506px;
-  height: 202px;
+  height: 250px;
   display: flex;
   align-items: center;
   padding-bottom: 3%;
+}
+
+.questionnaire-card:hover {
+  background-color: #dbdada;
+  border-radius: 21px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .card-content {
@@ -95,21 +101,23 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 16px;
+  margin-bottom: 6px;
   padding-top: 10%;
 }
 
 .icon {
   font-size: 36px;
-  margin-right: 12px;
+  margin-right: 12px; 
+  padding-top: 20px;
 }
 
 .headline {
-  font-family: 'Inter', sans-serif;
-  font-weight: 600;
+ 
+  font-weight: 200;
   font-size: 30px;
   line-height: 44px;
   color: #004D56;
+  padding-top: 20px;
   
 }
 
@@ -118,8 +126,8 @@ export default {
   font-weight: 200;
   font-size: 20px;
   line-height: 31px;
-  color: #555555;
-  padding-bottom: 15px;
+  color: #004D56;
+  padding-bottom: 45px;
   
 }
 
