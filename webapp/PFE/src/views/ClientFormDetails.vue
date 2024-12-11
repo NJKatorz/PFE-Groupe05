@@ -29,8 +29,8 @@
           <div class="stat-label">Questions Complétées</div>
         </div>
         <div class="stat-card">
-          <div class="stat-value">{{ calculateProgress }}%</div>
-          <div class="stat-label">Progression</div>
+          <div class="stat-value">{{ (form.scoreESG || 0).toFixed(2) }}%</div>
+          <div class="stat-label">Score ESG</div>
         </div>
       </div>
 
@@ -88,6 +88,7 @@ export default {
           this.form.companyId
         );
         this.company = companyResponse.data;
+        console.log("company : ", this.company);
       } catch (error) {
         console.error(
           "Erreur lors de la récupération des détails du formulaire:",
