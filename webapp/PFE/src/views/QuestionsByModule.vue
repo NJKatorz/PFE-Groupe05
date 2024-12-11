@@ -12,19 +12,51 @@ const selectedAnswers = ref({});
 const router = useRouter(); // Router pour la navigation
 const route = useRoute(); //  pour accéder aux paramètres
 
+const collapsedQuestions = ref({});
+
+
 // Données de la catégorie actuelle
 const currentCategory = computed(() => categories.value[currentCategoryIndex.value]);
+
+const categoryColors = {
+  'ENERGIE & CARBONE': '#b5cdbf',               // Vert foncé
+  'EAU, MATIERES PREMIERES ET FOURNITURES': '#b5cdbf',  // Vert clair
+  'DÉCHETS': '#b5cdbf',              // Vert clair
+  'ECOSYSTEMES & BIODIVERSITE': '#b5cdbf',      // Vert clair
+  'DIVERSITE, INCLUSION & EQUITE': ' #dfd4fb',   // Violet clair
+  'SECURITE, SANTE & BIEN-ETRE': ' #dfd4fb',     // Violet clair
+  'EMPLOI ET PRATIQUES DE TRAVAIL': ' #dfd4fb',  // Violet clair
+  'ENGAGEMENT CIVIQUE': ' #dfd4fb',              // Violet clair
+  'CONDUITE DES AFFAIRES': '#fde791',           // Jaune moutarde
+  'ETHIQUE DES AFFAIRES': '#fde791',            // Jaune moutarde
+  'PROTECTION DES DONNEES': '#fde791',          // Jaune moutarde
+  'CERTIFICATIONS': '#fde791'                   // Jaune moutarde
+};
+
+
+
+const getCategoryColor = (category) => {
+  return categoryColors[category] ; // Couleur par défaut si la catégorie n'est pas trouvée
+};
+
+
+
+
+
 const currentQuestions = computed(() => questionsByCategory.value[currentCategory.value] || []);
 const company = getAuthenticatedUser();
 
 const formId = ref(null); // Ajoutez une variable réactive pour l'ID du formulaire
 const formIdExisted = ref(null);
 
+const toggleQuestion = (questionId) => {
+  collapsedQuestions.value[questionId] = !collapsedQuestions.value[questionId];
+};
+
 const progressPercentage = computed(() => {
   if (!categories.value.length) return 0;
   return (currentCategoryIndex.value  / categories.value.length) * 100;
 });
-
 
 onMounted(async () => {
 
@@ -89,6 +121,7 @@ onMounted(async () => {
     const questions = formData.questionList;
 
 
+
     // Fonction pour remplacer "XXX" par le nom de l'entreprise
     const replaceXXXWithCompanyName = (questions, companyName) => {
       return questions.map((question) => {
@@ -133,6 +166,8 @@ onMounted(async () => {
     // Extraire les catégories
     categories.value = Object.keys(questionsByCategory.value);
 
+    console.log('cate' , categories.value);
+
     // Initialiser les réponses par catégorie
     selectedAnswers.value = categories.value.reduce((acc, category) => {
       acc[category] = questionsByCategory.value[category].reduce((answers, question) => {
@@ -144,6 +179,11 @@ onMounted(async () => {
 
     console.log('Questions regroupées par catégorie :', questionsByCategory.value);
     console.log('Réponses initialisées :', selectedAnswers.value);
+
+     // Initialiser les questions comme fermées par défaut
+     questions.forEach(question => {
+      collapsedQuestions.value[question.questionId] = true;
+    });
 
     if (bo === true){
       formData.answersList.forEach((answer) => {
@@ -288,6 +328,15 @@ const goToNextCategory = async () => {
      await submitForm();
   }
 };
+
+const isQuestionAnswered = (questionId, category) => {
+  const answer = selectedAnswers.value[category][questionId];
+  if (Array.isArray(answer)) {
+    return answer.length > 0;
+  }
+  return answer !== '' && answer !== null && answer !== undefined;
+};
+
 </script>
 
 <template>
@@ -297,13 +346,14 @@ const goToNextCategory = async () => {
       <div class="progress-bar">
         <div
           class="progress-fill"
-          :style="{ width: `${progressPercentage}%` }"
+          :style="{ width: `${progressPercentage}%` , background:getCategoryColor(currentCategory)  }"
         ></div>
         <div class="progress-percentage">{{ progressPercentage.toFixed(0) }}%</div>
       </div>
 
       <!-- Titre de la catégorie -->
-      <div class="module-header">
+      <div class="module-header"
+      :style="{ backgroundColor: getCategoryColor(currentCategory) }">
         <div class="module-info">
           <div class="module-title">
             <p>{{ categories[currentCategoryIndex] }}</p>
@@ -318,7 +368,16 @@ const goToNextCategory = async () => {
           :key="question.questionId"
           class="question"
         >
-          <h3>{{ question.question }}</h3>
+
+        <div class="question-header" @click="toggleQuestion(question.questionId)">
+          <h3 class="question-title">{{ question.question }}</h3>
+          <span class="response-status">
+            {{ isQuestionAnswered(question.questionId, categories[currentCategoryIndex]) ? 'répondu' : 'pas encore de réponse' }}
+          </span>
+        </div>
+
+      <div class="options" v-if="!collapsedQuestions[question.questionId]">
+
           <div class="options">
             <template v-if="question.type === 'radio'">
               <div
@@ -363,6 +422,9 @@ const goToNextCategory = async () => {
               />
             </template>
           </div>
+
+        </div>
+
         </div>
       </div>
 
@@ -388,6 +450,8 @@ const goToNextCategory = async () => {
   margin: 0 auto;
   padding: 1rem;
 }
+
+
 
 .progress-bar {
   position: relative;
@@ -416,23 +480,55 @@ const goToNextCategory = async () => {
 }
 
 .module-header {
-  background-color: #2F8886;
+
   padding: 1.5rem;
   border-radius: 8px;
   display: flex;
   align-items: center;
   gap: 1rem;
   margin: 2rem 0;
+  justify-content: center;
 }
 
 .module-title {
   font-size: 1.5rem;
-  font-weight: bold;
-  color: white;
+  font-weight:bolder;
+  color: #004851;
+
 }
 
 .questions-container {
   padding: 2rem 0;
+}
+
+.question-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding: 0.4rem;
+  border: 2px solid #E2E8F0;
+  border-radius: 8px;
+  background-color: #F7FAFC;
+  margin-bottom: 10px;
+}
+
+.question-header:hover {
+  background-color: #E2E8F0;
+}
+
+.chevron {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #2F8886;
+}
+
+.response-status {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #2F8886;
+  margin-left: 1rem;
+
 }
 
 .question {

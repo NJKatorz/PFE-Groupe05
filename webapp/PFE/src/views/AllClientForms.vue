@@ -1,31 +1,37 @@
 <template>
-  <div>
+  <div class="center">
     <h1>Liste des Formulaires</h1>
     <div class="form-grid">
       <router-link
-        class="form-card"
-        v-for="form in forms"
-        :key="form.formId"
-        :to="{ name: 'ClientFormDetails', params: { formId: form.formId } }"
+          v-for="form in forms"
+          :key="form.formId"
+          :to="{ name: 'ClientFormDetails', params: { formId: form.formId } }"
+          class="card-link"
       >
-        <h2>{{ form.companyName }}</h2>
-        <p><strong>Date de création :</strong> {{ formatDate(form.createdAt) }}</p>
-        <p><strong>Total des questions :</strong> {{ form.total }}</p>
-        <p><strong>Total des questions complétées :</strong> {{ form.completed }}</p>
+        <OurCard
+            :title="form.companyName"
+            :subtitle="`Date de création : ${formatDate(form.createdAt)}`"
+        >
+          <p><strong>Total des questions :</strong> {{ form.total }}</p>
+          <p><strong>Total des questions complétées :</strong> {{ form.completed }}</p>
+        </OurCard>
       </router-link>
     </div>
   </div>
 </template>
 
-
 <script>
 import FormsService from '@/services/FormsService'
+import OurCard from '../components/OurCard.vue' // Import the OurCard component
 
 export default {
+  components: {
+    OurCard, // Register the OurCard component
+  },
   data() {
     return {
-      forms: [], 
-      company: [], 
+      forms: [],
+      company: [],
     }
   },
   methods: {
@@ -66,11 +72,7 @@ export default {
 <style scoped>
 /* Conteneur principal pour centrer le contenu */
 div {
-  display: flex;
-  justify-content: center; /* Centrer horizontalement */
-  align-items: center; /* Centrer verticalement */
-  min-height: 10vh; /* Prendre toute la hauteur de la page */
-  flex-direction: column; /* Empile les éléments verticalement */
+  flex-direction: column;
 }
 
 /* Grille des formulaires */
@@ -78,23 +80,27 @@ div {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 16px;
-  max-width: 1200px; /* Largeur maximale de la grille */
-  width: 100%; /* Adapter la largeur au conteneur */
+  max-width: 1200px;
+  width: 100%;
 }
 
-/* Style des cartes */
-.form-card {
-  background-color: #f9f9f9;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 16px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease-in-out;
+/* Style pour le lien englobant la carte */
+.card-link {
   text-decoration: none;
   color: inherit;
+  transition: transform 0.2s ease-in-out;
 }
 
-.form-card:hover {
+.card-link:hover {
   transform: scale(1.02);
+}
+
+.center{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin-top: 50px;
+  margin-bottom: 50px;
 }
 </style>
