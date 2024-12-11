@@ -20,7 +20,7 @@ const FormsService = {
     },
   getFormByCompanyId(companyId){
     return api.get(`/forms/company/${companyId}`);
-  }
+  },
 
     getNumberOfRegisteredUsers(){
       return api.get('/users/count');

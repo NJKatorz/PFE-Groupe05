@@ -69,7 +69,13 @@
           <div class="card-progress-info">
             <div class="progress-header">
               <span class="progress-text">
-                Progression : {{ q.progress < 100 ? `${q.progress}%` : 'Terminé' }}
+                Progression : 
+                <template v-if="q.completed !== q.total">
+                  {{ q.progress }}%
+                </template>
+                <template v-else>
+                  Terminé
+                </template>
               </span>
               <span class="date-text">
                 {{ q.submitted ? `Soumis le : ${formatDate(q.sendAt)}` : `Créé le : ${formatDate(q.createdAt)}` }}
@@ -100,51 +106,53 @@
   </div>
 </template>
 
-
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import OurCard from '../components/OurCard.vue';
-import {getAuthenticatedUser} from "@/services/auths.js";
+import { getAuthenticatedUser } from "@/services/auths.js";
 import FormsService from "@/services/FormsService.js";
 
 const router = useRouter();
 const selectedQuestionnaire = ref('');
 const activeTab = ref('new');
-const hasESGForm = ref(false); // Nouvelle variable réactive
-const questionnaire = ref(null); // Un seul questionnaire de l'utilisateur
-// Charge l'utilisateur actuel
-const currentCompany = getAuthenticatedUser();
+const hasESGForm = ref(false);
 const questionnaires = ref([]);
 
+// Fonction pour calculer la progression
+const calculateProgress = (completed, total) => {
+  if (!total || total === 0) return 0; // Évite une division par zéro
+  return Math.round((completed / total) * 100);
+};
+
+const formatDate = (date) => {
+  const options = { year: 'numeric', month: 'long', day: 'numeric' };
+  return new Date(date).toLocaleDateString('fr-FR', options);
+};
+
+// Charger les questionnaires
 const loadQuestionnaire = async () => {
   try {
+    const currentCompany = getAuthenticatedUser();
     const response = await FormsService.getFormByCompanyId(currentCompany.companyId);
-    questionnaire.value = response.data;
-    console.log("QUESTIONNAIRE : ", response.data);
-    if(questionnaire.value){
+    const questionnaire = response.data;
+
+    if (questionnaire) {
       hasESGForm.value = true;
-      questionnaires.value.push(questionnaire.value);  // Ajoute le questionnaire à la liste
+      questionnaires.value.push({
+        ...questionnaire,
+        progress: calculateProgress(questionnaire.completed, questionnaire.total),
+      });
+    } else {
+      hasESGForm.value = false;
     }
-    else hasESGForm.value = false;
   } catch (error) {
     console.error("Erreur lors du chargement du formulaire :", error);
   }
 };
 
-
-// Appelé au montage du composant
-onMounted(() => {
-  loadQuestionnaire();
-});
-
 const selectQuestionnaire = (type) => {
   selectedQuestionnaire.value = type;
-};
-
-const formatDate = (date) => {
-  const options = { year: 'numeric', month: 'long', day: 'numeric' }
-  return new Date(date).toLocaleDateString('fr-FR', options)
 };
 
 const startQuestionnaire = () => {
@@ -152,9 +160,48 @@ const startQuestionnaire = () => {
     router.push('/questionnaire/' + selectedQuestionnaire.value);
   }
 };
+
+onMounted(() => {
+  loadQuestionnaire();
+});
 </script>
 
+
   <style scoped>
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.progress-text {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #2F8886;
+}
+
+.date-text {
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.progress-bar-container {
+  width: 100%;
+  height: 8px;
+  background-color: #E2E8F0;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 0.5rem;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(to right, #004851, #40867A);
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
   .questionnaire-container {
     width: 100%;
     max-width: 800px;

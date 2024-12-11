@@ -169,8 +169,6 @@ onMounted(async () => {
       });
       bo = false;
     }
-    // Charger la progression initiale
-    //await progressPercentage();
 
     // Charger la progression initiale
   } catch (error) {
