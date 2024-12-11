@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.List;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,18 +44,33 @@ public class FormsController {
     return service.getOneFormById(formId);
   }
 
-  @PostMapping("/forms/{formId}/saveAnswers")
-  public Form saveAnswers(@PathVariable int formId, @RequestBody List<Answer> answers) {
+   @PostMapping("/forms/{formId}/saveAnswers")
+  public ResponseEntity<?> saveAnswers(@PathVariable int formId, @RequestBody List<Answer> answers) {
+    try {
+      if (answers == null || answers.isEmpty()) {
+        throw new IllegalArgumentException("Les réponses ne peuvent pas être vides");
+      }
 
-    if(answers == null || answers.isEmpty()) {
-      throw new IllegalArgumentException("Les réponses ne peuvent pas être vides");
+      Form form = service.saveAnswers(formId, answers);
+      return ResponseEntity.ok(form);
+    } catch (IllegalArgumentException e) {
+      return ResponseEntity.badRequest().body(e.getMessage());
+    } catch (Exception e) {
+      return ResponseEntity.status(500).body("Une erreur interne s'est produite");
     }
-
-    return service.saveAnswers(formId, answers);
   }
 
   @PostMapping("/forms/{formId}/submit")
-  public Form submit(@PathVariable int formId) {return service.submit(formId);}
+  public ResponseEntity<?> submit(@PathVariable int formId) {
+    try {
+      Form form = service.submit(formId);
+      return ResponseEntity.ok(form);
+    } catch (IllegalArgumentException e) {
+      return ResponseEntity.badRequest().body(e.getMessage());
+    } catch (Exception e) {
+      return ResponseEntity.status(500).body("Une erreur interne s'est produite");
+    }
+  }
   @GetMapping("/forms/company/{companyId}")
   public Form getOneByCompanyId(@PathVariable int companyId){
     return service.getFormByCompanyId(companyId);
