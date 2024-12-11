@@ -155,7 +155,7 @@ public class FormsService {
     scoreE = (scoreE / 30) * 100;
     scoreS = (scoreS / 30) * 100;
     scoreG = (scoreG / 30) * 100;
-    scoreESG = (scoreESG / 90) * 100; // Diviser par 90 (30 * 3) pour obtenir le pourcentage total ESG // TODO ?
+    scoreESG = (scoreESG / 90) * 100; // Diviser par 90 (30 * 3) pour obtenir le pourcentage total ESG
 
 
     // Mise à jour des scores dans le formulaire
