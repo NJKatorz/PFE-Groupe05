@@ -61,7 +61,4 @@ public class Company {
   private boolean sellsProduct;
   @NonNull
   private boolean isOwner;
-  //champs a un formulaire en cours
 }
-
-//TODO
