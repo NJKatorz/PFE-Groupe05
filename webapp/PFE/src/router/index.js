@@ -50,6 +50,16 @@ const router = createRouter({
       name: 'BoardPage',
       component: () => import('@/views/BoardPage.vue')
     },
+    {
+      path: '/allCompanies',
+      name: 'AllCompanies',
+      component: ()=>import ("@/views/AllCompanies.vue"),
+    },
+    {
+      path: '/score',
+      name: 'score',
+      component: ()=>import ("@/views/EsgScore.vue"),
+    },
   ],
 })
 

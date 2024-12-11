@@ -28,7 +28,7 @@ public class Question {
   @NonNull
   private String category;
   @NonNull
-  private char pilier; // E,S,G
+  private String pillar; // E,S,G
   @NonNull
   private String template;
   @NonNull
