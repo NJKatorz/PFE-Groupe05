@@ -96,11 +96,9 @@ onMounted(() => {
 <style scoped>
 .dashboard-container {
   max-width: 80%;
-  margin: 50px auto 0;
+  margin: 0 auto;
 }
-.dashboard {
-  /* Remove or comment out the background-color property */
-}
+
 
 .dashboard-title {
   font-size: 2rem;
