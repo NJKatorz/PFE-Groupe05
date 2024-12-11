@@ -11,6 +11,8 @@ const currentCategoryIndex = ref(0);
 const selectedAnswers = ref({});
 const router = useRouter(); // Router pour la navigation
 const route = useRoute(); //  pour accéder aux paramètres
+const otherQuestions = ref([]); // Contiendra les questions supplémentaires
+// TODO
 
 const collapsedQuestions = ref({});
 
@@ -94,7 +96,7 @@ onMounted(async () => {
 
           console.log("Index de la catégorie : ", categoryIndex);
           if (categoryIndex !== -1) {
-            
+
            currentCategoryIndex.value = categoryIndex+1;
             console.log("currentCatIndex : ", currentCategoryIndex.value);
           }
@@ -161,6 +163,13 @@ onMounted(async () => {
       acc[category].push(question);
       return acc;
     }, {});
+
+    // TODO
+    if (formData.otherQuestions) {
+      console.log("Questions supplémentaires :", otherQuestions.value);
+      questionsByCategory.value['Questions auxquelles vous ne devez pas répondre'] = formData.otherQuestions || [];
+    }
+
 
 
     // Extraire les catégories
