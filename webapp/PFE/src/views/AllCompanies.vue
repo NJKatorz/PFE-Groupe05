@@ -13,8 +13,14 @@ export default {
         // Récupérer les entreprises depuis le service
         const response = await CompaniesService.getAll();
 
+        // Ajouter un état de validation pour chaque entreprise
+        this.companies = response.data.map(company => ({
+          ...company,
+          isValidating: false, // Par défaut, aucune entreprise n'est en cours de validation
+        }));
+
         // Trier les entreprises pour que les non validées apparaissent en premier
-        this.companies = response.data.sort((a, b) => {
+        this.companies.sort((a, b) => {
           if (!a.validated && b.validated) {
             return -1; // a (non validée) vient avant b (validée)
           }
@@ -29,20 +35,18 @@ export default {
     },
 
     async validateCompany(companyId) {
-      try {
-        console.log("Id de l'entreprise : ", companyId)
-        // Appel API pour valider l'entreprise
-        const response = await CompaniesService.validateCompany(companyId)
+      const company = this.companies.find(c => c.companyId === companyId);
+      if (!company) return;
 
-        // Mettre à jour l'état local si l'entreprise est validée
-        if (response.data.success) {
-          const updatedCompany = this.companies.find(c => c.id === companyId)
-          if (updatedCompany) {
-            updatedCompany.validated = true // Marquer l'entreprise comme validée
-          }
-        }
+      company.isValidating = true;
+
+      try {
+        await CompaniesService.validateCompany(companyId);
+        await this.fetchCompanies();
       } catch (error) {
-        console.error('Erreur lors de la validation de l\'entreprise:', error)
+        console.error("Erreur lors de la validation de l'entreprise:", error);
+      } finally {
+        company.isValidating = false;
       }
     },
 
@@ -71,9 +75,17 @@ export default {
       >
         <h2>{{ company.name }}</h2>
         <p><strong>Code NACE :</strong> {{ company.naceCode }}</p>
-        <p><strong>Date de validation :</strong> {{ formatDate(company.registrationDate) }}</p>
-        <p><strong>Personne de contact :</strong> {{ company.contactEmail }}</p>
+        <p>
+          <strong>Date de validation :</strong>
+          {{ company.validated ? formatDate(company.registrationDate) : "Non validée" }}
+        </p>
+        <p><strong>Personne de contact :</strong> <a :href="'mailto:' + company.contactEmail">{{ company.contactEmail }}</a></p>
         <p><strong>Nombre d'employés :</strong> {{ company.numberOfWorkers }}</p>
+        <p><strong>Est propriétaire :</strong> {{ company.owner ? 'Oui' : 'Non' }}</p>
+        <p>
+          <strong>Type :</strong>
+          {{ company.sellsProduct ? "Produit" : "Service" }}
+        </p>
 
         <!-- Affichage des templates -->
         <div v-if="company.templates && company.templates.length > 0">
@@ -86,15 +98,22 @@ export default {
           <p>Aucun template associé.</p>
         </div>
 
-        <!-- Affichage du bouton de validation uniquement si l'entreprise n'est pas validée -->
+        <!-- Bouton de validation avec indicateur de chargement -->
         <div v-if="!company.validated">
-          <button @click="validateCompany(company.companyId)" class="validate-btn">Valider l'entreprise</button>
+          <button
+            v-if="!company.isValidating"
+            @click="validateCompany(company.companyId)"
+            class="validate-btn"
+          >
+            Valider l'entreprise
+          </button>
+          <span v-else class="spinner"></span>
         </div>
-
       </div>
     </div>
   </div>
 </template>
+
 
 
 <style scoped>
@@ -145,4 +164,42 @@ export default {
   min-height: 300px;
   box-sizing: border-box;
 }
+
+/* Styles pour le spinner */
+.spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-top-color: #28a745;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Autres styles inchangés */
+.validate-btn {
+  background-color: #28a745;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.validate-btn:hover {
+  background-color: #218838;
+}
+
+.validate-btn:focus {
+  outline: none;
+  box-shadow: 0 0 5px rgba(40, 167, 69, 0.8);
+}
+
 </style>
