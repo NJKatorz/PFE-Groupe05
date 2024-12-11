@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -215,7 +216,6 @@ public class FormsService {
     return totalScore;
   }
 
-
   /**
    * Récupère le poids d'un choix donné dans une question.
    */
@@ -231,8 +231,4 @@ public class FormsService {
         .findFirst()
         .orElse(0); // Retourne 0 si le choix n'est pas trouvé
   }
-
-
-
-
 }
