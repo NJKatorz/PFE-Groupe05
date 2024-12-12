@@ -45,20 +45,20 @@
 import { ref, onMounted } from 'vue';
 import { Users, Activity, BarChart2, TrendingUp } from 'lucide-vue-next';
 import FormsService from '@/services/FormsService';
-
+import CompaniesService from '@/services/CompaniesService';
 const stats = ref([]);
 
 const initializeStats = async () => {
   try {
-    const users = (await FormsService.getNumberOfRegisteredUsers()).data;
     const submittedForms = (await FormsService.getNumberOfFormsSubmitted()).data;
     const formsInProgress = (await FormsService.getNumberOfFormsInProgress()).data;
     const averageESG = (await FormsService.getAverageScoreESG()).data;
+    const numberOfCompanies = (await CompaniesService.getAll()).data.length;
 
     stats.value = [
       {
         title: "Utilisateurs inscrits",
-        value: users,
+        value: numberOfCompanies,
         change: "+180 depuis le mois dernier",
         icon: Users,
       },

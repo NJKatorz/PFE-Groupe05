@@ -1,43 +1,21 @@
-FROM node:18
-COPY package*.json ./
-RUN npm install
-COPY . .
-EXPOSE 5173
-CMD ["npm", "run", "dev"]
-
-# build stage
+# Image contenant Node.js et npm pour construire l'application
 FROM node:lts-alpine as build-stage
+# Répertoire de travail
 WORKDIR /app
+# Copie des fichiers package.json et package-lock.json pour npm
 COPY package*.json ./
+# Installation des dépendances
 RUN npm install
+# Copie des fichiers sources
 COPY . .
+# Construction de l'application
 RUN npm run build
 
-# production stage
+# Image contenant Nginx pour exécuter l'application
 FROM nginx:stable-alpine as production-stage
+# Copie le contenu du répertoire dist dans le répertoire de travail de Nginx
 COPY --from=build-stage /app/dist /usr/share/nginx/html
+# Exposition du port 80
 EXPOSE 80
+# Commande pour exécuter l'application en démarrage Nginx
 CMD ["nginx", "-g", "daemon off;"]
-
-FROM node:lts-alpine
-
-# install simple http server for serving static content
-RUN npm install -g http-server
-
-# make the 'app' folder the current working directory
-WORKDIR /app
-
-# copy both 'package.json' and 'package-lock.json' (if available)
-COPY package*.json ./
-
-# install project dependencies
-RUN npm install
-
-# copy project files and folders to the current working directory (i.e. 'app' folder)
-COPY . .
-
-# build app for production with minification
-RUN npm run build
-
-EXPOSE 8080
-CMD [ "http-server", "dist" ]

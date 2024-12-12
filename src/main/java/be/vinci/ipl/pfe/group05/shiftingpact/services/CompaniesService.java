@@ -44,8 +44,6 @@ public class CompaniesService {
     company.setLogin(generateLogin(company.getName(), company.getNaceCode()));
     company.setRegistrationDate(LocalDateTime.now());
     company.setValidated(true);
-    //company.setScores(new ArrayList<>());
-   // company.setCompanyId((int) repository.count());
     repository.save(company);
 
     String emailContent = "Bonjour " + company.getName() + ",\n\n" +

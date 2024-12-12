@@ -18,6 +18,9 @@ const FormsService = {
     login(crendentials){
       return api.post('/auth/login', crendentials);
     },
+  getFormByCompanyId(companyId){
+    return api.get(`/forms/company/${companyId}`);
+  },
 
     getNumberOfRegisteredUsers(){
       return api.get('/users/count');

@@ -16,8 +16,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Form {
   @Id
   private ObjectId id;
+  @NonNull
   private int formId;
-
   @NonNull
   private Integer companyId;
   @NonNull
@@ -27,26 +27,19 @@ public class Form {
   @NonNull
   private LocalDateTime createdAt;
   private LocalDateTime sendAt;
-
   @NonNull
   private List<Question> questionList;
   @NonNull
   private List<Answer> answersList;
-
   @NonNull
   private List<Question> otherQuestions;
-
   @NonNull
   private double progression;
   @NonNull
   private boolean isSubmitted;
-
   private double scoreE;
-
   private double scoreS;
-
   private double scoreG;
-
   private double scoreESG;
 
   }

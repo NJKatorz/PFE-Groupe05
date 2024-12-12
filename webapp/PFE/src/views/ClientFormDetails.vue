@@ -56,6 +56,27 @@
             </div>
           </div>
         </div>
+
+
+        <div v-if="form.otherQuestions && form.otherQuestions.length > 0 && isCompany" class="other-questions-section">
+          <h3>Questions à titre informatif</h3>
+          <div class="questions-list">
+            <div
+              v-for="(question, index) in form.otherQuestions"
+              :key="`info-${index}`"
+              class="question-card"
+            >
+              <div class="question-header">
+                <div class="question-number info-question-number">Info</div>
+                <div class="question-text">{{ question.question }}</div>
+              </div>
+              <div class="answer-section">
+                <p class="info-message"> N/A car {{ question.template.toLowerCase() }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -63,12 +84,14 @@
 
 <script>
 import FormsService from "@/services/FormsService";
+import {getUserType} from "@/services/auths.js";
 
 export default {
   data() {
     return {
       form: null,
       company: null,
+      isCompany: false,
     };
   },
   computed: {
@@ -89,6 +112,8 @@ export default {
         );
         this.company = companyResponse.data;
         console.log("company : ", this.company);
+
+        this.isCompany = getUserType() === "company";
       } catch (error) {
         console.error(
           "Erreur lors de la récupération des détails du formulaire:",
@@ -242,4 +267,32 @@ export default {
   color: #666;
   font-style: italic;
 }
+
+.other-questions-section {
+  margin-top: 2rem;
+}
+
+.other-questions-section h3 {
+  color: #006D77;
+  margin-bottom: 1rem;
+}
+
+.info-message {
+  color: #666;
+  font-style: italic;
+}
+
+.info-question-number {
+  background: #66BB6A;
+  color: white;
+}
+
+
+.other-questions-section h3 {
+  color: #4CAF50;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
 </style>

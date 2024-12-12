@@ -16,7 +16,7 @@ const router = createRouter({
       component: () => import('../views/NewQuestionnaire.vue'),
     },
     {
-      path: '/questionnaire/:type',
+      path: '/questionnaire/:id',
       name: 'QuestionnaireForm',
       component: () => import('@/views/QuestionsByModule.vue')
     },
