@@ -7,15 +7,20 @@
 
     <div v-if="form && company" class="form-container">
       <!-- Company Info -->
-      <div class="company-info">
-        <h2>{{ company.name }}</h2>
-        <div class="company-meta">
-          <span>ID Entreprise : {{ company.companyId }}</span>
-          <span class="separator">•</span>
-          <span>ID Form : {{ form.formId }}</span>
-          <span class="separator">•</span>
-          <span>{{ formatDate(form.createdAt) }}</span>
+      <div class="company-info-container">
+        <div class="company-info">
+          <h2>{{ company.name }}</h2>
+          <div class="company-meta">
+            <span>ID Entreprise : {{ company.companyId }}</span>
+            <span class="separator">•</span>
+            <span>ID Form : {{ form.formId }}</span>
+            <span class="separator">•</span>
+            <span>{{ formatDate(form.createdAt) }}</span>
+          </div>
         </div>
+        <router-link :to="{ name: 'score', query: { formId: form.formId } }" class="score-details-button">
+          Détails du score
+        </router-link>
       </div>
 
       <!-- Statistics Cards -->
@@ -172,8 +177,16 @@ export default {
   padding: 2rem;
 }
 
-.company-info {
+.company-info-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
   margin-bottom: 2rem;
+}
+
+.company-info {
+  flex-grow: 1;
+  margin-right: 1rem;
 }
 
 .company-info h2 {
@@ -295,4 +308,18 @@ export default {
   margin-bottom: 1.5rem;
 }
 
+.score-details-button {
+  background-color: #006D77;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.score-details-button:hover {
+  background-color: #005a63;
+}
 </style>
+

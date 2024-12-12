@@ -2,11 +2,10 @@
   <div class="page-container">
     <OurCard title="Résultats de votre évaluation ESG" class="results-card">
       <div class="score-content">
-        <h1 class="global-score">Score global :{{ parseFloat(scoreESG).toFixed(2) }}%</h1>
+        <h1 class="global-score">Score global : {{ parseFloat(scoreESG).toFixed(2) }}%</h1>
 
         <div class="category-scores">
           <h2>Scores par catégorie</h2>
-          
 
           <div class="score-item">
             <div class="score-label">
@@ -39,8 +38,6 @@
           </div>
         </div>
 
-      
-
         <div class="recommendations">
           <h2>Recommandations</h2>
           <ul>
@@ -63,25 +60,49 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import OurCard from '../components/OurCard.vue';
+import FormsService from "@/services/FormsService";
+
 const route = useRoute();
 
-
-// Récupérer les scores depuis les paramètres de l'URL
-const scoreE = route.query.scoreE || 0;
-const scoreS = route.query.scoreS || 0;
-const scoreG = route.query.scoreG || 0;
-const scoreESG = route.query.scoreESG || 0;
+const scoreE = ref(0);
+const scoreS = ref(0);
+const scoreG = ref(0);
+const scoreESG = ref(0);
 
 const calculateProgress = (score) => {
   const percentage = Math.min(Math.max(parseFloat(score), 0), 100);
   return `${percentage}%`;
 };
 
+const fetchScoreData = async (formId) => {
+  try {
+    const response = await FormsService.getFormClientByFormId(formId);
+    const formData = response.data;
+    scoreE.value = formData.scoreE || 0;
+    scoreS.value = formData.scoreS || 0;
+    scoreG.value = formData.scoreG || 0;
+    scoreESG.value = formData.scoreESG || 0;
+  } catch (error) {
+    console.error("Error fetching score data:", error);
+  }
+};
 
+onMounted(() => {
+  const formId = route.query.formId;
+  if (formId) {
+    fetchScoreData(formId);
+  } else {
+    // Use the scores from the URL parameters if no formId is provided
+    scoreE.value = route.query.scoreE || 0;
+    scoreS.value = route.query.scoreS || 0;
+    scoreG.value = route.query.scoreG || 0;
+    scoreESG.value = route.query.scoreESG || 0;
+  }
+});
 </script>
-
 <style scoped>
 .page-container {
   min-height: 100vh;
@@ -141,7 +162,7 @@ const calculateProgress = (score) => {
 }
 
 .progress {
-  
+
   height: 100%;
   border-radius: 9999px;
   transition: width 0.3s ease;
