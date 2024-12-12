@@ -1,31 +1,18 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import {ref, computed, onMounted} from 'vue';
 import OurCard from '../components/OurCard.vue';
 import api from '../services/api';
-import { useRouter, useRoute } from 'vue-router';
+import {useRouter, useRoute} from 'vue-router';
 import {getAuthenticatedUser} from "@/services/auths.js";
 
 const questionsByCategory = ref({});
 const categories = ref([]);
 const currentCategoryIndex = ref(0);
-const selectedAnswers = ref({
-  ...categories.value.reduce((acc, category) => {
-    acc[category] = questionsByCategory.value[category].reduce((answers, question) => {
-      answers[question.questionId] = {
-        response: question.type === 'checkbox' ? [] : '',
-        comments: ''
-      };
-      return answers;
-    }, {});
-    return acc;
-  }, {})
-});
-const progress = ref(0); // Progression venant du backend
+const selectedAnswers = ref({});
 const router = useRouter(); // Router pour la navigation
 const route = useRoute(); //  pour accéder aux paramètres
 
 const collapsedQuestions = ref({});
-
 
 // Données de la catégorie actuelle
 const currentCategory = computed(() => categories.value[currentCategoryIndex.value]);
@@ -45,15 +32,9 @@ const categoryColors = {
   'CERTIFICATIONS': '#fde791'                   // Jaune moutarde
 };
 
-
-
 const getCategoryColor = (category) => {
-  return categoryColors[category] ; // Couleur par défaut si la catégorie n'est pas trouvée
+  return categoryColors[category]; // Couleur par défaut si la catégorie n'est pas trouvée
 };
-
-
-
-
 
 const currentQuestions = computed(() => questionsByCategory.value[currentCategory.value] || []);
 const company = getAuthenticatedUser();
@@ -62,18 +43,6 @@ const handleCommentInput = (questionId, value) => {
   const category = currentCategory.value;
   selectedAnswers.value[category][questionId].comments = value;
   console.log('Commentaire saisi :', selectedAnswers.value[category]);
-};
-
-// Fonction pour récupérer la progression depuis le backend
-const fetchProgression = async () => {
-  try {
-    const response = await api.get(`/forms/15/progression`);
-    progress
-      .value = response.data; // Mise à jour de la progression
-    console.log('Progression actuelle :', progress.value);
-  } catch (error) {
-    console.error('Erreur lors de la récupération de la progression :', error);
-  }
 };
 
 const formId = ref(null); // Ajoutez une variable réactive pour l'ID du formulaire
@@ -85,7 +54,7 @@ const toggleQuestion = (questionId) => {
 
 const progressPercentage = computed(() => {
   if (!categories.value.length) return 0;
-  return (currentCategoryIndex.value  / categories.value.length) * 100;
+  return (currentCategoryIndex.value / categories.value.length) * 100;
 });
 
 onMounted(async () => {
@@ -101,7 +70,7 @@ onMounted(async () => {
   try {
 
     let formData = null;
-    if(formIdExisted.value){
+    if (formIdExisted.value) {
       const response = await api.get(`/forms/${formIdExisted.value}`);
       console.log('Réponse de l’API GEEEEETT:', response.data);
       formData = response.data;
@@ -111,7 +80,8 @@ onMounted(async () => {
       if (formData.answersList && formData.answersList.length > 0) {
         const lastAnswer = formData.answersList[formData.answersList.length - 1];
         console.log("LastAnswer : ", lastAnswer);
-        const lastQuestion = formData.questionList.find(q => q.questionId === lastAnswer.questionId);
+        const lastQuestion = formData.questionList.find(
+          q => q.questionId === lastAnswer.questionId);
         console.log("Dernière question répondu : ", lastQuestion);
 
         if (lastQuestion) {
@@ -125,7 +95,7 @@ onMounted(async () => {
           console.log("Index de la catégorie : ", categoryIndex);
           if (categoryIndex !== -1) {
 
-           currentCategoryIndex.value = categoryIndex+1;
+            currentCategoryIndex.value = categoryIndex + 1;
             console.log("currentCatIndex : ", currentCategoryIndex.value);
           }
         }
@@ -150,8 +120,6 @@ onMounted(async () => {
 
     const questions = formData.questionList;
 
-
-
     // Fonction pour remplacer "XXX" par le nom de l'entreprise
     const replaceXXXWithCompanyName = (questions, companyName) => {
       return questions.map((question) => {
@@ -175,14 +143,13 @@ onMounted(async () => {
               return JSON.parse(option); // Parser seulement si c'est une chaîne JSON
             } catch (error) {
               console.error('Erreur lors du parsing du choix :', option, error);
-              return { choice: option, poids: 0 }; // Valeur par défaut en cas d'erreur
+              return {choice: option, poids: 0}; // Valeur par défaut en cas d'erreur
             }
           }
           return option; // Retourner directement si c'est déjà un objet
         });
       }
     });
-
 
     // Regrouper les questions par catégorie
     questionsByCategory.value = questions.reduce((acc, question) => {
@@ -192,11 +159,10 @@ onMounted(async () => {
       return acc;
     }, {});
 
-
     // Extraire les catégories
     categories.value = Object.keys(questionsByCategory.value);
 
-    console.log('cate' , categories.value);
+    console.log('cate', categories.value);
 
     // Initialiser les réponses par catégorie
     selectedAnswers.value = categories.value.reduce((acc, category) => {
@@ -210,12 +176,12 @@ onMounted(async () => {
     console.log('Questions regroupées par catégorie :', questionsByCategory.value);
     console.log('Réponses initialisées :', selectedAnswers.value);
 
-     // Initialiser les questions comme fermées par défaut
-     questions.forEach(question => {
+    // Initialiser les questions comme fermées par défaut
+    questions.forEach(question => {
       collapsedQuestions.value[question.questionId] = true;
     });
 
-    if (bo === true){
+    if (bo === true) {
       formData.answersList.forEach((answer) => {
         const question = formData.questionList.find(q => q.questionId === answer.questionId);
         if (!question) return;
@@ -230,7 +196,9 @@ onMounted(async () => {
               ? parsedAnswer.map(option => (typeof option === 'object' ? option.choice : option))
               : [];
           } catch (error) {
-            console.error(`Erreur lors du parsing de la réponse pour la question ${question.questionId} :`, error);
+            console.error(
+              `Erreur lors du parsing de la réponse pour la question ${question.questionId} :`,
+              error);
             selectedAnswers.value[category][answer.questionId] = [];
           }
         } else {
@@ -290,29 +258,14 @@ const saveAnswers = async () => {
   try {
     const category = currentCategory.value;
     const answers = Object.entries(selectedAnswers.value[category]).map(
-      ([questionId, value]) => {
-        // Vérifiez si la réponse est un tableau
-        let response;
-        if (Array.isArray(value.response)) {
-          response = JSON.stringify(
-            value.response.map(v => (typeof v === 'object' && v.choice ? v.choice : v))
-          );
-        } else {
-          // Vérifiez si la réponse est un objet avec une propriété choice
-          response =
-            typeof value.response === 'object' && value.response?.choice
-              ? value.response.choice
-              : value.response || '';
-        }
-
-        return {
-          questionId: parseInt(questionId, 10),
-          response, // Réponse traitée
-          comments: value.comments || '', // Inclure les commentaires
-        };
-      }
+      ([questionId, value]) => ({
+        questionId: parseInt(questionId, 10),
+        response: Array.isArray(value)
+          ? JSON.stringify(value.map(v => v.choice || v))
+          : value.choice || value,
+        comments: value.comments || '',
+      })
     );
-
 
     console.log('Données envoyées au backend :', JSON.stringify(answers));
 
@@ -320,7 +273,6 @@ const saveAnswers = async () => {
 
     if (response.status === 200) {
       console.log('Réponses sauvegardées avec succès.');
-
 
     } else {
       throw new Error('Erreur lors de la sauvegarde des réponses.');
@@ -330,8 +282,6 @@ const saveAnswers = async () => {
   }
 };
 
-
-
 const submitForm = async () => {
   try {
     const response = await api.post(`/forms/${formId.value}/submit`);
@@ -339,7 +289,7 @@ const submitForm = async () => {
     if (response.status === 200) {
       console.log('Formulaire soumis avec succès :', response.data);
 
-      const scoreE = response.data.scoreE ;
+      const scoreE = response.data.scoreE;
       const scoreS = response.data.scoreS;
       const scoreG = response.data.scoreG;
       const scoreESG = response.data.scoreESG;
@@ -347,7 +297,7 @@ const submitForm = async () => {
       // Rediriger vers la page de validation avec les scores comme paramètres
       router.push({
         path: '/validation',
-        query: { scoreE, scoreS, scoreG, scoreESG }
+        query: {scoreE, scoreS, scoreG, scoreESG}
       });
 
       // Extraire les scores de l'objet renvoyé
@@ -359,7 +309,6 @@ const submitForm = async () => {
   }
 };
 
-
 const goToNextCategory = async () => {
   await saveAnswers();
 
@@ -368,7 +317,7 @@ const goToNextCategory = async () => {
 
     scrollToTop();
   } else {
-     await submitForm();
+    await submitForm();
   }
 };
 const showPopup = ref(false); // État pour afficher ou masquer le popup
@@ -386,7 +335,6 @@ const goToNextCategoryForSave = async () => {
 const closePopup = () => {
   showPopup.value = false;
 };
-
 
 const isQuestionAnswered = (questionId, category) => {
   const answer = selectedAnswers.value[category][questionId];
@@ -419,7 +367,7 @@ const isQuestionAnswered = (questionId, category) => {
 
       <!-- Titre de la catégorie -->
       <div class="module-header"
-      :style="{ backgroundColor: getCategoryColor(currentCategory) }">
+           :style="{ backgroundColor: getCategoryColor(currentCategory) }">
         <div class="module-info">
           <div class="module-title">
             <p>{{ categories[currentCategoryIndex] }}</p>
@@ -435,69 +383,75 @@ const isQuestionAnswered = (questionId, category) => {
           class="question"
         >
 
-        <div class="question-header" @click="toggleQuestion(question.questionId)">
-          <h3 class="question-title">{{ question.question }}</h3>
-          <span class="response-status">
-            {{ isQuestionAnswered(question.questionId, categories[currentCategoryIndex]) ? 'répondu' : 'pas encore de réponse' }}
+          <div class="question-header" @click="toggleQuestion(question.questionId)">
+            <h3 class="question-title">{{ question.question }}</h3>
+            <span class="response-status">
+            {{
+                isQuestionAnswered(question.questionId, categories[currentCategoryIndex])
+                  ? 'répondu' : 'pas encore de réponse'
+              }}
           </span>
-        </div>
-
-      <div class="options" v-if="!collapsedQuestions[question.questionId]">
-
-          <div class="options">
-            <template v-if="question.type === 'radio'">
-              <div
-                v-for="option in question.choice"
-                :key="option"
-                class="radio-option"
-                @click="selectOption(question.questionId, option)"
-              >
-                <div class="radio-circle">
-                  <div
-                    class="radio-inner"
-                    v-if="selectedAnswers[categories[currentCategoryIndex]][question.questionId] === option"
-                  ></div>
-                </div>
-                <span>{{ option.choice }}</span>
-              </div>
-            </template>
-
-            <template v-else-if="question.type === 'checkbox'">
-              <div
-                v-for="option in question.choice"
-                :key="option"
-                class="checkbox-option"
-                @click="toggleCheckbox(question.questionId, option)"
-              >
-                <div class="checkbox">
-                  <div
-                    class="checkbox-inner"
-                    v-if="selectedAnswers[categories[currentCategoryIndex]][question.questionId]?.includes(option)"
-                  ></div>
-                </div>
-                <span>{{ option.choice }}</span>
-              </div>
-            </template>
-
-            <template v-else-if="question.type === 'champ libre'">
-              <input
-                type="text"
-                class="text-input"
-                @input="handleTextInput(question.questionId, $event.target.value)"
-                :value="selectedAnswers[categories[currentCategoryIndex]][question.questionId]"
-              />
-            </template>
           </div>
 
-        <template v-if="isQuestionAnswered(question.questionId, categories[currentCategoryIndex])">
-          <textarea
-            class="comment-input"
-            placeholder="Ajouter un commentaire (facultatif)"
-            @input="handleCommentInput(question.questionId, $event.target.value)"
-            :value="selectedAnswers[categories[currentCategoryIndex]][question.questionId]?.comments || ''"
-          ></textarea>
-        </template>
-        </div>
+          <div class="options" v-if="!collapsedQuestions[question.questionId]">
+
+            <div class="options">
+              <template v-if="question.type === 'radio'">
+                <div
+                  v-for="option in question.choice"
+                  :key="option"
+                  class="radio-option"
+                  @click="selectOption(question.questionId, option)"
+                >
+                  <div class="radio-circle">
+                    <div
+                      class="radio-inner"
+                      v-if="selectedAnswers[categories[currentCategoryIndex]][question.questionId] === option"
+                    ></div>
+                  </div>
+                  <span>{{ option.choice }}</span>
+                </div>
+              </template>
+
+              <template v-else-if="question.type === 'checkbox'">
+                <div
+                  v-for="option in question.choice"
+                  :key="option"
+                  class="checkbox-option"
+                  @click="toggleCheckbox(question.questionId, option)"
+                >
+                  <div class="checkbox">
+                    <div
+                      class="checkbox-inner"
+                      v-if="selectedAnswers[categories[currentCategoryIndex]][question.questionId]?.includes(option)"
+                    ></div>
+                  </div>
+                  <span>{{ option.choice }}</span>
+                </div>
+              </template>
+
+              <template v-else-if="question.type === 'champ libre'">
+                <input
+                  type="text"
+                  class="text-input"
+                  @input="handleTextInput(question.questionId, $event.target.value)"
+                  :value="selectedAnswers[categories[currentCategoryIndex]][question.questionId]"
+                />
+              </template>
+
+              <template
+                v-if="isQuestionAnswered(question.questionId, categories[currentCategoryIndex])">
+              <textarea
+                class="comment-input"
+                placeholder="Ajouter un commentaire (facultatif)"
+                @input="handleCommentInput(question.questionId, $event.target.value)"
+                :value="selectedAnswers[categories[currentCategoryIndex]][question.questionId]?.comments || ''"
+              ></textarea>
+              </template>
+            </div>
+
+          </div>
+
         </div>
       </div>
 
@@ -514,7 +468,7 @@ const isQuestionAnswered = (questionId, category) => {
 
         <button class="btn btn-next" @click="goToNextCategoryForSave">
           <span class="btn-icon">💾</span>
-        Sauvegarder
+          Sauvegarder
         </button>
         <button class="btn btn-next" @click="goToNextCategory">
           {{ currentCategoryIndex === categories.length - 1 ? 'Soumettre' : 'Suivant' }}
@@ -529,7 +483,6 @@ const isQuestionAnswered = (questionId, category) => {
   margin: 0 auto;
   padding: 1rem;
 }
-
 
 
 .progress-bar {
@@ -571,7 +524,7 @@ const isQuestionAnswered = (questionId, category) => {
 
 .module-title {
   font-size: 1.5rem;
-  font-weight:bolder;
+  font-weight: bolder;
   color: #004851;
 
 }
@@ -729,20 +682,6 @@ const isQuestionAnswered = (questionId, category) => {
   }
 }
 
-.comment-input {
-  width: 95%;
-  padding: 0.5rem;
-  border: 2px solid #E2E8F0;
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: border-color 0.2s ease, background-color 0.2s ease;
-}
-.comment-input:focus {
-  outline: none;
-  border-color: #2F8886;
-  background-color: #F7FAFC;
-}
-
 .popup-overlay {
   position: fixed;
   top: 0;
@@ -804,6 +743,7 @@ const isQuestionAnswered = (questionId, category) => {
     transform: translateY(0);
   }
 }
+
 .btn-save {
   display: inline-flex;
   align-items: center;
