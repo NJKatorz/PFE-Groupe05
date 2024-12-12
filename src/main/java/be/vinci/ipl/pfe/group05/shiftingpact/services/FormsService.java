@@ -268,9 +268,7 @@ public class FormsService {
     return totalScore;
   }
 
-  /**
-   * Récupère le poids d'un choix donné dans une question.
-   */
+
   /**
    * Get the weight of a given choice in a question.
    *

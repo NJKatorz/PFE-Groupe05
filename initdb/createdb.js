@@ -1,4 +1,4 @@
-// Initiliser la base de données avec des données de test
+// Initialize the database with test data
 db = db.getSiblingDB("project-pfe");
 
 // Create collections
@@ -8,7 +8,7 @@ db.createCollection("users");
 db.createCollection("answers");
 db.createCollection("questions");
 
-// Insérer des données dans la collection forms
+// Insert data into the forms collection
 db.forms.insert({
   _id: ObjectId("67570c91b867304c50e60b0d"),
   formId: 1,
@@ -155,7 +155,7 @@ db.forms.insert({
   ],
 });
 
-// Insérer des données dans la collection companies
+// Insert data into the companies collection
 db.companies.insertMany([
   {
     _id: ObjectId("6751913d15c861ffb5570796"),
@@ -216,7 +216,7 @@ db.companies.insertMany([
   },
 ]);
 
-// Insérer des données dans la collection users
+// Insert data into the users collection
 db.users.insert({
   _id: ObjectId("6751c57f15c861ffb55707b6"),
   userId: 1,
@@ -226,7 +226,7 @@ db.users.insert({
   password: "$2a$12$tphULG4hd5dRfw3oTaJpqOwqt2vT3anE/6tEQaVRV6up6uxmnQuv6",
 });
 
-// Insérer des données dans la collection answers
+// Insert data into the answers collection
 db.answers.insert({
   _id: ObjectId("675374f1a93d164abed7cb39"),
   questionId: 1,
@@ -235,7 +235,7 @@ db.answers.insert({
   _class: "be.vinci.ipl.pfe.group05.shiftingpact.models.Answer",
 });
 
-// Insérer des données dans la collection questions
+// Insert data into the questions collection
 db.questions.insertMany([
   {
     _id: ObjectId("6756f91015c861ffb5570b32"),
