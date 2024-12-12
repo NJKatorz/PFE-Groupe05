@@ -1,2 +1,0 @@
-### Get number of registered users
-GET http://localhost:8080/users/count
