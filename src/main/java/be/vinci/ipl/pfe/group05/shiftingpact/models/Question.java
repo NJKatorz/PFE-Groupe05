@@ -19,7 +19,6 @@ public class Question {
   private ObjectId id;
   @NonNull
   private int questionId;
-
   @NonNull
   private String question;
   private List<Choice> choice;
@@ -28,9 +27,9 @@ public class Question {
   @NonNull
   private String category;
   @NonNull
-  private String pillar; // E,S,G
+  private String pillar;
   @NonNull
   private String template;
   @NonNull
-  private String type; //radio, check box, champ libre
+  private String type;
 }
