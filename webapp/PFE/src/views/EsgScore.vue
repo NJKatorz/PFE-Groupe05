@@ -48,11 +48,14 @@
         </div>
 
         <div class="button-container">
-          <router-link to="/new-questionnaire">
+          <router-link v-if="isCompany" to="/new-questionnaire">
             <button class="return-button">
               Retourner aux questionnaires →
             </button>
           </router-link>
+          <button v-else class="return-button" @click="$router.back()">
+            Retour
+          </button>
         </div>
       </div>
     </OurCard>
@@ -60,7 +63,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import {ref, onMounted, computed} from 'vue';
 import { useRoute } from 'vue-router';
 import OurCard from '../components/OurCard.vue';
 import FormsService from "@/services/FormsService";
@@ -89,6 +92,10 @@ const fetchScoreData = async (formId) => {
     console.error("Error fetching score data:", error);
   }
 };
+
+const isCompany = computed(() => {
+  return localStorage.getItem('company') !== null;
+});
 
 onMounted(() => {
   const formId = route.query.formId;
@@ -201,6 +208,7 @@ onMounted(() => {
   border-radius: 0.5rem;
   cursor: pointer;
   transition: background-color 0.2s;
+  margin-left: 10px;
 }
 
 .return-button:hover {
