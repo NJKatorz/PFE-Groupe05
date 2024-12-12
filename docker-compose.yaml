@@ -38,7 +38,7 @@ services:
 
   # Vue.js Frontend
   frontend:
-    build: # Construction de l'image Ã  partir du Dockerfile situÃ© dans le dossier 'webapp/PFE' du projet Vue.js
+    build: # Construction de l'image à partir du Dockerfile situÃ© dans le dossier 'webapp/PFE' du projet Vue.js
       context: ./webapp/PFE
       dockerfile: Dockerfile
     container_name: vue-frontend # Nom du conteneur

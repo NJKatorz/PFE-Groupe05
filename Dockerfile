@@ -4,11 +4,11 @@ FROM maven:3.8.5-eclipse-temurin-17 AS build
 WORKDIR /app
 # Copie du fichier pom.xml
 COPY pom.xml .
-# Copie du rÃ©pertoire src
+# Copie du répertoire src
 COPY src ./src
 # Compilation de l'application
 RUN mvn clean package -DskipTests
-# Image contenant Java 17 pour exÃ©cuter l'application
+# Image contenant Java 17 pour exécuter l'application
 RUN mvn install
 
 # Image contenant Java 17 fournissant un environnement léger pour exéuter l'application
