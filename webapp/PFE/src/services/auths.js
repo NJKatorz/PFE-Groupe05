@@ -67,10 +67,25 @@ const getToken = () => {
   return localStorage.getItem(STORE_NAME);
 };
 
+const getUserType = () => {
+  const user = localStorage.getItem(USER);
+  const company = localStorage.getItem(COMPANY);
+
+  if (company) {
+    return 'company';
+  } else if (user) {
+    return 'user';
+  }
+
+  return null; // Aucun utilisateur connecté
+};
+
+
 export {
   setAuthenticatedUser,
   getAuthenticatedUser,
   isAuthenticated,
   clearAuthenticatedUser,
   getToken,
+  getUserType
 };

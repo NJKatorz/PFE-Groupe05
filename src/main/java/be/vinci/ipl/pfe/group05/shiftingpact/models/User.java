@@ -22,18 +22,14 @@ public class User {
   private ObjectId id;
   @NonNull
   private int userId;
-
   @NonNull
   private String email;
-
   @NonNull
   @Field("last_name")
   private String lastName;
-
   @NonNull
   @Field("first_name")
   private String firstName;
-
   @NonNull
   @JsonProperty(access = Access.WRITE_ONLY)
   private String password;

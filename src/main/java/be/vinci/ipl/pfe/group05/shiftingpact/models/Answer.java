@@ -13,8 +13,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Answer {
-  //@Id
-  //private ObjectId id;
   @NonNull
   private int questionId;
   private String response;
