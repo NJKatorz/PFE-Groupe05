@@ -1,51 +1,49 @@
 version: "3.8"
 services:
 
-  #Mongo DB
+  # Mongo DB
   mongodb:
-    image: mongo
-    container_name: mongodb
-    environment:
+    image: mongo # Image officielle de MongoDB
+    container_name: mongodb # Nom du conteneur
+    environment: # Variables d'environnement définissant le nom de la base de données, le nom d'utilisateur et le mot de passe
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: pfe
       MONGO_INITDB_DATABASE: project-pfe
     ports:
-      - 27017:27017
+      - 27017:27017 # Expose le port 27017 du conteneur sur le port 27017 de l'hôte
     volumes:
-      - data:/data/db # Monte le dossier local 'data' dans le conteneur
-      - ./initdb:/docker-entrypoint-initdb.d
+      - data:/data/db # Persistance des donnÃ©es de la base de données MongoDB sur un volume Docker nommÃ© 'data'
+      - ./initdb:/docker-entrypoint-initdb.d # Monte le dossier local 'initdb' dans le conteneur pour l'initialisation de la base de donnÃ©es grÃ¢ce au script 'createdb.js'
 
   # Spring Boot Backend
   backend:
-    image: maven:3.8.5-openjdk-17
-    build:
+    image: maven:3.8.5-openjdk-17 # Image Maven avec OpenJDK 17
+    build: # Construction de l'image Ã  partir du Dockerfile situÃ© dans le dossier racine du projet
       context: .
       dockerfile: Dockerfile
-    links:
+    links: # Lien avec le conteneur MongoDB permettant la communication entre les deux conteneurs
       - mongodb
-    container_name: spring-backend
+    container_name: spring-backend # Nom du conteneur
     ports:
-      - "8080:8080"
+      - "8080:8080" # Expose le port 8080 du conteneur sur le port 8080 de l'hôte
     volumes:
-      - .:/app
-    working_dir: /app
-    command: ["mvn", "spring-boot:run"]
+      - .:/app # Monte le dossier local du projet dans le conteneur
+    working_dir: /app # Définit le répertoire de travail du conteneur
+    command: ["mvn", "spring-boot:run"] # Commande exécutée pour démarrer l'application Spring Boot
     environment:
-      - SPRING_DATA_MONGODB_URI=mongodb://root:pfe@mongodb:27017/project-pfe?authSource=admin
-      - JAVA_OPTS=-Dhttps.protocols=TLSv1.2
+      - SPRING_DATA_MONGODB_URI=mongodb://root:pfe@mongodb:27017/project-pfe?authSource=admin # URI de la base de données local MongoDB
+      - JAVA_OPTS=-Dhttps.protocols=TLSv1.2 # Configuration de la version du protocole TLS pour les requÃªtes HTTPS
     depends_on:
-      - mongodb
+      - mongodb # Dépendance du conteneur mongodb pour garantir que le conteneur mongodb est démarré avant le conteneur backend
 
   # Vue.js Frontend
   frontend:
-    build:
+    build: # Construction de l'image Ã  partir du Dockerfile situÃ© dans le dossier 'webapp/PFE' du projet Vue.js
       context: ./webapp/PFE
       dockerfile: Dockerfile
-    container_name: vue-frontend
+    container_name: vue-frontend # Nom du conteneur
     ports:
-      - "5173:80"
-    depends_on:
-      - backend
+      - "5173:80" # Expose le port 80 du conteneur sur le port 5173 de l'hôte
 
-volumes:
+volumes: # Définition du volume 'data' pour la persistance des données de la base de données MongoDB
   data:
