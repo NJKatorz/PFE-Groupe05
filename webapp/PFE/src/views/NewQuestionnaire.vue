@@ -24,14 +24,18 @@
     >
       <!-- Options de questionnaire -->
       <div
-        :class="['questionnaire-option', { selected: selectedQuestionnaire === 'ESG' }]"
-        @click="selectQuestionnaire('ESG')"
+        :class="['questionnaire-option', { selected: selectedQuestionnaire === 'ESG', disabled: hasESGForm }]"
+        @click="!hasESGForm && selectQuestionnaire('ESG')"
       >
         <div class="radio-circle">
           <div class="radio-inner" v-if="selectedQuestionnaire === 'ESG'"></div>
         </div>
-        <div class="option-icon">🌱</div>
+        <div class="option-icon"></div>
         <span>Questionnaire ESG</span>
+      </div>
+      <!-- Message d'avertissement pour le questionnaire ESG -->
+      <div v-if="hasESGForm" class="warning-message">
+        Vous avez déjà un questionnaire ESG en cours.
       </div>
 
       <div
@@ -59,16 +63,22 @@
       <div v-if="questionnaires.length > 0" class="progress-cards">
         <OurCard
           v-for="q in questionnaires"
-          :key="q.id"
-          :title="q.name === 'ESG' ? 'Questionnaire ESG' : 'Questionnaire ODD'"
+          :key="q.formId"
+          :title="'Questionnaire ESG'"
         >
           <div class="card-progress-info">
             <div class="progress-header">
               <span class="progress-text">
-                Progression : {{ q.progress < 100 ? `${q.progress}%` : 'Terminé' }}
+                Progression : 
+                <template v-if="q.completed !== q.total">
+                  {{ q.progress }}%
+                </template>
+                <template v-else>
+                  Terminé
+                </template>
               </span>
               <span class="date-text">
-                {{ q.submitted ? `Soumis le : ${q.submitted}` : `Créé le : ${q.created}` }}
+                {{ q.submitted ? `Soumis le : ${formatDate(q.sendAt)}` : `Créé le : ${formatDate(q.createdAt)}` }}
               </span>
             </div>
 
@@ -80,9 +90,9 @@
             </div>
 
             <button
-              v-if="q.progress < 100"
+              v-if="!q.submitted"
               class="continue-button"
-              @click="router.push('/questionnaire/' + q.name)"
+              @click="router.push('/questionnaire/' + q.formId)"
             >
               Continuer →
             </button>
@@ -96,22 +106,50 @@
   </div>
 </template>
 
-
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import OurCard from '../components/OurCard.vue';
+import { getAuthenticatedUser } from "@/services/auths.js";
+import FormsService from "@/services/FormsService.js";
 
 const router = useRouter();
 const selectedQuestionnaire = ref('');
 const activeTab = ref('new');
+const hasESGForm = ref(false);
+const questionnaires = ref([]);
 
-// Dummy data for demonstration
-//à adapter avec les données de la base de données/backend
-const questionnaires = ref([
-  { id: 1, name: 'ESG', progress: 80, created: '03/12/2024' },
-  { id: 2, name: 'ODD', progress: 100, submitted: '03/12/2024' },
-]);
+// Fonction pour calculer la progression
+const calculateProgress = (completed, total) => {
+  if (!total || total === 0) return 0; // Évite une division par zéro
+  return Math.round((completed / total) * 100);
+};
+
+const formatDate = (date) => {
+  const options = { year: 'numeric', month: 'long', day: 'numeric' };
+  return new Date(date).toLocaleDateString('fr-FR', options);
+};
+
+// Charger les questionnaires
+const loadQuestionnaire = async () => {
+  try {
+    const currentCompany = getAuthenticatedUser();
+    const response = await FormsService.getFormByCompanyId(currentCompany.companyId);
+    const questionnaire = response.data;
+
+    if (questionnaire) {
+      hasESGForm.value = true;
+      questionnaires.value.push({
+        ...questionnaire,
+        progress: calculateProgress(questionnaire.completed, questionnaire.total),
+      });
+    } else {
+      hasESGForm.value = false;
+    }
+  } catch (error) {
+    console.error("Erreur lors du chargement du formulaire :", error);
+  }
+};
 
 const selectQuestionnaire = (type) => {
   selectedQuestionnaire.value = type;
@@ -122,9 +160,48 @@ const startQuestionnaire = () => {
     router.push('/questionnaire/' + selectedQuestionnaire.value);
   }
 };
+
+onMounted(() => {
+  loadQuestionnaire();
+});
 </script>
 
+
   <style scoped>
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.progress-text {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #2F8886;
+}
+
+.date-text {
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.progress-bar-container {
+  width: 100%;
+  height: 8px;
+  background-color: #E2E8F0;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 0.5rem;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(to right, #004851, #40867A);
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
   .questionnaire-container {
     width: 100%;
     max-width: 800px;
@@ -286,7 +363,19 @@ const startQuestionnaire = () => {
     transition: background-color 0.3s ease;
   }
 
-  .continue-button:hover {
-    background-color: #003840;
-  }
-  </style>
+.continue-button:hover {
+  background-color: #003840;
+}
+.warning-message {
+  color: #d9534f;
+  font-size: 0.875rem;
+  margin-top: 1rem;
+}
+
+.questionnaire-option.disabled {
+  opacity: 0.6;
+  pointer-events: none;
+  cursor: not-allowed; /* Ajout du curseur interdit */
+}
+</style>
+

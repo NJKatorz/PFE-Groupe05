@@ -16,11 +16,6 @@
                 Je confirme que les réponses fournies dans ce questionnaire sont fiables et reflètent fidèlement la situation de mon entreprise.
               </span>
 
-              <p><strong>Score E (Environnement) :</strong> {{ scoreE }}</p>
-      <p><strong>Score S (Social) :</strong> {{ scoreS }}</p>
-      <p><strong>Score G (Gouvernance) :</strong> {{ scoreG }}</p>
-      <p><strong>Score ESG Total :</strong> {{ scoreESG }}</p>
-
             </label>
           </div>
   

@@ -2,7 +2,7 @@
 import { ref, computed, onMounted } from 'vue';
 import OurCard from '../components/OurCard.vue';
 import api from '../services/api';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import {getAuthenticatedUser} from "@/services/auths.js";
 
 const questionsByCategory = ref({});
@@ -10,13 +10,48 @@ const categories = ref([]);
 const currentCategoryIndex = ref(0);
 const selectedAnswers = ref({});
 const router = useRouter(); // Router pour la navigation
+const route = useRoute(); //  pour accéder aux paramètres
+
+const collapsedQuestions = ref({});
+
 
 // Données de la catégorie actuelle
 const currentCategory = computed(() => categories.value[currentCategoryIndex.value]);
+
+const categoryColors = {
+  'ENERGIE & CARBONE': '#b5cdbf',               // Vert foncé
+  'EAU, MATIERES PREMIERES ET FOURNITURES': '#b5cdbf',  // Vert clair
+  'DÉCHETS': '#b5cdbf',              // Vert clair
+  'ECOSYSTEMES & BIODIVERSITE': '#b5cdbf',      // Vert clair
+  'DIVERSITE, INCLUSION & EQUITE': ' #dfd4fb',   // Violet clair
+  'SECURITE, SANTE & BIEN-ETRE': ' #dfd4fb',     // Violet clair
+  'EMPLOI ET PRATIQUES DE TRAVAIL': ' #dfd4fb',  // Violet clair
+  'ENGAGEMENT CIVIQUE': ' #dfd4fb',              // Violet clair
+  'CONDUITE DES AFFAIRES': '#fde791',           // Jaune moutarde
+  'ETHIQUE DES AFFAIRES': '#fde791',            // Jaune moutarde
+  'PROTECTION DES DONNEES': '#fde791',          // Jaune moutarde
+  'CERTIFICATIONS': '#fde791'                   // Jaune moutarde
+};
+
+
+
+const getCategoryColor = (category) => {
+  return categoryColors[category] ; // Couleur par défaut si la catégorie n'est pas trouvée
+};
+
+
+
+
+
 const currentQuestions = computed(() => questionsByCategory.value[currentCategory.value] || []);
 const company = getAuthenticatedUser();
 
 const formId = ref(null); // Ajoutez une variable réactive pour l'ID du formulaire
+const formIdExisted = ref(null);
+
+const toggleQuestion = (questionId) => {
+  collapsedQuestions.value[questionId] = !collapsedQuestions.value[questionId];
+};
 
 const progressPercentage = computed(() => {
   if (!categories.value.length) return 0;
@@ -24,11 +59,56 @@ const progressPercentage = computed(() => {
 });
 
 onMounted(async () => {
+
+  let bo = false;
+
+  if (route.params.id && route.params.id !== "ESG") {
+    console.log("id dans la route : ", route.params.id);
+    formIdExisted.value = route.params.id;
+  }
+  console.log("FORMMMMIDDD: ", formIdExisted.value);
+
   try {
-    // Récupérer les données via l'API
-    const response = await api.post(`/forms/company/${company.companyId}`);
-    console.log('Réponse de l’API :', response.data);
-    const formData = response.data;
+
+    let formData = null;
+    if(formIdExisted.value){
+      const response = await api.get(`/forms/${formIdExisted.value}`);
+      console.log('Réponse de l’API GEEEEETT:', response.data);
+      formData = response.data;
+      console.log("FORMDATA : ", formData);
+
+      // Récupérer la catégorie de la dernière question répondue
+      if (formData.answersList && formData.answersList.length > 0) {
+        const lastAnswer = formData.answersList[formData.answersList.length - 1];
+        console.log("LastAnswer : ", lastAnswer);
+        const lastQuestion = formData.questionList.find(q => q.questionId === lastAnswer.questionId);
+        console.log("Dernière question répondu : ", lastQuestion);
+
+        if (lastQuestion) {
+          // Extraire toutes les catégories uniques présentes dans formData.questionList
+          const cats = [...new Set(formData.questionList.map(question => question.category))];
+
+          const categoryIndex = cats.findIndex(cat => cat.trim() === lastQuestion.category.trim());
+          console.log("Catégories disponibles : ", cats);
+          console.log("Catégorie recherchée : ", lastQuestion.category);
+
+          console.log("Index de la catégorie : ", categoryIndex);
+          if (categoryIndex !== -1) {
+
+           currentCategoryIndex.value = categoryIndex+1;
+            console.log("currentCatIndex : ", currentCategoryIndex.value);
+          }
+        }
+      }
+
+      // TODO
+      bo = true;
+
+    } else {
+      const response = await api.post(`/forms/company/${company.companyId}`);
+      console.log('Réponse de l’API  :', response.data);
+      formData = response.data;
+    }
 
     if (!formData || !formData.questionList) {
       console.error('Aucune question trouvée dans la réponse de l’API.');
@@ -81,10 +161,12 @@ onMounted(async () => {
       acc[category].push(question);
       return acc;
     }, {});
-     
+
 
     // Extraire les catégories
     categories.value = Object.keys(questionsByCategory.value);
+
+    console.log('cate' , categories.value);
 
     // Initialiser les réponses par catégorie
     selectedAnswers.value = categories.value.reduce((acc, category) => {
@@ -98,8 +180,35 @@ onMounted(async () => {
     console.log('Questions regroupées par catégorie :', questionsByCategory.value);
     console.log('Réponses initialisées :', selectedAnswers.value);
 
-    // Charger la progression initiale
-    //await progressPercentage();
+     // Initialiser les questions comme fermées par défaut
+     questions.forEach(question => {
+      collapsedQuestions.value[question.questionId] = true;
+    });
+
+    if (bo === true){
+      formData.answersList.forEach((answer) => {
+        const question = formData.questionList.find(q => q.questionId === answer.questionId);
+        if (!question) return;
+
+        const category = question.category;
+        if (!selectedAnswers.value[category]) return;
+
+        if (question.type === 'checkbox') {
+          try {
+            const parsedAnswer = JSON.parse(answer.response); // Assurez-vous que la réponse est bien un JSON
+            selectedAnswers.value[category][answer.questionId] = Array.isArray(parsedAnswer)
+              ? parsedAnswer.map(option => (typeof option === 'object' ? option.choice : option))
+              : [];
+          } catch (error) {
+            console.error(`Erreur lors du parsing de la réponse pour la question ${question.questionId} :`, error);
+            selectedAnswers.value[category][answer.questionId] = [];
+          }
+        } else {
+          selectedAnswers.value[category][answer.questionId] = answer.response;
+        }
+      });
+      bo = false;
+    }
 
     // Charger la progression initiale
   } catch (error) {
@@ -207,7 +316,7 @@ const submitForm = async () => {
 
 
 const goToNextCategory = async () => {
-  await saveAnswers(); // Sauvegarder les réponses de la catégorie actuelle
+  await saveAnswers();
 
   if (currentCategoryIndex.value < categories.value.length - 1) {
     currentCategoryIndex.value++;
@@ -217,22 +326,55 @@ const goToNextCategory = async () => {
      await submitForm();
   }
 };
+const showPopup = ref(false); // État pour afficher ou masquer le popup
+
+// Fonction appelée au clic sur "Sauvegarder"
+const goToNextCategoryForSave = async () => {
+  await saveAnswers(); // Sauvegarde les réponses
+  showPopup.value = true; // Affiche le popup
+
+  setTimeout(() => {
+    showPopup.value = false;
+  }, 5000);
+};
+// Fonction pour fermer le popup immédiatement
+const closePopup = () => {
+  showPopup.value = false;
+};
+
+
+const isQuestionAnswered = (questionId, category) => {
+  const answer = selectedAnswers.value[category][questionId];
+  if (Array.isArray(answer)) {
+    return answer.length > 0;
+  }
+  return answer !== '' && answer !== null && answer !== undefined;
+};
+
 </script>
 
 <template>
   <div class="questionnaire-container">
     <OurCard :title="'QUESTIONNAIRE ESG '">
+      <div v-if="showPopup" class="popup-overlay">
+        <div class="popup">
+          <h2>Vos réponses ont été sauvegardées avec succès 🎉 </h2>
+          <p></p>
+          <button class="btn btn-popup" @click="closePopup">Fermer</button>
+        </div>
+      </div>
       <!-- Barre de progression -->
       <div class="progress-bar">
         <div
           class="progress-fill"
-          :style="{ width: `${progressPercentage}%` }"
+          :style="{ width: `${progressPercentage}%` , background:getCategoryColor(currentCategory)  }"
         ></div>
         <div class="progress-percentage">{{ progressPercentage.toFixed(0) }}%</div>
       </div>
 
       <!-- Titre de la catégorie -->
-      <div class="module-header">
+      <div class="module-header"
+      :style="{ backgroundColor: getCategoryColor(currentCategory) }">
         <div class="module-info">
           <div class="module-title">
             <p>{{ categories[currentCategoryIndex] }}</p>
@@ -247,7 +389,16 @@ const goToNextCategory = async () => {
           :key="question.questionId"
           class="question"
         >
-          <h3>{{ question.question }}</h3>
+
+        <div class="question-header" @click="toggleQuestion(question.questionId)">
+          <h3 class="question-title">{{ question.question }}</h3>
+          <span class="response-status">
+            {{ isQuestionAnswered(question.questionId, categories[currentCategoryIndex]) ? 'répondu' : 'pas encore de réponse' }}
+          </span>
+        </div>
+
+      <div class="options" v-if="!collapsedQuestions[question.questionId]">
+
           <div class="options">
             <template v-if="question.type === 'radio'">
               <div
@@ -292,6 +443,9 @@ const goToNextCategory = async () => {
               />
             </template>
           </div>
+
+        </div>
+
         </div>
       </div>
 
@@ -303,6 +457,12 @@ const goToNextCategory = async () => {
           :disabled="currentCategoryIndex === 0"
         >
           Précédent
+        </button>
+
+
+        <button class="btn btn-next" @click="goToNextCategoryForSave">
+          <span class="btn-icon">💾</span>
+        Sauvegarder
         </button>
         <button class="btn btn-next" @click="goToNextCategory">
           {{ currentCategoryIndex === categories.length - 1 ? 'Soumettre' : 'Suivant' }}
@@ -317,6 +477,8 @@ const goToNextCategory = async () => {
   margin: 0 auto;
   padding: 1rem;
 }
+
+
 
 .progress-bar {
   position: relative;
@@ -345,23 +507,55 @@ const goToNextCategory = async () => {
 }
 
 .module-header {
-  background-color: #2F8886;
+
   padding: 1.5rem;
   border-radius: 8px;
   display: flex;
   align-items: center;
   gap: 1rem;
   margin: 2rem 0;
+  justify-content: center;
 }
 
 .module-title {
   font-size: 1.5rem;
-  font-weight: bold;
-  color: white;
+  font-weight:bolder;
+  color: #004851;
+
 }
 
 .questions-container {
   padding: 2rem 0;
+}
+
+.question-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding: 0.4rem;
+  border: 2px solid #E2E8F0;
+  border-radius: 8px;
+  background-color: #F7FAFC;
+  margin-bottom: 10px;
+}
+
+.question-header:hover {
+  background-color: #E2E8F0;
+}
+
+.chevron {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #2F8886;
+}
+
+.response-status {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #2F8886;
+  margin-left: 1rem;
+
 }
 
 .question {
@@ -482,5 +676,94 @@ const goToNextCategory = async () => {
     justify-content: center;
   }
 }
-</style>
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
 
+.popup {
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 90%;
+  max-width: 400px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.popup h2 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  color: #4caf50;
+}
+
+.popup p {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 1.5rem;
+}
+
+.btn-popup {
+  background-color: #004851;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.2s ease;
+}
+
+.btn-popup:hover {
+  opacity: 0.9;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.btn-save {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem; /* Espace entre l'icône et le texte */
+  padding: 0.75rem 1.5rem;
+  background-color: #d1e7dd; /* Couleur de fond (vert clair comme sur l'image) */
+  border: 2px solid #0f5132; /* Bordure verte */
+  border-radius: 8px; /* Coins arrondis */
+  color: #0f5132; /* Couleur du texte */
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-save:hover {
+  background-color: #c8dfd3; /* Couleur plus claire au survol */
+  border-color: #0c3d24; /* Bordure plus foncée au survol */
+}
+
+.btn-save:active {
+  background-color: #b7d2c5; /* Couleur plus foncée au clic */
+}
+
+.btn-icon {
+  font-size: 1.2rem; /* Taille de l'icône */
+}
+
+
+</style>

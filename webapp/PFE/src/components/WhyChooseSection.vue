@@ -18,10 +18,9 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-import { useRouter } from 'vue-router';
 import { isAuthenticated, getAuthenticatedUser } from '../services/auths';
 
-const router = useRouter();
+
 
 const features = ref([
   {
