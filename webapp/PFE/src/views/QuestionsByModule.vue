@@ -18,19 +18,19 @@ const collapsedQuestions = ref({})
 const currentCategory = computed(() => categories.value[currentCategoryIndex.value])
 
 const categoryColors = {
-  'ENERGIE & CARBONE': '#b5cdbf', // Vert foncé
-  'EAU, MATIERES PREMIERES ET FOURNITURES': '#b5cdbf', // Vert clair
-  DÉCHETS: '#b5cdbf', // Vert clair
-  'ECOSYSTEMES & BIODIVERSITE': '#b5cdbf', // Vert clair
-  'DIVERSITE, INCLUSION & EQUITE': ' #dfd4fb', // Violet clair
-  'SECURITE, SANTE & BIEN-ETRE': ' #dfd4fb', // Violet clair
-  'EMPLOI ET PRATIQUES DE TRAVAIL': ' #dfd4fb', // Violet clair
-  'ENGAGEMENT CIVIQUE': ' #dfd4fb', // Violet clair
-  'CONDUITE DES AFFAIRES': '#fde791', // Jaune moutarde
-  'ETHIQUE DES AFFAIRES': '#fde791', // Jaune moutarde
-  'PROTECTION DES DONNEES': '#fde791', // Jaune moutarde
-  CERTIFICATIONS: '#fde791', // Jaune moutarde
-}
+  'ENERGIE & CARBONE': '#b5cdbf',               // Vertclair
+  'EAU, MATIERES PREMIERES ET FOURNITURES': '#b5cdbf',  // Vert clair
+  'DÉCHETS': '#b5cdbf',              // Vert clair
+  'ÉCOSYSTÈMES ET BIODIVERSITÉ': '#b5cdbf',      // Vert clair
+  'DDIVERSITE, INCLUSION ET EQUITE': ' #dfd4fb',   // Violet clair
+  'SÉCURITÉ, SANTÉ & BIEN-ÊTRE': ' #dfd4fb',     // Violet clair
+  'EMPLOI ET PRATIQUES DE TRAVAIL': ' #dfd4fb',  // Violet clair
+  'ENGAGEMENT CIVIQUE': ' #dfd4fb',              // Violet clair
+  'CONDUITE DES AFFAIRES': '#fde791',           // Jaune moutarde
+  'ETHIQUE DES AFFAIRES': '#fde791',            // Jaune moutarde
+  'PROTECTION DES DONNEES': '#fde791',          // Jaune moutarde
+  'CERTIFICATIONS': '#fde791'                   // Jaune moutarde
+};
 
 const getCategoryColor = (category) => {
   return categoryColors[category] // Couleur par défaut si la catégorie n'est pas trouvée
