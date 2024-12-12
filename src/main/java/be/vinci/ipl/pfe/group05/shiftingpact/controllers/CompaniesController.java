@@ -16,25 +16,44 @@ import org.springframework.web.server.ResponseStatusException;
 @RestController
 public class CompaniesController {
 
-    @Autowired
-    CompaniesService service;
+  @Autowired
+  CompaniesService service;
 
-    @GetMapping("/companies/{companyId}")
-    public Company getOneById(@PathVariable int companyId){
-        return service.getOneById(companyId);
-    }
+  /**
+   * Get a company by its id
+   *
+   * @param companyId the id of the company
+   * @return the company with the given id
+   */
+  @GetMapping("/companies/{companyId}")
+  public Company getOneById(@PathVariable int companyId) {
+    return service.getOneById(companyId);
+  }
 
+  /**
+   * Validate a company
+   *
+   * @param id the id of the company to validate
+   * @return a response entity with status 201 if the company is validated, 404 otherwise
+   */
   @PostMapping("/companies/{id}/validate")
   public ResponseEntity<Void> validate(@PathVariable int id) {
     boolean created = service.validateOne(id);
-    if(!created)
+    if (!created) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-    else return new ResponseEntity<>(HttpStatus.CREATED);
+    } else {
+      return new ResponseEntity<>(HttpStatus.CREATED);
+    }
   }
 
+  /**
+   * Get all companies
+   *
+   * @return all companies
+   */
   @GetMapping("/companies")
-  public Iterable<Company> getAll(){
-      return service.getAll();
+  public Iterable<Company> getAll() {
+    return service.getAll();
   }
 }
 

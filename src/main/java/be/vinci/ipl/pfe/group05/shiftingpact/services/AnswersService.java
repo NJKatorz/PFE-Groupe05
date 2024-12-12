@@ -16,6 +16,12 @@ public class AnswersService {
   AnswersRepository repository;
   @Autowired
   FormsRepository formsRepository;
+
+  /**
+   * Create a response
+   * @param answer the response to create for a question
+   * @return the response saved
+   */
  public Answer createOne(Answer answer){
     return repository.save(answer);
   }

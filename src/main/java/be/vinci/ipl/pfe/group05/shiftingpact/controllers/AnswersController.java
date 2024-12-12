@@ -12,6 +12,12 @@ public class AnswersController {
 
   @Autowired
   AnswersService service;
+
+  /**
+   * Save a response
+   * @param answer the response to save
+   * @return the response saved
+   */
   @PostMapping("/answers")
   public Answer saveResponse(@RequestBody Answer answer) {
     return service.createOne(answer);

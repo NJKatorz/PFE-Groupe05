@@ -12,6 +12,9 @@ import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+/**
+ * Model for the companies collection
+ */
 @Document(collection= "companies")
 @Getter
 @Setter
