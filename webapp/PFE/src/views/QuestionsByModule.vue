@@ -489,14 +489,14 @@ const isQuestionAnswered = (questionId, category) => {
             </template>
           </div>
 
-          <template v-if="question.type !== 'champ libre'">
-            <textarea
-              class="comment-input"
-              placeholder="Ajouter un commentaire"
-              @input="handleCommentInput(question.questionId, $event.target.value)"
-              :value="selectedAnswers[categories[currentCategoryIndex]][question.questionId].comments"
-            ></textarea>
-          </template>
+        <template v-if="isQuestionAnswered(question.questionId, categories[currentCategoryIndex])">
+          <textarea
+            class="comment-input"
+            placeholder="Ajouter un commentaire (facultatif)"
+            @input="handleCommentInput(question.questionId, $event.target.value)"
+            :value="selectedAnswers[categories[currentCategoryIndex]][question.questionId]?.comments || ''"
+          ></textarea>
+        </template>
         </div>
         </div>
       </div>
