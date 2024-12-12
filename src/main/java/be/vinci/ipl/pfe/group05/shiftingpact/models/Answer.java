@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+/**
+ * Model for the answers collection
+ */
 @Document(collection= "answers")
 @Getter
 @Setter

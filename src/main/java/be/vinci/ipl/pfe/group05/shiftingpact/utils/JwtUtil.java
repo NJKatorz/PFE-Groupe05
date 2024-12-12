@@ -14,6 +14,9 @@ import java.util.Date;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+/**
+ * Utils class for JWT token generation and verification
+ */
 @Component
 public class JwtUtil {
 
@@ -29,6 +32,10 @@ public class JwtUtil {
   @Autowired
   UsersService usersService;
 
+  /**
+   * Constructor for the JwtUtil class that initializes the JWT algorithm and verifier with the
+   * secret key
+   */
   public JwtUtil() {
     // Initialisation de l'algorithme HMAC256 avec une clé secrète
     this.jwtAlgorithm = Algorithm.HMAC256(SECRET_KEY);
@@ -39,6 +46,12 @@ public class JwtUtil {
 
   }
 
+  /**
+   * Generate a JWT token for a user
+   *
+   * @param user the user for which the token is generated
+   * @return the generated token
+   */
   public String generateTokenForUser(User user) {
     return JWT.create()
         .withIssuer("auth0")
@@ -50,6 +63,12 @@ public class JwtUtil {
         .sign(jwtAlgorithm);
   }
 
+  /**
+   * Generate a JWT token for a company
+   *
+   * @param company the company for which the token is generated
+   * @return the generated token
+   */
   public String generateTokenForCompany(Company company) {
     return JWT.create()
         .withIssuer("auth0")
@@ -61,7 +80,12 @@ public class JwtUtil {
         .sign(jwtAlgorithm);
   }
 
-
+  /**
+   * Verify a JWT token
+   *
+   * @param token the token to verify
+   * @return the user or company corresponding to the token
+   */
   public Object verify(String token) { // à refactore en 2 méthode une pour company et une pour user
     try {
       DecodedJWT decodedToken = jwtVerifier.verify(token);

@@ -15,6 +15,12 @@ public class QuestionsController {
   @Autowired
   QuestionsService service;
 
+  /**
+   * Get all questions
+   *
+   * @param template the template of the questions
+   * @return a list of all questions with the given template
+   */
   @GetMapping("/questions")
   public Iterable<Question> getAllByTemplate(@RequestParam(required = false) String template ) {
     if (template != null && !template.isEmpty()) return service.getAllByTemplate(template);

@@ -22,10 +22,6 @@ const FormsService = {
     return api.get(`/forms/company/${companyId}`);
   },
 
-    getNumberOfRegisteredUsers(){
-      return api.get('/users/count');
-    },
-
     getNumberOfFormsSubmitted(){
       return api.get('/forms/formsSubmitted');
     },

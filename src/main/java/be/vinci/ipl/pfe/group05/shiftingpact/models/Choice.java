@@ -5,6 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Model for the choices collection
+ */
 @Getter
 @Setter
 @NoArgsConstructor

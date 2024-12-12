@@ -8,14 +8,26 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class QuestionsService {
+
   @Autowired
   QuestionsRepository repository;
 
+  /**
+   * Get all questions by template
+   *
+   * @param template the template of the questions
+   * @return a list of all questions with the given template
+   */
   public List<Question> getAllByTemplate(String template) {
     return repository.findByTemplate(template);
   }
 
-  public List<Question> getAll(){
+  /**
+   * Get all questions
+   *
+   * @return a list of all questions
+   */
+  public List<Question> getAll() {
     return repository.findAll();
   }
 }

@@ -29,6 +29,13 @@ public class AuthController {
   @Autowired
   JwtUtil jwtUtil;
 
+  /**
+   * Login a user or a company with its login/email and password If the login/email and password are
+   * correct, the user/company is returned
+   *
+   * @param json the login/email and password of the user/company
+   * @return the user/company if the login/email and password are correct, null otherwise
+   */
   @PostMapping("/auth/login")
   public ResponseEntity<?> login(@RequestBody JsonNode json) {
     String login = json.has("login") ? json.get("login").asText(null) : null;
@@ -39,7 +46,7 @@ public class AuthController {
       return ResponseEntity.badRequest().body("Both login/email and password are required.");
     }
 
-    // Authentification en tant qu'entreprise
+    // Authentication as a company
     if (login != null) {
       Company company = companiesService.login(login, password);
       if (company != null) {
@@ -54,7 +61,7 @@ public class AuthController {
       }
     }
 
-    // Authentification en tant qu'utilisateur administrateur
+    // Authentication as an admin user
      if (email != null) {
       User user = usersService.login(email, password);
       if (user != null) {
