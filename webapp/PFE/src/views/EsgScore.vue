@@ -53,7 +53,7 @@
               Retourner aux questionnaires →
             </button>
           </router-link>
-          <button v-else class="return-button" @click="goBack">
+          <button v-else class="return-button" @click="$router.back()">
             Retour
           </button>
         </div>
