@@ -69,7 +69,7 @@
           <div class="card-progress-info">
             <div class="progress-header">
               <span class="progress-text">
-                Progression : 
+                Progression :
                 <template v-if="q.completed !== q.total">
                   {{ q.progress }}%
                 </template>
@@ -95,6 +95,13 @@
               @click="router.push('/questionnaire/' + q.formId)"
             >
               Continuer →
+            </button>
+            <button
+              v-else
+              class="results-button"
+              @click="router.push('/Forms/' + q.formId)"
+            >
+              Consulter mes résultats →
             </button>
           </div>
         </OurCard>
@@ -377,5 +384,22 @@ onMounted(() => {
   pointer-events: none;
   cursor: not-allowed; /* Ajout du curseur interdit */
 }
+
+.results-button {
+  width: 100%;
+  padding: 0.875rem;
+  background-color: #40867A;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.results-button:hover {
+  background-color: #2F8886;
+}
+
 </style>
 

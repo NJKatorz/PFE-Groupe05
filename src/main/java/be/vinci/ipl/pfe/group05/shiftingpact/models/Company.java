@@ -20,10 +20,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Company {
   @Id
   private String id;
-
   @NonNull
   private int companyId;
-
   @NonNull
   private String name;
   @NonNull
@@ -34,27 +32,19 @@ public class Company {
   private String address;
   @NonNull
   private String naceCode;
-
   @NonNull
   private LocalDateTime registrationDate;
-
   @NonNull
   private List<String> templates;
-  //private List<Integer> scores;
-
   @NonNull
   private String login;
-
   @NonNull
   @JsonProperty(access = Access.WRITE_ONLY)
   private String password;
-
   @NonNull
   private boolean isValidated;
-
   @NonNull
   private String contactEmail;
-
   @NonNull
   private int numberOfWorkers;
   @NonNull

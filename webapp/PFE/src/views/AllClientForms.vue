@@ -26,8 +26,8 @@
         >
           <p><strong>Total des questions :</strong> {{ form.total }}</p>
           <p><strong>Total des questions complétées :</strong> {{ form.completed }}</p>
-          <p><strong>Progression :</strong> {{ Math.round(form.progression * 100) }}%</p>
-          <p><strong>Statut :</strong> {{ form.isSubmitted ? 'Soumis' : 'En cours' }}</p>
+          <p><strong>Progression :</strong> {{ Math.round((form.completed / form.total) * 100) }}%</p>
+          <p><strong>Statut :</strong> {{ form.submitted ? 'Soumis' : 'En cours' }}</p>
         </OurCard>
       </router-link>
     </div>
