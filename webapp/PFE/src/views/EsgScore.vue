@@ -50,10 +50,10 @@
         <div class="button-container">
           <router-link v-if="isCompany" to="/new-questionnaire">
             <button class="return-button">
-              Retourner aux questionnaires
+              Retourner aux questionnaires →
             </button>
           </router-link>
-          <button class="return-button" @click="$router.back()">
+          <button v-else class="return-button" @click="goBack">
             Retour
           </button>
         </div>
